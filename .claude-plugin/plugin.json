@@ -1,0 +1,105 @@
+{
+  "name": "backend-developer",
+  "description": "Web/service back-end toolkit: Node/TS, Go, JVM (Spring), Python web (FastAPI/Django), plus REST/GraphQL/gRPC API design, databases/ORM/migrations, and event-driven architecture. Full igrsoft 11-stage workflow integration; requires_screenshots:false / cli-fallback evidence (curl/httpie/k6/test transcripts); scoped Bash allowlists; qualified Task() delegation; plugin-scoped audit/checkpoint hooks. Delegates Python/C/C++/Bash language depth to system-developer.",
+  "version": "1.0.0",
+  "author": {
+    "name": "IGRSoft",
+    "email": "support@igrsoft.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "nodejs",
+    "typescript",
+    "nestjs",
+    "fastify",
+    "express",
+    "hono",
+    "go",
+    "spring-boot",
+    "kotlin",
+    "fastapi",
+    "django",
+    "flask",
+    "rest",
+    "graphql",
+    "grpc",
+    "websockets",
+    "postgresql",
+    "mysql",
+    "mongodb",
+    "redis",
+    "prisma",
+    "drizzle",
+    "typeorm",
+    "gorm",
+    "hibernate",
+    "orm",
+    "migrations",
+    "microservices",
+    "event-driven",
+    "event-sourcing",
+    "cqrs",
+    "saga",
+    "kafka",
+    "rabbitmq",
+    "docker",
+    "owasp-api",
+    "oauth2",
+    "jwt",
+    "k6",
+    "testcontainers",
+    "opentelemetry",
+    "observability",
+    "workflow-integration",
+    "developer-review",
+    "dr-stage",
+    "security-review",
+    "release-engineering",
+    "hooks",
+    "subagent-lifecycle",
+    "qualified-agent-refs",
+    "pre-compact",
+    "max-turns",
+    "disallowed-tools",
+    "cli-fallback-evidence"
+  ],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|TaskUpdate|TaskCreate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/audit-tooluse.sh",
+            "args": [
+              "--kind",
+              "tool"
+            ],
+            "continueOnBlock": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/audit-subagent.sh",
+            "continueOnBlock": true
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/precompact-checkpoint.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
