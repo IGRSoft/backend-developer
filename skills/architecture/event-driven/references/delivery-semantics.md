@@ -3,8 +3,12 @@
 Detailed trade-offs behind the [../SKILL.md](../SKILL.md) > Delivery Semantics
 summary: broker choice, ordering and partitioning, consumer scaling, dead-letter
 queues, and change-data-capture as an outbox alternative. Version-gate every
-broker feature (Kafka transactions, RabbitMQ quorum queues, SQS FIFO) against
-your actual versions — see skill: version-feature-matrix.
+broker feature (Kafka transactions and share groups, RabbitMQ quorum queues, SQS
+FIFO) against your actual versions — see skill: version-feature-matrix. Two current
+broker realities shape the choices below: Kafka 4.x is KRaft-only and now offers
+native queue semantics (share groups / "Queues for Kafka") in addition to the log,
+and RabbitMQ 4.x removed classic mirrored queues so quorum queues are the only
+replicated/HA option.
 
 ## At-Least-Once vs Exactly-Once
 
@@ -28,7 +32,7 @@ broker.
 | Dimension | Kafka | RabbitMQ | SQS |
 |-----------|-------|----------|-----|
 | Model | Distributed log (replayable) | Queue / exchange routing | Managed queue |
-| Ordering | Per-partition | Per-queue (single consumer) | FIFO queues: per message-group |
+| Ordering | Per-partition (per-key); share groups relax 1-consumer-per-partition for queue-style fan-out | Per-queue (single consumer) | FIFO queues: per message-group |
 | Replay | Yes (offset rewind) | No (consume = remove) | No |
 | Retention | Time/size based, re-readable | Until acked | Up to 14 days |
 | Dedup | App-level (or EOS) | App-level | FIFO content/id dedup (5-min window) |
@@ -37,7 +41,11 @@ broker.
 Pick the log (Kafka) when you need replay, event sourcing, or many independent
 consumer groups over the same stream. Pick a queue (RabbitMQ/SQS) for work
 distribution where a message is consumed once and routing flexibility or managed
-ops matter more than replay.
+ops matter more than replay. The line is now softer: Kafka 4.x **share groups**
+("Queues for Kafka") add queue-style semantics — per-record acknowledgement and
+many consumers per partition — so a Kafka cluster can serve work-queue workloads
+without a second broker. Still reach for RabbitMQ/SQS when you want their routing
+model, managed ops, or simpler queue ergonomics rather than running Kafka.
 
 ## Ordering & Partitioning
 

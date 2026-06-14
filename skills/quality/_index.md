@@ -9,7 +9,7 @@ Quick navigation for API security, performance, and testing.
 | `SKILL.md` | Entry router: skill selection, symptom router, tool version snapshot, decision tree |
 | `api-security/SKILL.md` | OWASP API Top 10 doctrine, authn/authz, injection/SSRF/rate-limiting, secrets, input validation |
 | `api-security/references/authz-bola-bfla.md` | Object- and function-level authorization deep dive: BOLA (API1), BOPLA (API3), BFLA (API5), ownership checks, scopes/RBAC/ABAC |
-| `api-security/references/authn-tokens.md` | OAuth2/OIDC flows, JWT validation pitfalls, session management, API keys, token storage and rotation |
+| `api-security/references/authn-tokens.md` | OAuth2/OIDC flows, JWT validation pitfalls (RFC 8725 algs), sender-constrained tokens (DPoP/RFC 9449), session management, API keys, token storage and rotation |
 | `api-security/references/injection-ssrf-ratelimit.md` | SQL/NoSQL/command injection, SSRF defense, rate limiting & resource caps, security misconfiguration, CORS |
 | `be-performance/SKILL.md` | Latency budgets, load testing, N+1/slow queries, pooling, caching tiers, backpressure, per-stack profiling |
 | `be-performance/references/load-testing-k6.md` | k6 scripts, thresholds, ramping/arrival-rate executors, p95/p99 gates, CI integration |

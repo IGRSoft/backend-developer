@@ -109,7 +109,7 @@ Run tools in this order. In `--fix`, formatters run **before** the final lint re
 Notes:
 - **`golangci-lint --fix` and `rubocop -a` are conservative**: apply only the safe-autofix linters/cops the project opted into; never invent rules or use `rubocop -A` (unsafe autocorrect can change behavior — out of scope, Rule 7).
 - **`tsc`, `mypy`, `go vet`, and `phpstan` are report-only.** None has a safe mechanical fixer; their findings always land in the report and, when they need judgment, under "Needs review".
-- `ruff check --statistics` and `golangci-lint run --out-format=tab` produce the per-rule counts used for the violation summary in `--check`.
+- `ruff check --statistics` and `golangci-lint run --output.tab.path=stdout` produce the per-rule counts used for the violation summary in `--check`. (golangci-lint v2 replaced the v1 `--out-format=<fmt>` flag with per-format `--output.<fmt>.path`; on a v1 toolchain use `--out-format=tab`. v2 also renamed config keys — `linters.default` replaced `enable-all`/`disable-all`, and `golangci-lint migrate` converts a v1 config.)
 
 ## Workflow
 

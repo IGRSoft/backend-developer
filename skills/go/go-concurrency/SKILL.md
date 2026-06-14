@@ -28,16 +28,22 @@ semaphores, graceful shutdown, leak debugging) →
 
 ## Version Snapshot
 
+Per-iteration loop variables are **baseline** (1.22, below any supported floor) —
+goroutine capture in a `for` loop is safe without `v := v`. Go supports only the
+two most recent minors; gate the rows below against your floor.
+
 | Feature | Since | Fallback before that version |
 |---------|-------|------------------------------|
-| Per-iteration loop variable (safe goroutine capture) | 1.22 | `v := v` shadow inside the loop |
+| Per-iteration loop variable (safe goroutine capture) | 1.22 (baseline) | `v := v` shadow inside the loop |
 | `context.WithCancelCause` / `context.Cause` | 1.20 | `context.WithCancel` + a separate error channel |
 | `context.AfterFunc` | 1.21 | Spawn a watcher goroutine on `ctx.Done()` |
 | `sync.OnceFunc` / `sync.OnceValue` | 1.21 | `sync.Once` + a captured closure |
+| `sync.WaitGroup.Go` (spawn + count in one call) | 1.25 | `wg.Add(1)` + `go func(){ defer wg.Done(); … }()` |
+| `testing/synctest` (deterministic concurrency tests, stable) | 1.25 | `synctest` experiment (1.24); real clock + retries/`eventually` |
 | `golang.org/x/sync/errgroup` (`SetLimit`) | x/sync | Manual `WaitGroup` + buffered semaphore channel |
 
 `errgroup` lives in `golang.org/x/sync`, not the stdlib — add it explicitly.
-Canonical minimums: skill [version-feature-matrix](${CLAUDE_SKILL_DIR}/_shared/version-feature-matrix.md).
+Canonical Go floor: skill [version-feature-matrix](${CLAUDE_SKILL_DIR}/_shared/version-feature-matrix.md).
 
 ## Context: Propagate, Cancel, Deadline
 
@@ -79,7 +85,7 @@ go doWork() // who stops it? where does its error go?
 g, ctx := errgroup.WithContext(ctx)
 g.SetLimit(8) // cap concurrent goroutines
 
-for _, id := range ids { // Go 1.22+: id is per-iteration, safe to capture
+for _, id := range ids { // id is per-iteration (baseline since 1.22), safe to capture
 	g.Go(func() error {
 		return s.process(ctx, id) // first non-nil error cancels ctx for the rest
 	})
@@ -91,7 +97,9 @@ if err := g.Wait(); err != nil { // blocks until all return; returns first error
 
 `errgroup.WithContext` cancels the shared `ctx` on the first error, so siblings
 observing `ctx.Done()` stop early. `SetLimit(n)` bounds parallelism without a
-manual semaphore. Full worker-pool and pipeline patterns:
+manual semaphore. When you only need to wait (no error sink), `sync.WaitGroup.Go`
+(1.25) folds `Add(1)` + `go func(){ defer Done(); … }()` into one call and removes
+the classic `Add`/`Done` mismatch foot-gun. Full worker-pool and pipeline patterns:
 [references/concurrency-patterns.md](references/concurrency-patterns.md).
 
 ## Channels vs sync Primitives
@@ -148,6 +156,32 @@ Evidence for a concurrency fix is the `go test -race` transcript (before: race
 report; after: clean `ok`), plus a goroutine-count delta — not a build log.
 Leak/deadlock debugging walkthrough: [references/concurrency-patterns.md](references/concurrency-patterns.md).
 
+For time- and goroutine-dependent tests, prefer `testing/synctest` (stable since
+1.25; experimental in 1.24 as `synctest.Run`, now deprecated in favor of
+`synctest.Test`). It runs the test in an isolated "bubble" with a virtualized clock
+that advances only when every goroutine is durably blocked, so timeout/retry/ticker
+logic is exercised deterministically in microseconds instead of real sleeps —
+killing the usual source of flaky concurrency tests.
+
+```go
+func TestTimeout(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		done := make(chan error, 1)
+		go func() { done <- slowOp(ctx) }()
+		synctest.Wait()                 // block until all bubble goroutines are idle
+		time.Sleep(time.Second)         // fake clock: jumps instantly
+		if err := <-done; !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("want deadline exceeded, got %v", err)
+		}
+	})
+}
+```
+
+Fallback before 1.25: inject a clock interface and use real (short) sleeps with
+`eventually`-style polling, accepting the flakiness `synctest` removes.
+
 ## Diagnostics
 
 | Symptom | Cause | Fix |
@@ -157,7 +191,7 @@ Leak/deadlock debugging walkthrough: [references/concurrency-patterns.md](refere
 | `all goroutines are asleep - deadlock!` | Unbuffered channel with no concurrent peer; circular wait | Add a reader/writer goroutine, buffer, or `select` with cancellation |
 | Work keeps running after client disconnects | `ctx` not propagated to downstream calls | Thread `ctx` into DB/HTTP calls; check `ctx.Err()` in loops |
 | `cancel` not called (timer leak) | Missing `defer cancel()` | Always `defer cancel()` right after `WithTimeout`/`WithCancel` |
-| Closure captures last loop value | Toolchain < 1.22 loop semantics | Bump `go` to 1.22, or `v := v` inside the loop |
+| Closure captures last loop value | Legacy toolchain (< 1.22 loop semantics — below any supported floor) | Bump the `go` directive to a supported minor; `v := v` only on truly pinned legacy builds |
 | `WaitGroup` reused/negative counter panic | `Add` after `Wait`, or copied by value | `Add` before launching; pass `*WaitGroup`, never a copy |
 | `errgroup` swallows all but one error | By design — returns first error only | Use `errors.Join` per-goroutine, or collect via a results channel |
 

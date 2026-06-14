@@ -9,16 +9,16 @@ description: >-
 
 # Node.js / TypeScript Skills
 
-**Navigation and version snapshot for Node.js LTS + TypeScript 5.x back-end development**
+**Navigation and version snapshot for Node.js Active LTS + TypeScript 5.x back-end development**
 
 ## Version Snapshot
 
 | Version | Headline (one line) |
 |---------|---------------------|
-| Node 20 (LTS) | Stable `fetch`/`Web Streams`/`AbortController`, `--test` runner, `node:test`; permission model experimental |
-| Node 22 (LTS) | `require(esm)` for sync ESM graphs, stable WebSocket client, `--run` script shortcut, V8 12.4 |
-| Node 24 (LTS, "Krypton") | npm 11, V8 13.6 (`Float16Array`, explicit resource management `using`), `URLPattern` global, permission model approaching stable |
-| TypeScript 5.x | `using`/`await using` (5.2), `const` type params (5.0), decorators stage-3 (5.0), `satisfies` (4.9), `--isolatedDeclarations` (5.5), inferred type predicates (5.5) |
+| Node 20 ("Iron") | EOL/retired (2026-04-30) — migrate off; stable `fetch`/`Web Streams`/`AbortController`, `node:test` runner, `--env-file`, V8 11.3 |
+| Node 22 (Maintenance LTS, "Jod") | `require(esm)` for sync ESM graphs (stable/unflagged), stable WebSocket client + `glob` (`node:fs`), `node --run` script shortcut, V8 12.4 |
+| Node 24 (Active LTS, "Krypton") | npm 11, V8 13.6 (`Float16Array`, native `using`/`await using` + `Symbol.dispose`, stable 24.2), `URLPattern` global, `--permission` stable |
+| TypeScript 5.x | `using`/`await using` (5.2), `const` type params (5.0), decorators stage-3 (5.0), `satisfies` (4.9), inferred type predicates + `--isolatedDeclarations` (5.5), `import defer` (5.9) — 5.9 current GA (native port `tsgo`/TS 7 preview only, not a floor) |
 
 Runtime/transpiler minutiae shift between minor releases — for anything you pin
 in CI, verify against your runtime (`node -v`, `tsc -v`) and link the canonical

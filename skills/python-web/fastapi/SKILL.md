@@ -30,15 +30,24 @@ layer. Deep DI graphs, OAuth2/JWT flow, and async session lifecycle:
 
 ## Version Markers & Fallbacks
 
-| Feature | Needs | Fallback |
-|---------|-------|----------|
-| `Annotated[T, Depends()]` style DI | FastAPI 0.95+ | bare `Depends()` default-arg style (deprecated pattern) |
-| Pydantic v2 (`model_validate`/`model_dump`) | FastAPI 0.100+ | Pydantic v1 (`parse_obj`/`dict`) on FastAPI <0.100 |
-| OpenAPI 3.1 output | FastAPI 0.99+ | OpenAPI 3.0.x on older releases |
-| `lifespan=` context manager | FastAPI 0.93+ | deprecated `@app.on_event("startup")` |
+On a current, supported FastAPI the modern idioms below are **baseline-on** — they
+are no longer optional toggles. `Annotated[T, Depends()]` DI, Pydantic v2,
+OpenAPI 3.1 output, and the `lifespan=` context manager are all standard; the
+fallbacks remain only for code stranded on long-EOL releases. Pydantic **v1 is no
+longer supported** by current FastAPI — the floor now requires Pydantic v2 (with a
+short-lived `pydantic.v1` shim that is also being removed), so plan the v2 migration
+rather than relying on the shim.
+
+| Feature | Status | Fallback (legacy only) |
+|---------|--------|------------------------|
+| `Annotated[T, Depends()]` style DI | Baseline; the canonical DI form | bare `Depends()` default-arg style (deprecated pattern) |
+| Pydantic v2 (`model_validate`/`model_dump`) | Required — current FastAPI dropped Pydantic v1 | none on supported FastAPI; v1 codebases must migrate (the `pydantic.v1` shim is temporary) |
+| OpenAPI 3.1 output | Baseline | OpenAPI 3.0.x only on long-EOL releases |
+| `lifespan=` context manager | Baseline; `@app.on_event` is removed-grade legacy | deprecated `@app.on_event("startup")` |
+| Strict `Content-Type` check on JSON bodies | Default-on (CSRF hardening); opt out per-route with `strict_content_type=False` | older releases parsed any body as JSON regardless of header |
 
 Pin `fastapi`, `pydantic`, `sqlalchemy` in `pyproject.toml`/`uv.lock`. Canonical
-version lookup: skill: version-feature-matrix
+version lookup (current floors live there, not here): skill: version-feature-matrix
 (`../../_shared/version-feature-matrix.md`).
 
 ## Routes: sync vs async

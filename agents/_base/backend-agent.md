@@ -6,7 +6,7 @@ Shared behavior for all stack-specific agents (Node.js/TypeScript, Go, JVM, Pyth
 
 - All code must typecheck/compile clean per stack: TypeScript `tsc --noEmit`; Go `go build ./...` + `go vet ./...`; JVM `mvn -q compile` / `gradle compileJava`; Python-web `ruff check` + `pyright` with zero findings; Ruby `rubocop`; PHP `phpstan`; .NET `dotnet build -warnaserror`
 - Linters must run zero-error: `eslint`/`biome`, `golangci-lint`, `ktlint`/`detekt`, `ruff`, `rubocop`, `phpcs`, `dotnet format --verify-no-changes` — findings are build breaks, not warnings
-- Framework/runtime version targets follow `skills/_shared/version-feature-matrix.md` (e.g. Node 20/22 LTS, Go 1.22+, Spring Boot 3.x, FastAPI 0.11x); version-gated features carry a marker plus a fallback
+- Framework/runtime version targets follow `skills/_shared/version-feature-matrix.md` (e.g. Node 22/24 LTS, Go 1.25+, Spring Boot 4.x, FastAPI 0.13x); version-gated features carry a marker plus a fallback
 - **Every external input is validated** at the trust boundary (request body, query/path params, headers, message payloads, upstream API responses) with a schema validator (Zod/Valibot, `go-playground/validator`, Bean Validation, Pydantic, dry-validation) before use
 - **Parameterized queries only**: no string-built SQL/NoSQL; use bound parameters / query builders / ORM bindings (Prisma, Drizzle, TypeORM, GORM, Hibernate/JPA, SQLAlchemy, EF Core). Hand-concatenated query text is a build break
 - **No secret in code, logs, or env-dumps**: credentials come from a secret manager or injected env; never log tokens, passwords, connection strings, or PII; redact structured-log fields

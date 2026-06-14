@@ -167,14 +167,18 @@ Full implementation, cost-rule examples, and resolver-level authorization:
 
 | Capability | Floor | Fallback when unavailable |
 |------------|-------|---------------------------|
-| `@defer` / `@stream` incremental delivery | draft spec; Apollo Server 4+, some clients | return the full response; no incremental delivery |
-| `@oneOf` input objects | draft spec | validate "exactly one" in the resolver |
+| `@oneOf` input objects | **ratified — September 2025 edition** of the spec | validate "exactly one" in the resolver on older servers |
+| `@defer` / `@stream` incremental delivery | **still draft (Stage 2)**; Apollo Server 5 / `graphql-js` 17 alpha, some clients | return the full response; no incremental delivery |
 | Subscriptions over WebSocket | `graphql-ws` protocol (current) | poll a query, or SSE |
 | Persisted queries | Apollo APQ, relay-compiler, manual registry | accept arbitrary queries only behind auth + cost limits |
 
-GraphQL has no API version number — evolution is additive (see
-[api-versioning](../api-versioning/SKILL.md) > GraphQL). Confirm server/client
-support against the [version-feature-matrix](../../_shared/version-feature-matrix.md).
+The GraphQL spec is now anchored to the **September 2025 edition** (the first
+ratified edition since October 2021) — `@oneOf` and schema coordinates graduated
+into it; `@defer`/`@stream` remain a Stage-2 draft, so gate incremental delivery
+on server/client support, not on the spec. GraphQL has no API version number —
+evolution is additive (see [api-versioning](../api-versioning/SKILL.md) >
+GraphQL). Confirm server/client support against the
+[version-feature-matrix](../../_shared/version-feature-matrix.md).
 
 ## Diagnostics
 

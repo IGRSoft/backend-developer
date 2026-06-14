@@ -29,6 +29,8 @@ injection, SSRF, rate limiting, and misconfiguration →
 
 ## The OWASP API Security Top 10 (2023)
 
+> **Edition note (verified 2026):** the **API** Security Top 10 is a distinct project from the general OWASP Top 10 and its current edition is still **2023** — the general web-app OWASP Top 10:2025 (finalized early 2026) is a *different* list and does **not** supersede this one. This skill stays anchored on the API Security Top 10 (2023). Re-anchor only when OWASP ships a new *API* Security edition.
+
 | ID | Risk | One-line defense | Reference |
 |----|------|------------------|-----------|
 | API1 | Broken Object Level Authorization (BOLA) | Re-check ownership of every object by its id, per request | [authz-bola-bfla](references/authz-bola-bfla.md) |
@@ -88,14 +90,16 @@ import { jwtVerify, createRemoteJWKSet } from "jose";
 const JWKS = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`));
 
 const { payload } = await jwtVerify(token, JWKS, {
-  issuer: ISSUER,            // pin iss
-  audience: API_AUDIENCE,    // pin aud
-  algorithms: ["RS256"],     // never allow "none" or HS/RS confusion
+  issuer: ISSUER,                  // pin iss
+  audience: API_AUDIENCE,          // pin aud
+  algorithms: ["EdDSA", "ES256"],  // pin to your IdP's algs; never "none" or HS/RS confusion
   clockTolerance: "30s",
 });
 ```
 
-Sessions, OAuth2/OIDC flows, refresh-token rotation, and API-key handling: [references/authn-tokens.md](references/authn-tokens.md).
+Pin `algorithms` to exactly what your issuer signs with. Per RFC 8725 (JWT Best Current Practices), prefer `EdDSA` or `ES256`; `RS256` remains fine — the rule is to *name an explicit allow-list*, never let the token's `alg` header choose. For public clients (SPAs, mobile, CLIs, AI agents), sender-constrain the token with **DPoP (RFC 9449)** so a stolen bearer token can't be replayed.
+
+Sessions, OAuth2/OIDC flows, DPoP, refresh-token rotation, and API-key handling: [references/authn-tokens.md](references/authn-tokens.md).
 
 ## Injection, SSRF, and resource limits
 

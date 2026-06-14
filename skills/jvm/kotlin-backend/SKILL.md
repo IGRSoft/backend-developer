@@ -29,22 +29,29 @@ layer on top of (or instead of) Spring.
 
 ## The Kotlin 2.x Baseline
 
-| Need | Minimum | Fallback |
-|------|---------|----------|
-| K2 compiler (default), faster, stricter | Kotlin 2.0+ | Kotlin 1.9 (`languageVersion = "1.9"`) |
+Version *floors* live in the matrix — link, do not pin here. This table marks
+*which feature arrived when* and the fallback for older toolchains:
+[version-feature-matrix](../../_shared/version-feature-matrix.md).
+
+| Need | Marker | Fallback |
+|------|--------|----------|
+| K2 compiler (default), faster, stricter | Kotlin 2.0+ (default since 2.0) | Kotlin 1.9 (`languageVersion = "1.9"`) |
 | Coroutines + structured concurrency | kotlinx.coroutines 1.8+ | callbacks / Reactor |
 | `suspend` controllers in Spring | Spring 6 / Boot 3 + Kotlin 1.6+ | Reactor `Mono`/`Flux` |
 | Data classes, sealed classes, `when` exhaustiveness | Kotlin 1.x | — (baseline) |
 | Sealed *interfaces* | Kotlin 1.5 | sealed class |
-| Context parameters / value classes (perf) | Kotlin 2.x (verify flag) | regular params / wrapper class |
+| Context parameters (stabilizing) / value classes (perf) | Kotlin 2.2+ (`-Xcontext-parameters`; verify flag) | regular params / wrapper class |
+| Kotlin on **Spring Boot 4.x** | Kotlin 2.2+ required by the Boot 4 BOM | stay on Boot 3.5 with Kotlin 1.9/2.x |
 | Ktor server | Ktor 2.x/3.x | Spring Boot |
 
 **Platform reality (2026):** Kotlin 2.x with the K2 compiler is the default for
 new services and is stricter about smart-cast and nullability than 1.9. Spring
-Boot 3 has first-class Kotlin support (`suspend` MVC handlers, coroutine-aware
-data repositories). Pin the Kotlin and coroutines versions in the build file and
-gate features on the actual toolchain — see skill `version-feature-matrix`
-(`../../_shared/version-feature-matrix.md`).
+Boot has first-class Kotlin support (`suspend` MVC handlers, coroutine-aware data
+repositories); **Spring Boot 4.x requires Kotlin 2.2+** (its BOM manages the 2.2
+series) and leans further into Kotlin via Spring Framework 7's JSpecify-based
+null-safety, which interops cleanly with Kotlin's nullability. Pin the Kotlin and
+coroutines versions in the build file and gate features on the actual toolchain —
+floors in the matrix.
 
 ## Null-Safety
 
@@ -117,10 +124,12 @@ Rules:
 
 ## Spring + Kotlin
 
-Spring Boot 3 understands coroutines directly: declare `suspend` controller
-functions and Spring bridges them to the reactive runtime. Use constructor
-injection (idiomatic in Kotlin — primary constructor), and keep `@Transactional`
-on the service layer exactly as in [spring-boot](../spring-boot/SKILL.md).
+Spring Boot (3.x and 4.x) understands coroutines directly: declare `suspend`
+controller functions and Spring bridges them to the reactive runtime. Use
+constructor injection (idiomatic in Kotlin — primary constructor), and keep
+`@Transactional` on the service layer exactly as in
+[spring-boot](../spring-boot/SKILL.md). On Boot 4.x, raise the Kotlin plugin and
+dependency coordinates to the 2.2 series to match the managed dependency set.
 
 ```kotlin
 @RestController

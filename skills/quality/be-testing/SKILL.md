@@ -108,16 +108,17 @@ A unit test on each side can both pass while the API and its consumer disagree. 
 - **Schema-based** — validate requests/responses against the OpenAPI spec; **Schemathesis** fuzzes from the spec to find 500s and contract violations. Best for public/REST APIs.
 
 ```ts
-// Pact consumer expectation (Node)
-provider.addInteraction({
-  state: "order 42 exists",
-  uponReceiving: "a request for order 42",
-  withRequest: { method: "GET", path: "/orders/42" },
-  willRespondWith: { status: 200, body: { id: 42, total: like(999) } },
-});
+// Pact consumer expectation (Node, Pact spec v4 / PactV4 fluent API)
+await provider
+  .addInteraction()
+  .given("order 42 exists")
+  .uponReceiving("a request for order 42")
+  .withRequest("GET", "/orders/42")
+  .willRespondWith(200, (b) => b.jsonBody({ id: 42, total: like(999) }))
+  .executeTest(async (mock) => { /* call the client against mock.url */ });
 ```
 
-Full Pact flow, provider verification, the broker, and Schemathesis: [references/contract-testing.md](references/contract-testing.md).
+Full Pact flow (spec v4 + plugins, provider verification, the broker), and Schemathesis: [references/contract-testing.md](references/contract-testing.md).
 
 ## Regression Tests for Security & Performance
 

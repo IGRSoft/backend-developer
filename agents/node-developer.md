@@ -39,18 +39,20 @@ Evidence gate: service/API work defaults `requires_screenshots: false`. When the
 
 ## Node / TypeScript Feature Guidance
 
-`Node LTS 20/22` with `TypeScript 5.x` is the target baseline. Adopt new features with a version marker and a fallback per `skill: modern-typescript-backend` and `skills/_shared/version-feature-matrix.md` (canonical runtime-minimum table). **Verify behavior via Context7 or Ref before relying on it** — runtime flags graduate from experimental across minor versions; do not assert from memory.
+The **active LTS** Node line with current **TypeScript 5.x** is the target baseline; the safe default for new services is the active LTS, with the prior LTS still in maintenance. Adopt new features with a version marker and a fallback per `skill: modern-typescript-backend` and `skills/_shared/version-feature-matrix.md` (canonical runtime-minimum table — the single home for the exact LTS/EOL anchors; do not restate them here). **Verify behavior via Context7 or Ref before relying on it** — runtime flags graduate from experimental across minor versions; do not assert from memory.
 
-| Feature (Node 20/22, TS 5.x) | Use for | Fallback | Since |
+| Feature | Use for | Fallback | Since (link matrix for exact floor) |
 |---|---|---|---|
-| Native `fetch` / `Request` / `Response` (undici) | Outbound HTTP without `node-fetch` | `undici` or `node-fetch` dependency | Node 18+ (stable 21+) |
-| `node:test` + `node:assert` | Zero-dependency test runner | `vitest` / `jest` | Node 20 (stable) |
-| Stable `--watch` / built-in `.env` (`--env-file`) | Dev reload, config loading | `nodemon` / `dotenv` | Node 20.6 / 22 |
-| `Array.fromAsync`, top-level `await` in ESM | Async iteration, module init | manual async IIFE | Node 22 / ESM |
-| `using` / `await using` (explicit resource mgmt) | Deterministic cleanup of handles, spans, conns | `try/finally` | TS 5.2 |
+| Native `fetch` / `Request` / `Response` (undici) | Outbound HTTP without `node-fetch` | `undici` or `node-fetch` dependency | stable on all current LTS lines |
+| `node:test` + `node:assert` + `mock` | Zero-dependency test runner | `vitest` / `jest` | stable on current LTS — good for libs/simple services |
+| Built-in `.env` (`--env-file`), `node --run` (run `package.json` scripts) | Dev reload, config loading, script runner | `nodemon` / `dotenv` / `npm run` | stable on current LTS |
+| Built-in `glob`/`globSync` (`node:fs`), stable WebSocket client | File matching, WS without `ws` | `fast-glob` / `ws` | stable on current LTS |
+| `require()` of a synchronous ESM graph | CJS interop with ESM-only deps | dynamic `import()` | unflagged/default on current LTS — throws on top-level-`await` ESM |
+| `--permission` (process permission model) | Restrict fs/net/env/child-process at runtime | OS sandbox / container caps | stable (renamed from `--experimental-permission`) |
+| `using` / `await using` (explicit resource mgmt) | Deterministic cleanup of handles, spans, conns | `try/finally` | TS 5.2 + native `Symbol.dispose` runtime (newest LTS) or polyfill |
 | `const` type params, `satisfies` operator | Precise inference, config validation | explicit annotations | TS 5.0 / 4.9 |
 
-Two migration rules worth stating up front: **prefer native `fetch` and `node:test` over their historical dependencies** on 20/22-targeted code (fewer supply-chain surfaces), and treat any `--experimental-*` flag as provisional — pin the exact Node version and document the flag. Confirm exact behavior against your toolchain (`node -v`; `node --version` and `tsc --version`).
+Two migration rules worth stating up front: **prefer native `fetch`, `node:test`, and `--env-file` over their historical dependencies** (`node-fetch`/`jest`/`dotenv`) on LTS-targeted code (fewer supply-chain surfaces), and treat any remaining `--experimental-*` flag as provisional — pin the exact Node version and document the flag. The TypeScript native port ("tsgo", shipped as `@typescript/native-preview` / TS 7 beta) is a fast typecheck preview — evaluate it, but keep `tsc` as the authoritative gate until your project's emit/`--build` scenarios are fully supported. Confirm exact behavior against your toolchain (`node -v`; `node --version` and `tsc --version`).
 
 ## Framework Guidance
 
@@ -58,7 +60,7 @@ Choose the framework deliberately by DI needs, validation strategy, and throughp
 
 | Framework | DI / structure | Validation | Performance profile | Reach for when |
 |---|---|---|---|---|
-| **Express** | Minimal, manual wiring | bring-your-own (`zod`/`celebrate`) | Baseline; mature middleware ecosystem | Small/legacy services, maximal ecosystem |
+| **Express** | Minimal, manual wiring | bring-your-own (`zod`/`celebrate`) | Baseline; mature middleware ecosystem; Express 5 GA auto-forwards async rejections | Small/legacy services, maximal ecosystem |
 | **NestJS** | First-class DI container, modules, decorators | `class-validator` + DTOs (or zod pipe) | Overhead from DI/metadata; scales org-wide | Large teams, layered architecture, enterprise |
 | **Fastify** | Plugin/encapsulation model, lightweight DI | JSON-Schema (Ajv) or zod via `fastify-type-provider-zod` | High throughput, schema-driven serialization | Performance-sensitive JSON APIs |
 | **Hono** | Minimal, middleware chain | `@hono/zod-validator` | Very fast; multi-runtime (Node/edge/workers) | Edge/serverless, small fast services |
@@ -106,7 +108,7 @@ All database access uses **parameterized queries** — never string-concatenated
 
 1. **Analyze** the typing, framework, and async/streams model before writing code; decide validation strategy and data-access client explicitly.
 2. **Implement** strict-typed, ESM-first Node/TypeScript with boundary validation (`zod`), narrow error handling, and no floating promises.
-3. **Verify version assumptions** via Context7/Ref for any Node 20/22 or TS 5.x feature; state the version marker and fallback.
+3. **Verify version assumptions** via Context7/Ref for any Node LTS or TS 5.x feature against the matrix floor; state the version marker and fallback.
 4. **Run** `prettier`/`eslint` (or `biome`), then `tsc --noEmit`, then the changed-file tests via `vitest run -t` / `jest -t` (single scoped command).
 5. **State portability constraints** — minimum Node version, ESM vs CJS assumptions, any `--experimental-*` flags, Linux/macOS divergences.
 6. **Delegate**: tests → `backend-developer:be-test-generator`; profiling → `backend-developer:be-performance-engineer`; deps/locks/CVEs → `backend-developer:be-dependency-manager`; batch fixes → `backend-developer:be-code-fixer`; deep security → `backend-developer:be-security-auditor`; API contract → `backend-developer:api-designer`; schema/migrations → `backend-developer:database-engineer`.
@@ -120,4 +122,4 @@ When preparing `development-N.md` for technical-lead review, flag these Node-spe
 - **Input validation** — every external surface (`body`/`query`/`params`/headers) validated with `zod`/JSON-Schema at the boundary; parsed type matches the handler signature.
 - **Authz boundaries** — object-level and function-level checks present (OWASP API1/API5); no trusting client-supplied IDs/roles; ownership verified before mutation.
 - **Data-access risk** — parameterized queries only (no string SQL/NoSQL); transaction boundaries correct and idempotent; N+1 patterns flagged; migration safety noted.
-- **Feature adoption risk** — every Node 20/22 or TS 5.x feature use carries a version marker and fallback; any `--experimental-*` flag documented with a pinned version.
+- **Feature adoption risk** — every Node LTS or TS 5.x feature use carries a version marker and fallback (gated against the matrix floor); any `--experimental-*` flag documented with a pinned version.

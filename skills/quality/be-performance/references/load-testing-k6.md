@@ -1,6 +1,6 @@
 # Load Testing with k6
 
-k6 is a scriptable HTTP load tester. Tests are JavaScript; thresholds turn a run into a pass/fail CI gate. Run as a single scoped command — no `cd`-chains.
+k6 (now **Grafana k6**, GA at v1.0 since May 2025 with a stable scripting API) is a scriptable HTTP load tester. Tests are JavaScript; thresholds turn a run into a pass/fail CI gate. Run as a single scoped command — no `cd`-chains.
 
 ```bash
 k6 run --env BASE_URL=https://api.example.com load.js
@@ -18,6 +18,8 @@ A **closed model** (fixed number of virtual users, each waiting for its previous
 | `constant-vus` | closed | simple concurrency soak |
 | `ramping-vus` | closed | gradual concurrency ramp |
 | `per-vu-iterations` | closed | fixed work per VU (data-driven) |
+
+> The legacy `externally-controlled` executor was **removed in k6 1.x** — scripts that still set it will not run. For distributed/large-scale runs use the Grafana **k6 Operator** (`TestRun` CRD, v1.0 GA) on Kubernetes or Grafana Cloud k6 instead of externally scaling VUs.
 
 ```js
 export const options = {

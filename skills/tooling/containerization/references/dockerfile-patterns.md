@@ -50,14 +50,14 @@ docker-compose*.yml
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM node:22-bookworm AS build
+FROM node:24-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
 COPY . .
 RUN npm run build && npm prune --omit=dev
 
-FROM gcr.io/distroless/nodejs22-debian12 AS runtime
+FROM gcr.io/distroless/nodejs24-debian12 AS runtime
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
@@ -72,7 +72,7 @@ pnpm: `--mount=type=cache,target=/pnpm/store pnpm install --frozen-lockfile`. ya
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM golang:1.22 AS build
+FROM golang:1.26-bookworm AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod go mod download
@@ -93,7 +93,7 @@ ENTRYPOINT ["/app"]
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:25-jdk AS build
 WORKDIR /src
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
@@ -101,7 +101,7 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw -q dependency:go-offline
 COPY src ./src
 RUN --mount=type=cache,target=/root/.m2 ./mvnw -q -DskipTests package
 
-FROM eclipse-temurin:21-jre AS runtime              # JRE, not JDK, in the final image
+FROM eclipse-temurin:25-jre AS runtime              # JRE, not JDK, in the final image
 WORKDIR /app
 COPY --from=build /src/target/*.jar app.jar
 RUN useradd -r -u 10001 appuser
@@ -116,7 +116,7 @@ Smaller still: Spring Boot layered jars (`-Djarmode=layertools extract`) for bet
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM python:3.12-slim AS build
+FROM python:3.13-slim AS build
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
@@ -124,7 +124,7 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
 COPY . .
 
-FROM python:3.12-slim AS runtime
+FROM python:3.13-slim AS runtime
 WORKDIR /app
 COPY --from=build /app /app
 ENV PATH="/app/.venv/bin:$PATH"

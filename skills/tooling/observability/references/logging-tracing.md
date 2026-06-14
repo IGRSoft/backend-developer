@@ -149,3 +149,7 @@ req.log = logger.child({ trace_id: span?.traceId, span_id: span?.spanId });
 ```
 
 Now: from a slow span in Jaeger you copy its `trace_id`, filter logs by it, and read the exact statements that ran. That join — span ↔ log via shared `trace_id` — is the entire payoff; everything above exists to make it reliable. Reading these signals to fix a symptom: [be-diagnostics](../SKILL.md). Never let secrets/PII into either signal ([api-security](../../quality/api-security/SKILL.md)).
+
+### Shipping logs through OpenTelemetry (now stable)
+
+The OTel **logs Bridge API + SDK** are now stable in the spec, so instead of hand-injecting `trace_id`/`span_id` you can attach an OTel **log appender** to your existing logger and let the SDK stamp the active trace context and export logs over OTLP — the same pipeline as traces and metrics. The Bridge API is wired *behind* your logger (pino/Logback/Serilog/structlog/slog handler), not called directly by app code. Per-language appender maturity still varies, so check your SDK's status page; until a stable appender exists for your runtime, the manual `trace_id` injection above is the equivalent fallback (correlation works either way).

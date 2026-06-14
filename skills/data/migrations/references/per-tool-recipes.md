@@ -60,7 +60,7 @@ mvn flyway:validate         # verify checksums match what ran
 mvn flyway:repair           # fix checksum/failed-migration metadata
 ```
 
-- Versioned `V1__desc.sql`, repeatable `R__desc.sql`, undo `U1__desc.sql` (Teams edition).
+- Versioned `V1__desc.sql`, repeatable `R__desc.sql`, undo `U1__desc.sql` (paid edition).
 - **Gotcha — checksums**: never edit an applied `V` file; Flyway validates checksums
   and fails. Add a new version. Use `flyway:repair` only to fix metadata, not to
   excuse editing history.
@@ -79,6 +79,10 @@ liquibase updateSQL         # print SQL without applying (review)
   computed checksum.
 - **Gotcha**: declare a `rollback` block per changeset — Liquibase cannot auto-roll-back
   arbitrary SQL. For `CONCURRENTLY`, set `runInTransaction="false"` on the changeSet.
+- **Licensing/JDK note**: Liquibase 5.0+ splits into Community and the commercial
+  "Secure" distribution under the Functional Source License (not OSI open-source) and
+  requires Java 17+. Pin the edition + JDK you actually run; confirm in the
+  [version-feature-matrix](../../../_shared/version-feature-matrix.md).
 
 ## Alembic (Python)
 

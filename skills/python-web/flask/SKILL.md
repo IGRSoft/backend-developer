@@ -29,15 +29,19 @@ Factory/blueprint composition, session scoping, and worker tuning in depth:
 
 ## Version Markers & Fallbacks
 
-| Feature | Needs | Fallback |
-|---------|-------|----------|
+Target current **Flask 3.1+ on Werkzeug 3.1+** (the maintained line) for new
+services; the older 2.x/3.0 fallbacks remain only for code that hasn't migrated.
+Exact floors live in the matrix — link, don't restate.
+
+| Feature | Since | Fallback (legacy only) |
+|---------|-------|------------------------|
 | Async view functions (`async def`) | Flask 2.0+ (`flask[async]`) | sync views; run async work via a queue |
 | `flask --app` CLI / factory autodetect | Flask 2.2+ | `FLASK_APP` env var |
-| Flask 3.x (Werkzeug 3) | Flask 3.0+ | Flask 2.3 on Werkzeug 2 |
-| Flask-SQLAlchemy 3.x (SQLAlchemy 2.0 API) | Flask-SQLAlchemy 3.0+ | 2.x legacy Query API |
+| Flask 3.1 on Werkzeug 3.1 (current maintained line) | Flask 3.1+ | Flask 3.0/2.3 on Werkzeug 2/3.0 |
+| Flask-SQLAlchemy 3.1 (SQLAlchemy 2.0 typed API) | Flask-SQLAlchemy 3.1+ | 2.x legacy `Query` API |
 
 Pin `flask`, `flask-sqlalchemy` (or `sqlalchemy`), and your validation lib in
-`pyproject.toml`/`uv.lock`. Canonical version lookup: skill: version-feature-matrix
+`pyproject.toml`/`uv.lock`. Canonical version lookup (current floors): skill: version-feature-matrix
 (`../../_shared/version-feature-matrix.md`).
 
 ## App Factory

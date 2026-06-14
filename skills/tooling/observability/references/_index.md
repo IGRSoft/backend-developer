@@ -8,8 +8,8 @@ full method/export tables.
 
 | File | Covers | Read when |
 |------|--------|-----------|
-| `logging-tracing.md` | Structured loggers per runtime (pino/slog/structlog/Logback/Serilog), correlation/trace IDs via context-locals, OpenTelemetry spans, W3C context propagation across HTTP/gRPC/Kafka/RabbitMQ, the Collector, sampling, log↔trace correlation | You are wiring logs or traces into a specific runtime |
-| `metrics-red-use.md` | RED and USE methods, OTel/Prometheus instrument types and naming, histogram buckets, label-cardinality rules, exemplars (metric→trace), OTLP/Prometheus export, alerting on SLOs | You are choosing which metrics to emit and how to name/export them |
+| `logging-tracing.md` | Structured loggers per runtime (pino/slog/structlog/Logback/Serilog), correlation/trace IDs via context-locals, OpenTelemetry spans, the now-stable OTel logs Bridge API/appenders, W3C context propagation across HTTP/gRPC/Kafka/RabbitMQ, the Collector, sampling, log↔trace correlation | You are wiring logs or traces into a specific runtime |
+| `metrics-red-use.md` | RED and USE methods, OTel/Prometheus instrument types and stable semconv naming, histogram buckets (explicit + native histograms), label-cardinality rules, exemplars (metric→trace), OTLP/Prometheus export (incl. Prometheus 3.x native OTLP), alerting on SLOs | You are choosing which metrics to emit and how to name/export them |
 
 ## Quick Links by Problem
 

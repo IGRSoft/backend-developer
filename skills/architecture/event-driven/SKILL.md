@@ -37,9 +37,12 @@ for read models fed by events, see [cqrs-event-sourcing](../cqrs-event-sourcing/
 | Consumer failure | Will reprocess the message | A message is processed once |
 
 Brokers give you at-least-once delivery; building reliability means designing for
-duplicates and reordering, not wishing them away. Version-gate broker features
-(Kafka transactions/EOS, RabbitMQ quorum queues, SQS FIFO + dedup) against your
-actual versions — see skill: version-feature-matrix.
+duplicates and reordering, not wishing them away. On current broker lines this is
+the baseline reality, not an opt-in: RabbitMQ 4.x removed classic mirrored queues,
+so quorum queues are the only replicated/HA queue type; Kafka 4.x is KRaft-only and
+adds native queue (share-group) semantics on top of the log. Version-gate broker
+features (Kafka transactions/EOS and share groups, RabbitMQ quorum queues, SQS FIFO
++ dedup) against your actual versions — see skill: version-feature-matrix.
 
 ## Pub/Sub Basics
 

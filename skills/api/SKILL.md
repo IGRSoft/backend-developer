@@ -60,15 +60,15 @@ Floors this plugin assumes. Spec revisions and generators shift between releases
 
 | Spec / Tool | Assumed floor | Why |
 |-------------|---------------|-----|
-| OpenAPI | 3.1.x | JSON Schema 2020-12 alignment, `webhooks` |
-| AsyncAPI | 3.x | event/message contracts, channel/operation split |
-| JSON Schema | 2020-12 | `$dynamicRef`, unevaluated keywords |
-| Protocol Buffers | proto3 (edition 2023 where supported) | optional/oneof semantics, editions |
-| RFC 9457 | current | `application/problem+json` (obsoletes RFC 7807) |
-| GraphQL spec | Oct 2021 + drafts | `@oneOf`, `@defer`/`@stream` are draft *(verify)* |
+| OpenAPI | 3.1.x baseline; 3.2.0 (GA Sep 2025) where tooling supports it | JSON Schema 2020-12 alignment, `webhooks`; 3.2 is strictly additive over 3.1 (structured tags, streaming media types, new OAuth flows) — 3.1 descriptions stay valid |
+| AsyncAPI | 3.x (3.1.0 current) | event/message contracts, channel/operation split; 3.1 is a non-breaking minor over 3.0 |
+| JSON Schema | 2020-12 | `$dynamicRef`, unevaluated keywords; the dialect OpenAPI 3.1/3.2 aligns to |
+| Protocol Buffers | proto3 baseline; editions (2023, 2024 latest) where supported | optional/oneof semantics; editions replace `syntax=` with feature flags — Edition 2024 ships in protoc 32.x+ |
+| RFC 9457 | current | `application/problem+json` (Standards Track, obsoletes RFC 7807) |
+| GraphQL spec | September 2025 edition | first ratified edition since Oct 2021; `@oneOf` input objects + schema coordinates now in-spec; `@defer`/`@stream` still draft (Stage 2) *(verify)* |
 | openapi-generator | 7.x | multi-language client/server codegen |
 | oapi-codegen | 2.x | Go-native server/client from OpenAPI |
-| buf | current stable | proto lint, breaking-change detection, codegen |
+| buf | current stable (v1.x) | proto lint, breaking-change detection, codegen |
 | spectral | 6.x | OpenAPI/AsyncAPI linting & style rules |
 
 ## Decision Tree

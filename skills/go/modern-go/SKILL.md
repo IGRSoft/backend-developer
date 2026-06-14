@@ -28,19 +28,31 @@ goroutines, channels, and `context` → [go-concurrency](../go-concurrency/SKILL
 
 ## Version Snapshot
 
+Go ships two minors a year (Feb/Aug) and supports only the **two most recent**
+majors — pin your floor accordingly. Range-over-func iterators and the `iter`
+package, the loop-variable fix, and `ServeMux` method/wildcard routing are all
+**baseline now** (≤ 1.22/1.23, below any supported floor); stop gating on them.
+
 | Feature | Since | Fallback before that version |
 |---------|-------|------------------------------|
 | Generics (`[T any]`, type constraints) | 1.18 | Interfaces + type assertions, or codegen |
 | `errors.Join` (multi-error) | 1.20 | `fmt.Errorf` chains or a `multierror` helper |
 | `log/slog` structured logging | 1.21 | `zap`/`zerolog`, or `log` + manual fields |
 | `min`/`max`/`clear` builtins | 1.21 | Hand-written helpers; delete map keys in a loop |
-| Range-over-integer (`for i := range n`) | 1.22 | `for i := 0; i < n; i++` |
-| Per-iteration loop variable scoping | 1.22 | Shadow with `v := v` inside the loop body |
-| Range-over-func iterators (`iter.Seq`) | 1.23 | Return slices/channels, or callback-style funcs |
-| `unique` / `cmp.Or` | 1.21–1.23 | Manual interning; explicit zero-value checks |
+| Per-iteration loop variable scoping; range-over-integer (`for i := range n`) | 1.22 (baseline) | Shadow with `v := v`; classic 3-clause `for` |
+| Range-over-func iterators (`iter.Seq`/`iter.Seq2`), `unique`, `cmp.Or` | 1.23 (baseline) | Return slices/channels, or callback-style funcs |
+| Generic type aliases; `go.mod` `tool` directive; `os.Root`; `runtime.AddCleanup`; Swiss-Tables maps | 1.24 | Blank-import `tools.go`; `path/filepath` traversal guards; finalizers |
+| `testing/synctest` (stable); `sync.WaitGroup.Go`; container-aware `GOMAXPROCS` (default) | 1.25 | `synctest` experiment (1.24); manual `Add(1)`/`Done`; set `GOMAXPROCS` from cgroup yourself |
+| `errors.AsType[T]` (type-safe `errors.As`); `new(expr)`; `slog.NewMultiHandler` | 1.26 | `errors.As` with a target var; `p := &v`; fan-out handlers by hand |
 
-Pin the toolchain with `go 1.23` + a `toolchain go1.23.x` line in `go.mod`.
-Canonical minimums: skill [version-feature-matrix](${CLAUDE_SKILL_DIR}/_shared/version-feature-matrix.md).
+Pin the toolchain in `go.mod` (`go 1.25` + a `toolchain go1.25.x` line, or 1.26 for
+the current minor); since 1.21 the `go` directive is a real minimum the toolchain
+enforces. Canonical Go floor: skill [version-feature-matrix](${CLAUDE_SKILL_DIR}/_shared/version-feature-matrix.md).
+
+**`encoding/json/v2` is still experimental** as of Go 1.26 — opt in only with
+`GOEXPERIMENT=jsonv2` (it lands as the default `encoding/json` backend in 1.27).
+Do not depend on `encoding/json/v2` / `encoding/json/jsontext` in shipping code yet;
+keep using `encoding/json`.
 
 ## Errors: Wrap, Inspect, Aggregate
 
@@ -158,10 +170,11 @@ Do not genericize a function used at one concrete type. Prefer an interface for
 runtime polymorphism (a `Repository` boundary); prefer generics for compile-time
 type identity across call sites.
 
-## Range-over-func Iterators (1.23+)
+## Range-over-func Iterators (baseline since 1.23)
 
 Custom iterators with `iter.Seq[T]` / `iter.Seq2[K,V]` compose with `for ... range`
-and stream without materializing slices.
+and stream without materializing slices. This is baseline on every supported
+toolchain — adopt it freely; the fallback below only matters for legacy floors.
 
 ```go
 func Lines(r io.Reader) iter.Seq2[int, string] {
@@ -202,8 +215,8 @@ no longer need a router dependency.
 | Internal SQL/driver text reaches the client | Returning `err` straight to the response | Map to status + safe message at the boundary |
 | `slog` output is unstructured text | `NewTextHandler` in production | Use `NewJSONHandler`; reserve text for local dev |
 | Generic helper won't compile on a type | Constraint too narrow / missing `~` | Add `~int` etc. for named types; widen the set |
-| `for i := range n` won't compile | Toolchain < 1.22 | Bump `go` directive, or classic 3-clause `for` |
-| `iter.Seq` undefined | Toolchain < 1.23 | Bump `go` directive, or return a slice/channel |
+| `iter.Seq` / `for i := range n` won't compile | Legacy toolchain (< 1.23 / < 1.22 — below any supported floor) | Bump the `go` directive to a supported minor; only fall back on truly pinned legacy builds |
+| `encoding/json/v2` symbols undefined | Built without `GOEXPERIMENT=jsonv2` (still experimental through 1.26) | Use `encoding/json` (v1); don't ship on v2 until it's the default in 1.27 |
 
 ## Related Skills
 

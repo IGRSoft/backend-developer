@@ -155,8 +155,10 @@ matters, enqueue a durable job and let a separate worker process it.
 
 ## lifespan — Startup/Shutdown
 
-Use the `lifespan` async context manager (the `on_event` decorators are
-deprecated). Open pools on startup, close on shutdown.
+Use the `lifespan` async context manager — it is the standard on current FastAPI,
+and the legacy `@app.on_event("startup")`/`("shutdown")` decorators are
+deprecated/removed-grade, not just discouraged. Open pools on startup, close on
+shutdown.
 
 ```python
 from contextlib import asynccontextmanager

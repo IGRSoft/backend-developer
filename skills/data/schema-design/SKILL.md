@@ -46,7 +46,7 @@ Constraints are not optional decoration — they are the database enforcing your
 invariants so application bugs cannot corrupt data.
 
 ```sql
--- PostgreSQL 16
+-- PostgreSQL 18
 CREATE TABLE users (
   id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   email       citext NOT NULL,                       -- case-insensitive
@@ -130,10 +130,10 @@ Full JSON indexing and partitioning detail: [references/advanced-modeling.md](re
 | Feature | Needs | Fallback if older |
 |---------|-------|-------------------|
 | `GENERATED ALWAYS AS IDENTITY` | PostgreSQL 10+ | `bigserial` |
-| UUIDv7 (time-ordered) generation | app-side lib or PG 18 `uuidv7()` *(verify)* | UUIDv4 + separate sort column, or `bigint` |
+| UUIDv7 (time-ordered) generation | PG 18 built-in `uuidv7()`, or an app-side lib on older engines | UUIDv4 + separate sort column, or `bigint` |
 | `MERGE` (upsert) | PostgreSQL 15+ / MySQL 8 | `INSERT ... ON CONFLICT` (PG) / `ON DUPLICATE KEY` (MySQL) |
 | `jsonb` subscripting `col['k']` | PostgreSQL 14+ | `col -> 'k'` operator form |
-| MongoDB `$jsonSchema` validation | MongoDB 3.6+ (use 6.0+ features) | app-layer validation only |
+| MongoDB `$jsonSchema` validation | MongoDB 3.6+ (target the current 8.0 LTS) | app-layer validation only |
 
 Confirm engine features against the [version-feature-matrix](../../_shared/version-feature-matrix.md) before relying on them in a migration.
 

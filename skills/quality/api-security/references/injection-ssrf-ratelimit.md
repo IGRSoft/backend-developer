@@ -135,7 +135,7 @@ Treat data from third parties as hostile, just like user input:
 
 ## Scanning & verification
 
-- **DAST** — OWASP ZAP baseline scan against a running instance in CI.
+- **DAST** — ZAP (the scanner formerly named *OWASP ZAP*; it left OWASP in 2023 and is now "ZAP by Checkmarx", still free/open-source and actively maintained) baseline scan against a running instance in CI.
 - **Schema fuzzing** — Schemathesis drives the OpenAPI spec with malformed input to surface 500s and contract violations (overlaps [be-testing](../../be-testing/SKILL.md)).
 - **Dependency/image CVEs** — `npm audit` / `osv-scanner` / `govulncheck` / `trivy` each CI run. Route findings via the [be-security-auditor](../../../_shared/../) review and [be-dependency-manager](../../../_shared/../).
 

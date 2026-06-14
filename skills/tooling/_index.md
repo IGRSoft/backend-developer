@@ -11,11 +11,11 @@ Quick navigation for containerization, runtime diagnostics, and observability.
 | `containerization/references/dockerfile-patterns.md` | Per-runtime multi-stage Dockerfiles (Node/Go/JVM/Python/.NET), distroless targets, BuildKit cache + secret mounts, image hardening |
 | `containerization/references/compose-local-deps.md` | Docker Compose for Postgres/MySQL/Mongo/Redis/Kafka/RabbitMQ, healthcheck gating, seeding, parity with Testcontainers |
 | `be-diagnostics/SKILL.md` | Symptom → tool routing across logs, traces, metrics, profilers, and EXPLAIN |
-| `be-diagnostics/references/profilers.md` | CPU/heap profilers per runtime: pprof, py-spy/tracemalloc, JFR/async-profiler, clinic/--prof, dotnet-trace |
+| `be-diagnostics/references/profilers.md` | CPU/heap profilers per runtime: pprof, py-spy/tracemalloc, JFR/async-profiler, clinic/--prof, dotnet-trace; continuous profiling (Pyroscope/Parca/eBPF) |
 | `be-diagnostics/references/db-diagnosis.md` | EXPLAIN ANALYZE, N+1 detection, connection-pool exhaustion, slow-query logs, lock waits |
 | `observability/SKILL.md` | Structured logging, OpenTelemetry traces, RED/USE metrics, log/trace/metric correlation |
 | `observability/references/logging-tracing.md` | Structured loggers per runtime, correlation/trace IDs, OTel spans, context propagation across HTTP/gRPC/queues |
-| `observability/references/metrics-red-use.md` | RED/USE method, instrument naming, histograms + exemplars, Prometheus/OTLP export |
+| `observability/references/metrics-red-use.md` | RED/USE method, stable semconv naming, histograms (explicit + native) + exemplars, Prometheus/OTLP export (incl. Prometheus 3.x native OTLP) |
 
 ## Quick Links by Problem
 

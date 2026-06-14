@@ -28,9 +28,11 @@ Skip if you already have the signals and just need to *read* them to fix somethi
 
 | Signal | Answers | Cardinality | Primary tool |
 |--------|---------|-------------|--------------|
-| **Logs** | "What exactly happened in *this* request?" | high (per event) | structured logger → log backend |
+| **Logs** | "What exactly happened in *this* request?" | high (per event) | structured logger → log backend (or OTel logs bridge → OTLP, now stable) |
 | **Traces** | "Where did the time go across services?" | high (per request) | OpenTelemetry → Jaeger/Tempo |
 | **Metrics** | "Is the system healthy in aggregate, over time?" | low (aggregated) | OpenTelemetry/Prometheus |
+
+A fourth signal, **continuous profiling** (CPU/heap flamegraphs sampled cheaply in prod), is emerging: the OTel **profiles** signal is still in development (OTLP support at "development" stability), but tools like Grafana Pyroscope and Parca already ship it over OTLP today. Treat it as production-ready tooling, pre-stable protocol — see [be-diagnostics profilers.md](../be-diagnostics/references/profilers.md).
 
 The win is **correlation**: every log line, span, and metric exemplar carries the same `trace_id`, so from a spiking p99 you jump to an exemplar trace, then to its logs — one investigation, not three.
 
@@ -132,7 +134,7 @@ If any link is missing (no exemplar, no shared `trace_id`, unstructured logs), y
 
 ## Version & Fallbacks
 
-OpenTelemetry signal stability differs per language and version — traces and metrics are stable in most SDKs; the **logs** SDK/bridge is newer, so confirm with the version-feature-matrix (skill: version-feature-matrix) and each SDK's status page. Fallbacks: if the OTel logs bridge isn't stable in your runtime, emit JSON logs with the `trace_id`/`span_id` fields manually (correlation still works); if you can't run a Collector, export OTLP straight to a backend and sample in-process.
+All three OpenTelemetry signals are now stable in the specification — traces, metrics, **and logs** (the logs Bridge API + SDK + OTLP protocol all graduated to stable). The Bridge API is meant to be wired into your existing logger (pino/slog/Logback/Serilog/structlog) via an appender, not called directly. Per-language SDK coverage still varies, so confirm each runtime's status page and the version-feature-matrix (skill: version-feature-matrix) before relying on a specific appender. Fallbacks: if a stable logs appender isn't yet available for your runtime, emit JSON logs with the `trace_id`/`span_id` fields manually (correlation still works); if you can't run a Collector, export OTLP straight to a backend and sample in-process.
 
 ## Related Skills
 

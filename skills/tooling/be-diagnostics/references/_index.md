@@ -8,7 +8,7 @@ and worked walkthroughs.
 
 | File | Covers | Read when |
 |------|--------|-----------|
-| `profilers.md` | Per-runtime CPU/heap/thread profilers (pprof, py-spy/memray/tracemalloc, JFR/async-profiler, clinic/`--cpu-prof`, dotnet-trace/gcdump), flamegraphs, heap-snapshot diffing, the measure→fix→re-measure loop, k6/wrk load generation | A service is slow or leaking and you need to find *where* |
+| `profilers.md` | Per-runtime CPU/heap/thread profilers (pprof, py-spy/memray/tracemalloc, JFR/async-profiler, clinic/`--cpu-prof`, dotnet-trace/gcdump), continuous profiling (Pyroscope/Parca/eBPF, OTel profiles signal), flamegraphs, heap-snapshot diffing, the measure→fix→re-measure loop, k6/wrk load generation | A service is slow or leaking and you need to find *where* |
 | `db-diagnosis.md` | `EXPLAIN (ANALYZE, BUFFERS)` reading, index decisions, N+1 detection per ORM, connection-pool sizing and exhaustion, slow-query logs (`pg_stat_statements`/`log_min_duration_statement`), lock chains and deadlocks | A query is slow, the pool times out, or the DB is the bottleneck |
 
 ## Quick Links by Problem

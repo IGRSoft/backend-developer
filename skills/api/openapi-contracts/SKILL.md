@@ -15,7 +15,7 @@ description: >-
 ## When to Use
 
 Use this skill when:
-- Making an OpenAPI (3.1) or AsyncAPI (3.0) document the source of truth
+- Making an OpenAPI (3.1, or 3.2 GA where tooling supports it) or AsyncAPI (3.x) document the source of truth
 - Generating typed clients/servers from a spec (openapi-generator, oapi-codegen, buf)
 - Catching drift between the spec and the deployed implementation (contract testing)
 - Enforcing API style/consistency with linting (spectral)
@@ -73,11 +73,12 @@ components:
 ```
 
 - OpenAPI 3.1 aligns with **JSON Schema 2020-12** — reuse the same schemas for request validation and codegen.
+- **OpenAPI 3.2.0** (GA Sep 2025) is strictly additive over 3.1 — structured tag navigation, streaming-friendly media types, and new OAuth flows. Existing 3.1 documents stay valid; opt into 3.2 ergonomics only once your generator/linter chain supports it.
 - **Document error responses** (`application/problem+json`) as first-class, not just the happy path.
 - Stable `operationId`s drive generated method names — treat them as part of the contract.
 
-AsyncAPI 3.0 does the same for event/message surfaces (channels, operations,
-messages) — use it for Kafka/RabbitMQ/SQS contracts and webhooks. See
+AsyncAPI 3.x (3.1.0 current) does the same for event/message surfaces (channels,
+operations, messages) — use it for Kafka/RabbitMQ/SQS contracts and webhooks. See
 [event-driven](../../architecture/event-driven/SKILL.md).
 
 ## Code Generation
@@ -162,11 +163,11 @@ A failure here means: make the change additive, or mint a new major version.
 
 | Capability | Floor | Fallback when unavailable |
 |------------|-------|---------------------------|
-| OpenAPI + JSON Schema 2020-12 | OpenAPI 3.1 | 3.0.x with its bespoke schema subset |
-| AsyncAPI event contracts | AsyncAPI 3.0 | 2.x (different channel model) |
+| OpenAPI + JSON Schema 2020-12 | OpenAPI 3.1 baseline (3.2.0 GA where tooling supports it — additive over 3.1) | 3.0.x with its bespoke schema subset |
+| AsyncAPI event contracts | AsyncAPI 3.x (3.1.0 current) | 2.x (different channel model) |
 | OpenAPI breaking-change CI | `oasdiff` | manual review of the spec diff |
-| Proto lint + breaking | `buf` (current) | `protoc` + hand review |
-| Property-based contract tests | `schemathesis` 3.x | `dredd`, or hand-written contract tests |
+| Proto lint + breaking | `buf` (current v1.x) | `protoc` + hand review |
+| Property-based contract tests | `schemathesis` 4.x | `dredd`, or hand-written contract tests |
 
 Confirm tool/spec support against the
 [version-feature-matrix](../../_shared/version-feature-matrix.md).

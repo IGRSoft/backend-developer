@@ -97,7 +97,7 @@ Run these verbatim (substituting the migration `name`, project path, and databas
 | golang-migrate | `migrate create -ext sql -dir migrations -seq <NAME>` | `migrate -path migrations -database "$DATABASE_URL" up` | `migrate ... up 1 --dry-run`-equivalent: read `*.up.sql` | `migrate -path migrations -database "$DATABASE_URL" down 1` |
 | goose | `goose -dir migrations create <NAME> sql` | `goose -dir migrations postgres "$DSN" up` | `goose -dir migrations status` + read pending | `goose -dir migrations postgres "$DSN" down` |
 | Atlas | `atlas migrate diff <NAME> --env local` | `atlas migrate apply --env local` | `atlas migrate lint --env local --latest 1` | `atlas migrate down --env local 1` |
-| Flyway | (author `V<n>__<NAME>.sql`) | `flyway migrate` | `flyway info` + `flyway validate` (and review `U<n>__` undo if present) | `flyway undo` (Teams) or apply `U<n>__` undo script |
+| Flyway | (author `V<n>__<NAME>.sql`) | `flyway migrate` | `flyway info` + `flyway validate` (and review `U<n>__` undo if present) | `flyway undo` (paid edition) or apply `U<n>__` undo script |
 | Liquibase | `liquibase diffChangeLog` | `liquibase update` | `liquibase updateSQL` (prints SQL, no apply) | `liquibase rollbackCount 1` |
 | Alembic | `alembic revision --autogenerate -m "<NAME>"` | `alembic upgrade head` | `alembic upgrade head --sql` (offline SQL, no apply) | `alembic downgrade -1` |
 | Rails | `bin/rails generate migration <NAME>` | `bin/rails db:migrate` | `bin/rails db:migrate:status` + `db:migrate VERSION=...` dry inspection | `bin/rails db:rollback STEP=1` |
@@ -106,7 +106,7 @@ Run these verbatim (substituting the migration `name`, project path, and databas
 
 Notes:
 - Always read the `DATABASE_URL`/`DSN` from the project's `.env`/config rather than hard-coding it; never echo the full connection string (with credentials) into the log — redact the password.
-- For tools without a first-class down/undo (Drizzle, Flyway Community, Prisma), `verify` MUST flag the migration as **irreversible** and require a hand-written down script or a forward-only fix plan before `apply`.
+- For tools without a first-class down/undo (Drizzle, Flyway free edition, Prisma), `verify` MUST flag the migration as **irreversible** and require a hand-written down script or a forward-only fix plan before `apply`.
 - `--create-only` / `--autogenerate` variants generate the file WITHOUT applying — that is the intended `generate` behavior here.
 
 ## Workflow

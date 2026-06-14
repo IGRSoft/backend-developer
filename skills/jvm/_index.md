@@ -7,14 +7,14 @@ Quick navigation for Spring Boot (Java) and Kotlin back-end skills.
 | File | Description |
 |------|-------------|
 | `SKILL.md` | Entry point: canonical framework-selection table (need → minimum platform → fallback), decision tree |
-| `spring-boot/SKILL.md` | Spring Boot 3.x: REST controllers, constructor DI, @Transactional boundaries, JPA/Hibernate, Bean Validation, Spring Security, WebFlux |
+| `spring-boot/SKILL.md` | Spring Boot (3.5 / 4.x): REST controllers, constructor DI, @Transactional boundaries, JPA/Hibernate, Bean Validation, Spring Security, WebFlux |
 | `kotlin-backend/SKILL.md` | Kotlin for back-ends: coroutines + structured concurrency, null-safety, data/sealed classes, Spring with Kotlin, Ktor |
 
 ## Subdirectories
 
 | Directory | Contents | Description |
 |-----------|----------|-------------|
-| `spring-boot/` | 1 skill + 1 ref | Spring Boot 3.x service patterns and a JPA performance deep-dive |
+| `spring-boot/` | 1 skill + 1 ref | Spring Boot 3.5 / 4.x service patterns and a JPA performance deep-dive |
 | `kotlin-backend/` | 1 skill | Idiomatic Kotlin back-end patterns, coroutines, Ktor |
 
 ## Reference Files

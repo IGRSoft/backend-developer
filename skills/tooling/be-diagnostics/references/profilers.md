@@ -22,6 +22,7 @@ Jump to:
 - Python
 - .NET
 - Heap & Leak Diagnosis
+- Continuous Profiling (prod, always-on)
 - Diagnostic Table
 
 ---
@@ -185,6 +186,18 @@ Common back-end leak shapes:
 - **Request data on a long-lived object** — appending per-request state to a module-level list/array.
 - **Listeners/timers never removed** — `emitter.on(...)` per request; `setInterval` never cleared.
 - **Unclosed resources** — DB connections, file/socket handles, streams not released on the error path (also shows up as `pool timeout`, see [db-diagnosis.md](db-diagnosis.md)).
+
+---
+
+## Continuous Profiling (prod, always-on)
+
+The ad-hoc tools above answer "profile *this* instance *now*". **Continuous profiling** runs a low-overhead sampler across the whole fleet all the time, so when an incident already happened you scrub back to the flamegraph from the bad window instead of trying to reproduce it.
+
+- **Grafana Pyroscope** and **Parca** (Polar Signals) are the open-source platforms. Parca leans on **eBPF** for whole-host, zero-instrumentation CPU profiling; Pyroscope supports both SDK pushers and an eBPF agent and ships over **OTLP**.
+- The **OpenTelemetry profiles signal** is the emerging fourth telemetry signal — its OTLP protocol is still at "development" stability, but the **OTel eBPF profiler** already collects host-wide CPU stacks and exports them (e.g. to Pyroscope) today. Treat continuous profiling as production-ready *tooling* riding a *pre-stable* wire format: adopt it, but pin the agent/collector versions and don't assume cross-vendor portability yet.
+- Overhead is sampling-class (single-digit %); the win is that a regression is already recorded. This complements RED metrics + trace sampling ([observability](../../observability/SKILL.md)) — metrics tell you *that* p99 moved, the stored profile tells you *which frame*.
+
+The same flamegraph-reading discipline from the per-runtime sections applies; continuous profiling just changes *when* you capture (always) and *where* you look (the incident window).
 
 ---
 

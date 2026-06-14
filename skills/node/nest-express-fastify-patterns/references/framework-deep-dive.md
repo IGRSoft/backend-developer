@@ -4,12 +4,31 @@ Per-framework internals that don't fit the entry skill. Verify behavior against
 your pinned major (`express`, `@nestjs/*`, `fastify`, `hono`) — see
 `../../../_shared/version-feature-matrix.md`.
 
-## Express: async errors and Express 5
+## Express: async errors (Express 5 vs legacy Express 4)
 
-### Express 4 — async errors do not auto-forward
+### Express 5 (GA) — async rejections auto-forward
 
-A rejected promise in an `async` handler is *not* caught by Express 4; it becomes
-an unhandled rejection (process may crash, request hangs). Two safe patterns:
+Express 5 is the current GA major (and the default Express integration in
+NestJS 11). A promise returned from an `async` handler/middleware that rejects is
+forwarded to the error handler automatically — `return` the promise (or `await`
+inside the handler) and let your one 4-arg error middleware map it. The
+`asyncHandler`/`wrap` helper is no longer required:
+
+```ts
+// Express 5 — a throw/rejection lands in the error middleware, no wrapper
+app.get("/x", async (_req, res) => { res.json(await load()); });
+```
+
+Express 5 also tightens path-route matching (named wildcards instead of bare
+`*`/regex strings), drops several long-deprecated methods, and raised its Node
+floor (no pre-18 runtimes). When upgrading from 4, re-test routes using `*`
+wildcards and regex paths, and audit removed methods (`app.del`, `res.json(status, obj)`, etc.).
+
+### Legacy Express 4 — async errors do not auto-forward
+
+On Express 4 a rejected promise in an `async` handler is *not* caught; it becomes
+an unhandled rejection (process may crash, request hangs). Two safe patterns
+until you can move to 5:
 
 ```ts
 // 1. explicit forward
@@ -23,13 +42,6 @@ const wrap = (fn: express.RequestHandler): express.RequestHandler =>
 
 app.get("/x", wrap(async (req, res) => { res.json(await load()); }));
 ```
-
-### Express 5
-
-Express 5 forwards rejected promises returned from middleware/handlers to the
-error handler automatically, so the `wrap` helper becomes optional. It also
-tightens path-route matching (named wildcards) and drops several deprecated
-methods. When upgrading, re-test routes using `*` wildcards and regex paths.
 
 ### Middleware order
 

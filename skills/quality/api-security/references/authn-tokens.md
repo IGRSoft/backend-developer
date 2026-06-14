@@ -22,13 +22,15 @@ import { jwtVerify, createRemoteJWKSet } from "jose";
 const JWKS = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`));
 
 const { payload } = await jwtVerify(token, JWKS, {
-  issuer: ISSUER,                 // 1. pin iss
-  audience: API_AUDIENCE,         // 2. pin aud — token for another API is invalid here
-  algorithms: ["RS256"],          // 3. pin alg — blocks `none` and HS/RS confusion
-  clockTolerance: "30s",          // 4. exp/nbf checked automatically by jose
+  issuer: ISSUER,                  // 1. pin iss
+  audience: API_AUDIENCE,          // 2. pin aud — token for another API is invalid here
+  algorithms: ["EdDSA", "ES256"],  // 3. pin alg — blocks `none` and HS/RS confusion
+  clockTolerance: "30s",           // 4. exp/nbf checked automatically by jose
 });
 // 5. enforce scopes/roles from the claims, server-side, per route (see authz ref)
 ```
+
+**Algorithm choice (RFC 8725 — JWT Best Current Practices):** prefer `EdDSA` (Ed25519 — best security/performance, deterministic nonce) or `ES256`; `RS256` is still acceptable. What matters is pinning an explicit allow-list of exactly the algorithm(s) your issuer uses — never read the algorithm from the token header, and never include a symmetric (`HS*`) alg alongside an asymmetric one (that is the HS/RS confusion attack).
 
 Common JWT pitfalls:
 
@@ -64,6 +66,15 @@ res.cookie("sid", sessionId, {
 
 - **Never** store access/refresh tokens in `localStorage` — XSS reads it. Use `httpOnly` cookies, or keep tokens in memory with a refresh from an `httpOnly` cookie.
 - Mobile: platform secure storage (Keychain / Keystore).
+
+## Sender-constrained tokens — DPoP (RFC 9449)
+
+A plain bearer token is replayable: anyone who steals it (XSS, a leaked log, a proxy) can use it. **DPoP** (Demonstrating Proof-of-Possession, RFC 9449, finalized 2023) binds the token to a key pair the client holds — the client signs a fresh proof JWT for every token *and* every resource request, so a captured access/refresh token is useless without the private key.
+
+- **When to use it:** public clients (SPAs, mobile, CLIs, and AI agents / MCP clients) where you can't keep a client secret. OAuth 2.1 and the MCP spec both call out sender-constrained tokens as the recommended hardening here — in 2026 the question is *when* you adopt DPoP, not whether.
+- **How it lands:** the authorization server issues a DPoP-bound token (`cnf.jkt` thumbprint claim); the resource server checks the `DPoP` proof header's key matches that thumbprint and that the proof's `htm`/`htu`/`jti`/`iat` are fresh (reject replayed proofs).
+- **Alternative:** mTLS-bound tokens (RFC 8705) for confidential service-to-service clients that already terminate client certificates.
+- **Fallback (older stacks):** if your IdP/resource server can't do DPoP yet, keep plain bearer tokens but shorten access-token lifetime, rotate refresh tokens with reuse detection (below), and keep tokens out of `localStorage`.
 
 ## Refresh-token rotation & reuse detection
 
@@ -108,8 +119,9 @@ Versions: skill [version-feature-matrix](../../../_shared/version-feature-matrix
 ## Checklist
 
 - [ ] Authorization Code + PKCE (or Client Credentials for m2m); no Implicit/ROPC.
-- [ ] JWT validation pins `algorithms`, `issuer`, `audience`, and checks `exp`/`nbf`.
+- [ ] JWT validation pins `algorithms` (prefer `EdDSA`/`ES256`), `issuer`, `audience`, and checks `exp`/`nbf`.
 - [ ] Keys fetched from JWKS with rotation; no `alg: none`, no HS/RS confusion.
+- [ ] Public clients (SPA/mobile/CLI/agent) sender-constrain tokens with DPoP (RFC 9449) where the IdP supports it; otherwise short-lived tokens + refresh rotation.
 - [ ] Session cookies are `httpOnly` + `secure` + `sameSite`; id regenerated on login.
 - [ ] Refresh tokens rotate with reuse detection; revoke on reuse.
 - [ ] API keys stored hashed, scoped, rotatable, sent in a header.

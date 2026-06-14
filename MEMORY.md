@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| Plugin version | 1.0.0 |
+| Plugin version | 1.1.0 |
 | igrsoft compatibility | v3.17.0 |
 | Claude Code min required | 2.1.169 |
-| Last updated | 2026-06-14 |
+| Last updated | 2026-06-15 |
 
 Version strings move together (plugin.json, marketplace.json metadata, README
 header, this table) per the igrsoft `/cc-update` convention.
@@ -89,6 +89,30 @@ Deliberately **not** implemented here:
   `be-security-auditor` are organized around the OWASP API Security Top 10 (broken
   object/function-level authorization, injection, SSRF, secrets, rate limiting)
   rather than the memory-safety CWE Top 25 that anchors system-developer.
+
+## Version History
+
+### 1.1.0 — 2026-06 Best-Practices Refresh
+
+Runtime and framework floor bumps: Node.js 24 LTS, Go 1.26 (1.25 floor), Java 25
+LTS (Spring Boot 4.x GA / Spring Framework 7), .NET 10 LTS, FastAPI 0.136 / Django
+5.2 LTS / Flask 3.1, Rails 8.1, PHP 8.2+ / Laravel 12 / Symfony 7.4 LTS.
+
+Matrix expanded with new rows: Ruby/Rails, PHP/Laravel/Symfony, .NET Runtime &
+ASP.NET Core, MongoDB 8.0, Redis/Valkey divergence note. Total: 21 rows refreshed
+(A) + 22 added (+R) = 43 version-bearing surface rows.
+
+Notable shifts captured: OTel Logs API stable; Kafka 4.0 KRaft-only + native queue
+semantics; RabbitMQ 4.x quorum-only; GraphQL `@oneOf` ratified; OpenAPI 3.2 GA;
+RFC 9745 Deprecation header; ZAP→Checkmarx security tooling rebrand; DPoP/RFC
+9449 sender-constrained tokens; continuous profiling (Pyroscope/Parca). Pre-existing
+broken matrix link fixed (secure-coding/references/input-validation-and-parsing.md
+relative paths). Three un-owned domain SKILL.md files (jvm, node, quality) refreshed
+post-fan-out.
+
+Carried forward: OOS-1 advisory (skills/data/SKILL.md 8KB split follow-up);
+JavaScript framework matrix section (Express/NestJS/Fastify/Hono rows, follow-up);
+OWASP API Top 10 2023 edition re-anchor (structural, separate worktask).
 
 ## Companion Patch (REQUIRED, external)
 
