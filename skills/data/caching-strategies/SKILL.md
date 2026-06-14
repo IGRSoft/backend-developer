@@ -161,7 +161,7 @@ if (n > LIMIT) throw new TooManyRequests();
 | `SET key val NX PX ttl` (atomic lock) | Redis 2.6.12+ / any Valkey | `SETNX` + separate `EXPIRE` (non-atomic — avoid) |
 | `FUNCTION`/server-side functions | Redis 7.0+ / Valkey 7.2+ | `EVAL` Lua scripts |
 | `CLIENT NO-EVICT` / fine ACLs | Redis 7.x+ / Valkey 7.2+ | network ACLs + separate instances |
-| Hash-field TTL (`HEXPIRE`/`HGETEX`) | Redis 7.4+ / Valkey 9 | separate keyed entries with per-key TTL |
+| Hash-field TTL (`HEXPIRE`/`HGETEX`) | Redis 7.4+ / Valkey 8.1+ | separate keyed entries with per-key TTL |
 | Valkey (BSD-3 open fork) | drop-in Redis-OSS replacement (LF-stewarded) | Redis 8 (AGPLv3) |
 | `OBJECT FREQ` (LFU introspection) | `maxmemory-policy` set to `*-lfu` | `OBJECT IDLETIME` (LRU) |
 
