@@ -1,0 +1,31 @@
+# Workflow scratch state
+.context/
+
+# macOS
+.DS_Store
+
+# Node / TypeScript
+node_modules/
+dist/
+*.tsbuildinfo
+.turbo/
+
+# Go
+/bin/
+*.test
+*.out
+
+# JVM (Maven/Gradle)
+target/
+build/
+.gradle/
+
+# Python
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Containers / local infra
+.env
+docker-compose.override.yml
