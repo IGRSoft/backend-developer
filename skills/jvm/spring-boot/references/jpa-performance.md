@@ -2,7 +2,16 @@
 
 Deep-dive companion to [../SKILL.md](../SKILL.md) > JPA & Hibernate. Fetch
 strategies, N+1 elimination, projections, pagination traps, and batching for
-Spring Data JPA on Hibernate 6.x (Boot 3.x).
+Spring Data JPA on Hibernate 6.x (Boot 3.x) and Hibernate 7.x (Boot 4.x).
+
+**Hibernate 6 vs 7**: Spring Boot 3.x ships Hibernate 6.x; Spring Boot 4.x ships
+Hibernate 7.x (Jakarta Persistence 3.2, Jakarta EE 11). The fetch/projection
+patterns below are unchanged across both. When moving to Hibernate 7 on a Boot
+3.5→4.x upgrade, re-check: JPA 3.2 semantic changes (stricter query validation,
+`Enum`/`java.time` handling), removed deprecated APIs, and that any
+`hibernate.*` properties you set still exist. Both remain on the `jakarta.*`
+namespace — pin the floor in the matrix, not here:
+[version-feature-matrix](../../../_shared/version-feature-matrix.md).
 
 ## Fetch-Strategy Decision Table
 

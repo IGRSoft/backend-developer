@@ -45,11 +45,11 @@ Floors this plugin assumes. Library and runtime support shift between minor rele
 
 | Tool | Assumed floor | Why |
 |------|---------------|-----|
-| k6 | current stable | scriptable HTTP load tests; thresholds gate p95/p99 |
+| Grafana k6 | current stable | scriptable HTTP load tests; thresholds gate p95/p99 |
 | OpenTelemetry SDK | 1.x (lang-specific) | traces/metrics/logs; OTLP export *(verify per lang)* |
 | Testcontainers | current stable per lang | real Postgres/Redis/Kafka in integration tests |
 | Pact | 4.x (spec v4) | consumer-driven contract testing |
-| OWASP ZAP | current stable | DAST against a running API |
+| ZAP by Checkmarx (formerly OWASP ZAP) | current stable | DAST against a running API |
 | osv-scanner / govulncheck / npm audit / trivy | current stable | dependency + image CVE scanning |
 | pgbench / EXPLAIN (ANALYZE) | ships with Postgres 14+ | query plans + DB-level load baseline *(verify)* |
 | autocannon / wrk | current stable | quick HTTP throughput smoke benchmarks |

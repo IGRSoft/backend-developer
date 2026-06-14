@@ -140,14 +140,15 @@ orders = session.scalars(
 
 | Capability | Needs | Fallback |
 |------------|-------|----------|
-| Prisma interactive transactions | Prisma 4.7+ (5.x stable) | sequential `$transaction([...])` array |
-| Prisma `driverAdapters` (edge/serverless pools) | Prisma 5.4+ preview | direct driver + external pooler |
+| Prisma interactive transactions | Prisma 4.7+ (stable on current majors) | sequential `$transaction([...])` array |
+| Prisma driver adapters (edge/serverless pools) | GA on current Prisma (Rust-free client is the default from v7) | direct driver + external pooler |
 | Drizzle relational queries (`with`) | current stable | manual joins / `db.select()` |
 | EF Core `AsSplitQuery()` | EF Core 5+ | accept cartesian or multiple manual queries |
 | SQLAlchemy `selectinload` async | SQLAlchemy 2.0 async engine | sync session + `selectinload` |
 | GORM prepared-stmt cache | GORM v2 (`PrepareStmt: true`) | per-query prepare |
+| TypeORM `DataSource` API | TypeORM 0.3+ (1.0 is the modernized major) | legacy `Connection` API (0.2, removed) |
 
-Confirm ORM/runtime versions against the [version-feature-matrix](../../_shared/version-feature-matrix.md).
+Confirm ORM/runtime versions against the canonical [version-feature-matrix](../../_shared/version-feature-matrix.md) (the single home for ORM floors).
 
 ## Diagnostics
 

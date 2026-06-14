@@ -30,15 +30,22 @@ safety in depth: [references/django-advanced.md](references/django-advanced.md).
 
 ## Version Markers & Fallbacks
 
-| Feature | Needs | Fallback |
+For a new service, target the current **LTS (5.2, supported into 2028)** unless you
+need a 6.x-only feature; 6.0 is the current short-term-support line. Exact floors
+and support windows live in the matrix — link, don't restate.
+
+| Feature | Since | Fallback |
 |---------|-------|----------|
 | Async views (`async def` view) | Django 4.1+ | sync views; `sync_to_async` wrapper |
 | Async ORM (`aget`/`acreate`/`async for`) | Django 4.1+ (broadened 5.0) | `sync_to_async(qs.get)` shim |
 | `GeneratedField` / `db_default` | Django 5.0+ | computed in `save()` / model default |
-| DRF 3.15 serializer `UniqueValidator` async-safe paths | DRF 3.15+ | manual `validate_*` checks |
+| `CompositePrimaryKey` (multi-column PK) | Django 5.2 LTS+ | surrogate `id` + `unique_together` (note: composite PKs don't yet target FKs/admin) |
+| Built-in **Tasks** framework (background work, no Celery dependency) | Django 6.0+ | external queue (Celery/RQ/Arq) on 5.x |
+| `AsyncPaginator`/`AsyncPage`, native CSP middleware | Django 6.0+ | sync paginator; `django-csp` package on 5.x |
+| DRF serializers/viewsets, Django 6.0 + Python 3.14 support | DRF 3.17+ | DRF 3.16 (Django 4.2 floor); manual `validate_*` checks |
 
 Pin `django`, `djangorestframework` in `pyproject.toml`/`uv.lock`. Canonical
-version lookup: skill: version-feature-matrix
+version lookup (current floors + support windows): skill: version-feature-matrix
 (`../../_shared/version-feature-matrix.md`).
 
 ## Models & Migrations
@@ -184,6 +191,12 @@ async def book_count(request):
 Mixing sync ORM in an async view raises `SynchronousOnlyOperation` — wrap with
 `sync_to_async` or use the `a`-prefixed async methods. See
 [references/django-advanced.md](references/django-advanced.md) § async.
+
+For background work, current Django ships a **built-in Tasks framework** (enqueue
+work outside the request/response cycle without pulling in Celery) and async
+pagination (`AsyncPaginator`/`AsyncPage`) — see the version-markers table for the
+since-version and the matrix for the floor. On the LTS line, keep an external queue
+(Celery/RQ/Arq) until you adopt the newer release.
 
 ## Single-Command Build & Test
 

@@ -21,9 +21,9 @@ PHP (Laravel/Symfony), and .NET — plus the cross-cutting disciplines that
 design APIs, model data, shape architecture, and ship/observe services.
 The emphasis is on **version specificity**: every framework and runtime
 feature carries a version marker and a fallback path, so guidance stays
-correct whether you target Node 20 LTS or 22, Go 1.22 or 1.23, Spring Boot
-3.2 or 3.4, FastAPI 0.110+ or Django 5.x. When a version claim matters, verify
-it against your runtime and the canonical
+correct whatever runtime line you target (Node.js LTS, current Go, Spring Boot
+3.5/4.x, FastAPI, Django, and the rest). When a version claim matters, look up
+the floor and verify it against your runtime in the canonical
 [`_shared/version-feature-matrix.md`](_shared/version-feature-matrix.md) rather
 than trusting memory.
 
@@ -249,10 +249,10 @@ runtime before relying on a feature.
 
 | Runtime / Framework | Baseline | Newest | Headline of the newest |
 |---------------------|----------|--------|------------------------|
-| Node.js | 20 LTS | 22 LTS | Stable native `fetch`/`WebSocket`, built-in `node:test` runner, `--watch`, permission model (verify against your version) |
-| Go | 1.22 | 1.23 | Ranging over functions (iterators), `for` loop per-iteration scoping, enhanced routing patterns in `net/http` |
-| Spring Boot (JVM) | 3.2 (Java 17) | 3.4 (Java 21) | Virtual threads, GraalVM AOT/native images, observability via Micrometer, RestClient |
-| Python web | FastAPI 0.110 / Django 4.2 LTS | FastAPI 0.115+ / Django 5.1 | ASGI maturity, pydantic v2, async ORM (Django), per-request lifespan/deps (verify against your version) |
+| Node.js | 22 LTS | 24 LTS | Native `using`/`await using` + `Symbol.dispose`, stable `--permission`, npm 11 (verify against your version) |
+| Go | 1.25 | 1.26 | Green Tea GC default, `errors.AsType[T]`, `new(expr)`, `slog.NewMultiHandler` |
+| Spring Boot (JVM) | 3.5 (Java 17) | 4.x (Java 25 first-class) | Jakarta EE 11 / Spring Framework 7, Jackson 3, JSpecify null-safety, first-class API versioning, Hibernate 7 |
+| Python web | FastAPI 0.13x / Django 5.2 LTS | Django 6.0 | ASGI maturity, Pydantic v2 required, async ORM, built-in Tasks framework + native CSP (verify against your version) |
 
 > **Database/driver caveat:** ORM and driver feature support (e.g. Prisma
 > relation modes, Hibernate 6 query rewriting, SQLAlchemy 2.0 async) varies by

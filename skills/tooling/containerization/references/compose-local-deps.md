@@ -36,7 +36,7 @@ services:
       db:    { condition: service_healthy }
       cache: { condition: service_healthy }
   db:
-    image: postgres:16
+    image: postgres:18
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -48,7 +48,7 @@ services:
       retries: 10
     volumes: ["pgdata:/var/lib/postgresql/data"]
   cache:
-    image: redis:7
+    image: redis:8                # AGPLv3; swap to valkey/valkey:8.1 (BSD-3) for license-sensitive stacks
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -80,7 +80,7 @@ Each datastore needs its own readiness probe (below). `interval`/`retries` set h
 ```yaml
 # MySQL
 mysql:
-  image: mysql:8
+  image: mysql:8.4
   environment:
     MYSQL_DATABASE: app
     MYSQL_USER: app
@@ -94,7 +94,7 @@ mysql:
 
 # MongoDB
 mongo:
-  image: mongo:7
+  image: mongo:8.0
   healthcheck:
     test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
     interval: 5s
@@ -140,7 +140,7 @@ rabbitmq:
 
 ```yaml
 db:
-  image: postgres:16
+  image: postgres:18
   volumes:
     - ./db/init:/docker-entrypoint-initdb.d:ro   # *.sql / *.sh run once, on first boot
     - pgdata:/var/lib/postgresql/data
@@ -153,19 +153,19 @@ Postgres, MySQL, and Mongo official images all run scripts in `/docker-entrypoin
 Pin the **same image tags** in Compose and in your Testcontainers integration tests so "works locally" and "passes in CI" mean the same thing:
 
 ```java
-// Java — Testcontainers, same postgres:16 as Compose
-static PostgreSQLContainer<?> pg = new PostgreSQLContainer<>("postgres:16");
+// Java — Testcontainers, same postgres:18 as Compose
+static PostgreSQLContainer<?> pg = new PostgreSQLContainer<>("postgres:18");
 ```
 
 ```go
 // Go — testcontainers-go
-req := testcontainers.ContainerRequest{Image: "postgres:16", ExposedPorts: []string{"5432/tcp"},
+req := testcontainers.ContainerRequest{Image: "postgres:18", ExposedPorts: []string{"5432/tcp"},
   WaitingFor: wait.ForListeningPort("5432/tcp")}
 ```
 
 ```ts
 // Node — testcontainers
-const pg = await new PostgreSqlContainer("postgres:16").start();
+const pg = await new PostgreSqlContainer("postgres:18").start();
 ```
 
 Testcontainers gives each test run a throwaway container (parallel-safe, no port clashes); Compose gives you a long-lived local stack for manual work. Both should reference the same versions tracked in the version-feature-matrix (skill: version-feature-matrix). Full integration-test patterns: [be-testing](../../quality/be-testing/SKILL.md).

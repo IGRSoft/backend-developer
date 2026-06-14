@@ -41,12 +41,19 @@ Registration is part of test generation: file discovery (Vitest/Jest globs, `*_t
 `@Test`, pytest `test_*`, `*_spec.rb`, `*Test.php`, `[Fact]`). A test that the runner
 does not discover does not exist.
 
+Framework-selection notes (link floors to [version-feature-matrix.md](version-feature-matrix.md)):
+- **Node/TS**: Vitest is the default for services (Vite-native, TS-first); the in-tree `node:test` + `mock` runner is stable on the current LTS and good for libraries / zero-dependency packages but still lacks watch/snapshot/DX polish; Jest for legacy/existing codebases.
+- **Go**: `go test -race` + table-driven (`t.Run`) is the spine; `testing/synctest` (stable in 1.25) is the modern deterministic concurrency/time-test mechanism, and `uber-go/goleak` asserts no leaked goroutines.
+- **.NET**: xUnit v3 is the current line (new `xunit.v3` package + Microsoft Testing Platform runner); xUnit v2 still supported.
+- **PHP**: PHPUnit 12 (requires PHP 8.3+) is current; PHPUnit 11 (PHP 8.2+) still bug-fixed; Pest 3 (PHP 8.2+) builds on PHPUnit 11.
+- **Ruby**: RSpec (rspec-rails) primary, Minitest the Rails default; FactoryBot for factories, request specs for controller/API; Rails 8.1 ships Local CI (`bin/ci`) to run tests + lint + audit locally.
+
 ## Contract Testing
 
 | Approach | Use when | Tooling |
 |----------|----------|---------|
-| Consumer-driven contracts | Multiple consumers of an internal service | Pact (broker-mediated provider verification) |
-| Schema/snapshot contracts | Public REST/GraphQL surface | OpenAPI / JSON Schema validation, GraphQL schema diff |
+| Consumer-driven contracts | Multiple consumers of an internal service | Pact (broker-mediated provider verification) — target Pact Specification **v4** (PactV4 API / PactNet 5.x): mixed HTTP + async-message interactions in one pact, plugin support (gRPC/Protobuf) |
+| Schema/snapshot contracts | Public REST/GraphQL surface | OpenAPI / JSON Schema validation, GraphQL schema diff; Schemathesis **v4** for property-based fuzzing (`st run … --max-examples 200` — the v3 `--hypothesis-max-examples` flag was removed) |
 | gRPC contract | Proto-defined services | buf breaking-change detection against the registry |
 
 Run provider verification in CI against the latest published consumer contracts;
@@ -111,7 +118,7 @@ func TestGetUser_OtherTenant_Returns404(t *testing.T) {
 
 - Each test runs in isolation — no shared mutable state, no ordering assumptions
 - Per-test setup/teardown; wrap DB work in a transaction rollback or truncate between tests
-- Hermetic by default: ephemeral containers, no shared staging DB, no real network egress
+- Hermetic by default: ephemeral containers, no shared staging DB, no real network egress. Testcontainers reusable containers (`withReuse()` / `testcontainers.reuse.enable=true`) are experimental and **not for CI** — they disable the Ryuk reaper and leak; use only for local iteration.
 - Deterministic: inject a fixed clock and seeded IDs; no `sleep` as synchronization — poll/await instead
 
 ## Quality Gates

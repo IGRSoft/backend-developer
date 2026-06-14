@@ -57,8 +57,9 @@ go mod tidy                     # reconcile go.mod / go.sum with imports
 **Go versioning in one line**: generics (`[T any]`) land in **1.18**; `slog`
 structured logging in **1.21**; `min`/`max`/`clear` builtins in **1.21**;
 range-over-integer in **1.22**; range-over-func iterators in **1.23**.
-Pin the toolchain in `go.mod` with a `go 1.23` directive plus a `toolchain`
-line. Per-feature minimums: [version-feature-matrix](${CLAUDE_SKILL_DIR}/_shared/version-feature-matrix.md).
+Pin the toolchain in `go.mod` with a `go 1.25` directive plus a `toolchain`
+line (current supported floor; 1.26 for the current minor). Per-feature
+minimums and the canonical floor: [version-feature-matrix](${CLAUDE_SKILL_DIR}/_shared/version-feature-matrix.md).
 
 The `go` directive in `go.mod` gates which language features compile — bump it
 deliberately and let `golangci-lint` flag pre-`go`-directive constructs.

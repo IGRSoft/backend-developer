@@ -95,16 +95,22 @@ Breaking changes need a humane, signposted retirement — never a silent removal
 
 ```http
 # Responses from a deprecated version advertise their fate
-Deprecation: true
+Deprecation: @1727740800
 Sunset: Wed, 01 Oct 2025 00:00:00 GMT
 Link: <https://docs.acme.com/migrate/v1-to-v2>; rel="deprecation"
-Warning: 299 - "v1 is deprecated; migrate to v2 by 2025-10-01"
 ```
+
+RFC 9745 (published March 2025) made `Deprecation` a real response header — its
+value is a **date** (an `sf-date`, e.g. `@1727740800` for the deprecation
+instant), *not* the older `Deprecation: true` boolean some pre-RFC tooling
+emitted. Don't reach for the legacy `Warning` header — it was obsoleted by RFC
+9111 (HTTP caching); carry the human-readable migration note in the
+`rel="deprecation"` `Link` target instead.
 
 Policy checklist:
 1. **Announce** before deprecating — changelog, email, dashboard banner.
 2. **Window**: publish a minimum support window (e.g., 6–12 months for public APIs) and stick to it.
-3. **Signal in-band**: `Deprecation` + `Sunset` headers (RFC 8594) plus a migration `Link`.
+3. **Signal in-band**: `Deprecation` (RFC 9745, date value) + `Sunset` (RFC 8594) headers plus a migration `Link`.
 4. **Measure** usage of the old version; chase the long-tail callers before sunset.
 5. **Sunset**: after the window, old version returns `410 Gone` (REST) — not a silent `404`.
 
@@ -115,7 +121,7 @@ usage before removal in the next breaking schema cut.
 
 | Capability | Floor | Fallback when unavailable |
 |------------|-------|---------------------------|
-| `Deprecation`/`Sunset` headers | RFC 8594 (Sunset), Deprecation draft | `Warning` header + docs link |
+| `Deprecation`/`Sunset` headers | RFC 9745 (Deprecation, date value), RFC 8594 (Sunset) | `rel="deprecation"` `Link` + docs (no `Warning` — obsoleted by RFC 9111) |
 | Breaking-change CI gate | `buf breaking` (proto), `oasdiff` (OpenAPI) | manual diff review of the merged contract |
 | GraphQL field deprecation | `@deprecated` (spec) + usage analytics | changelog-only, riskier removal |
 | Date-pinned routing | API gateway / app version router | URL-path majors |

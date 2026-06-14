@@ -44,7 +44,7 @@ Evidence gate: service/API work defaults `requires_screenshots: false`. When the
 
 ## Framework Selection
 
-`FastAPI`, `Django`, and `Flask` are the supported targets. Pick deliberately and record a version marker per `skill: fastapi` and `skills/_shared/version-feature-matrix.md` (canonical minimum-version table). **Verify framework behavior via Context7 or Ref before relying on it** — major-version semantics (Pydantic v1→v2, async SQLAlchemy 2.0, Django async views) shift; do not assert from memory.
+`FastAPI`, `Django`, and `Flask` are the supported targets. Pick deliberately and record a version marker per `skill: fastapi` and `skills/_shared/version-feature-matrix.md` (canonical minimum-version table). **Verify framework behavior via Context7 or Ref before relying on it** — major-version semantics shift: current FastAPI **requires Pydantic v2** (v1 support dropped — migrate, don't lean on the temporary `pydantic.v1` shim), the async SQLAlchemy 2.x engine and Django async views/ORM are the modern defaults, and Django's LTS-vs-STS line (5.2 LTS vs 6.0) gates feature availability. Do not assert from memory.
 
 | Framework | Use for | Validation | Persistence | Async posture |
 |---|---|---|---|---|

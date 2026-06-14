@@ -1,7 +1,7 @@
 ---
 name: spring-boot
 description: >-
-  Spring Boot 3.x back-end patterns — REST controllers, constructor DI,
+  Spring Boot back-end patterns (3.5 and 4.x) — REST controllers, constructor DI,
   @Transactional boundaries, JPA/Hibernate mapping (N+1, fetch joins, DTO
   projection), Bean Validation, Spring Security, and WebFlux reactive
   endpoints on the jakarta.* namespace. Use when writing or reviewing
@@ -9,14 +9,19 @@ description: >-
   choosing the blocking-vs-reactive stack.
 ---
 
-# Spring Boot 3.x
+# Spring Boot
 
 **Annotation-driven REST services with correct DI, transactions, persistence, and auth boundaries**
+
+Spring Boot 4.x (on Spring Framework 7) is the current line; Spring Boot 3.5 is
+the supported fallback (final 3.x minor). The patterns below hold on both — where
+4.x shifts a default, it is called out inline. Runtime/framework/Kotlin minimums:
+skill `version-feature-matrix` (`../../_shared/version-feature-matrix.md`).
 
 ## When to Use
 
 Use this skill when:
-- Building or reviewing a Spring Boot 3.x REST or reactive service
+- Building or reviewing a Spring Boot REST or reactive service (3.5 or 4.x)
 - Wiring dependency injection and deciding bean scopes
 - Placing `@Transactional` boundaries and reasoning about rollback rules
 - Mapping JPA/Hibernate entities and eliminating N+1 queries
@@ -27,7 +32,7 @@ Use this skill when:
 Routing: deep JPA/Hibernate performance work (fetch strategies, projections,
 batch sizing, pagination) → [references/jpa-performance.md](references/jpa-performance.md).
 
-## The Namespace Rule (Boot 3.x = `jakarta.*`)
+## The Namespace Rule (Boot 3.x / 4.x = `jakarta.*`)
 
 | Job | Import | Do not use |
 |-----|--------|------------|
@@ -35,17 +40,43 @@ batch sizing, pagination) → [references/jpa-performance.md](references/jpa-per
 | Validation constraints | `jakarta.validation.*` | `javax.validation.*` |
 | Servlet API | `jakarta.servlet.*` | `javax.servlet.*` |
 
-Spring Boot 3.x requires Java 17+ and runs entirely on the `jakarta.*`
-namespace. Mixing a `javax.*` library in silently breaks transaction and
-validation weaving. Pin Boot in `pom.xml`/`build.gradle.kts` and let the BOM
-carry transitive versions. Platform minimums: skill `version-feature-matrix`
+Spring Boot 3.x and 4.x run entirely on the `jakarta.*` namespace. Mixing a
+`javax.*` library in silently breaks transaction and validation weaving. Pin Boot
+in `pom.xml`/`build.gradle.kts` and let the BOM carry transitive versions.
+Java/Kotlin/Spring-Boot minimums: skill `version-feature-matrix`
 (`../../_shared/version-feature-matrix.md`).
+
+## Boot 3.5 vs 4.x: What Changes
+
+Most patterns in this skill are identical on both lines. The defaults that shift
+when moving from Boot 3.5 to Boot 4.x (verify against the release notes before
+relying on any of them):
+
+- **Jackson 3 is the default JSON mapper** (was Jackson 2). A Jackson 2 module
+  still ships for ecosystem libraries that have not moved — but new code targets
+  Jackson 3 package names. Audit custom `ObjectMapper` config and serializers.
+- **JSpecify null-safety annotations** replace the old `org.springframework.lang`
+  `@Nullable`/`@NonNull`. Add `@NullMarked` at the package level (`package-info.java`)
+  and `@Nullable` from `org.jspecify.annotations` where null is allowed — a null
+  checker (or Kotlin) then flags violations at compile time.
+- **Modularized starters/jars** — the monolithic core was split into smaller,
+  focused modules; some starter coordinates were renamed. Re-resolve dependencies
+  after the upgrade rather than assuming the old artifact ids.
+- **First-class API versioning + HTTP Service Clients** (`@ImportHttpServices`) are
+  new in Spring Framework 7 / Boot 4 — prefer them over hand-rolled version routing
+  and manual `RestClient`/`WebClient` wiring on new 4.x services.
+- **Jakarta EE 11 / Hibernate 7** ship with Boot 4 (Boot 3.x carries Hibernate 6) —
+  see [references/jpa-performance.md](references/jpa-performance.md) for the 6→7 note.
+
+Staying on Boot 3.5 is a valid choice while you plan the move (OSS support runs to
+mid-2026 — confirm the matrix); none of the patterns below require Boot 4.
 
 ## Controllers & DI
 
 Use **constructor injection** (not field `@Autowired`) — it makes
 dependencies final, testable, and impossible to forget. A single constructor
-needs no annotation. Map request/response bodies with **records** (Java 17).
+needs no annotation. Map request/response bodies with **records** (available on
+every supported JDK).
 
 ```java
 @RestController
@@ -85,8 +116,12 @@ codes, pagination, versioning) lives in [api-design](../../api/SKILL.md).
 ## Error Handling
 
 Centralize error-to-response mapping with `@RestControllerAdvice` so every
-endpoint returns a consistent body (RFC 9457 `ProblemDetail`). Never leak stack
-traces or SQL to clients — see [secure-coding](../../_shared/secure-coding/SKILL.md).
+endpoint returns a consistent body. `ProblemDetail` / `ErrorResponse` render the
+**RFC 9457** "Problem Details for HTTP APIs" format (RFC 9457 obsoletes the older
+RFC 7807; the Spring API is the same) — supported on Spring Framework 6 and 7.
+Return `ProblemDetail` from any `@ExceptionHandler` and its `status` drives the
+HTTP status. Never leak stack traces or SQL to clients — see
+[secure-coding](../../_shared/secure-coding/SKILL.md).
 
 ```java
 @RestControllerAdvice
@@ -201,7 +236,8 @@ record CreateUser(
 
 ## Spring Security
 
-Configure a `SecurityFilterChain` bean (no `WebSecurityConfigurerAdapter` in 6.x).
+Configure a `SecurityFilterChain` bean (the removed `WebSecurityConfigurerAdapter`
+is gone in Spring Security 6+, which both Boot 3.x and 4.x use).
 Authenticate with OAuth2/OIDC resource-server (JWT) for APIs; enforce
 authorization at the method layer so it cannot be bypassed by a new endpoint.
 
@@ -236,11 +272,15 @@ the caller. URL-pattern rules alone are **broken function-level authorization
 
 ## WebFlux: When (and When Not)
 
-Use **blocking MVC + virtual threads** (Java 21, `spring.threads.virtual.enabled=true`)
+Use **blocking MVC + virtual threads** (Java 21+, opt-in via
+`spring.threads.virtual.enabled=true` — Spring Boot does not enable them for you)
 as the default — it gives you high concurrency with ordinary imperative code and
-a normal stack trace. Reach for **WebFlux** only when you need backpressure, are
-already non-blocking end-to-end (R2DBC, reactive clients), or stream large
-results. Do not block a Reactor thread (`block()`, JDBC) inside WebFlux.
+a normal stack trace, and on a current LTS JDK it is the standard recommendation
+for most services. Reach for **WebFlux** only when you need backpressure, are
+already non-blocking end-to-end (R2DBC, reactive clients), or stream/push large
+results (SSE, WebSocket) — virtual threads have narrowed WebFlux's remaining
+niche to those streaming cases. Do not block a Reactor thread (`block()`, JDBC)
+inside WebFlux.
 
 ```java
 @RestController

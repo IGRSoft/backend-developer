@@ -131,7 +131,7 @@ A leak shows as a retained set that grows between two snapshots taken at the sam
 
 ## Version & Fallbacks
 
-Profiler and DB tooling availability shifts across runtime/engine versions — confirm with `--version` and the version-feature-matrix (skill: version-feature-matrix). Notable floors: Go `net/http/pprof` stdlib (any modern Go); JFR open-source since JDK 11; `pg_stat_statements` is an extension you must enable; py-spy needs `ptrace` (or `--cap-add SYS_PTRACE` in containers). When a profiler is unavailable in prod, fall back to RED metrics + trace sampling ([observability](../observability/SKILL.md)).
+Profiler and DB tooling availability shifts across runtime/engine versions — confirm with `--version` and the version-feature-matrix (skill: version-feature-matrix). Notable floors: Go `net/http/pprof` stdlib (any modern Go); JFR open-source since JDK 11 (async-profiler 4.x can also consume the JDK 25 `CPUTimeSample` event); `pg_stat_statements` is an extension you must enable; py-spy needs `ptrace` (or `--cap-add SYS_PTRACE` in containers). When you can't attach a profiler to the live prod instance, fall back to RED metrics + trace sampling ([observability](../observability/SKILL.md)) — or run **continuous profiling** (Pyroscope/Parca, eBPF) so the flamegraph for the bad window is already recorded; see [profilers.md](references/profilers.md).
 
 ## Related Skills
 

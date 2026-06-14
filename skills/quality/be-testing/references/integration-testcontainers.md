@@ -126,6 +126,7 @@ Equivalents: `fishery` (Node), `FactoryBot` (Ruby), Test Data Builders (JVM/.NET
 - One container per suite, isolate inside it (don't start a container per test).
 - Use `tmpfs` for the DB data dir in CI for a faster throwaway DB.
 - Mark integration tests with a tag/profile so the fast unit suite can run on every save and integration runs on PR.
+- **Reusable containers** (`withReuse()` / `testcontainers.reuse.enable=true`) keep a container alive across runs to skip startup — but the feature is still **experimental and explicitly not for CI** (it disables the Ryuk reaper, so containers leak between runs). Use it only for fast local iteration; CI should let Ryuk clean up per run.
 
 Versions: skill [version-feature-matrix](../../../_shared/version-feature-matrix.md).
 

@@ -46,10 +46,10 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 /backend-developer:code-modernize . --target node@22
 
 # Bump a FastAPI / Django project to a newer Python + framework line
-/backend-developer:code-modernize . --target django@5.1
+/backend-developer:code-modernize . --target django@5.2
 
-# Roll a .NET service to the next LTS
-/backend-developer:code-modernize src/ --target dotnet@9.0
+# Roll a .NET service to the current LTS
+/backend-developer:code-modernize src/ --target dotnet@10.0
 ```
 
 ## Options
@@ -57,7 +57,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 | Option | Default | Effect |
 |--------|---------|--------|
 | `path` | `.` | Directory or file to modernize. Inventory and detection are rooted here. |
-| `--target <framework@version>` | required | The destination framework/runtime and version (e.g. `spring-boot@3.4`, `node@22`, `nestjs@11`, `fastify@5`, `django@5.1`, `fastapi@0.115`, `rails@8`, `laravel@11`, `dotnet@9.0`, `go@1.23`). For a breaking major, the command auto-inserts the intermediate landing if the source is more than one major below the target. |
+| `--target <framework@version>` | required | The destination framework/runtime and version (e.g. `spring-boot@4.0`, `node@22`, `nestjs@11`, `fastify@5`, `django@5.2`, `fastapi@0.136`, `rails@8`, `laravel@11`, `dotnet@10.0`, `go@1.26`). For a breaking major, the command auto-inserts the intermediate landing if the source is more than one major below the target. Pin services to an LTS line (e.g. .NET `10.0`, not the `9.0` STS). |
 | `--dry-run` | off | Produce `.context/.modernize/plan.md` (the migration ledger) and stop. No edits, no commits. |
 
 `--target` is required — there is no default, because the right destination depends on the deployment runtime and the rest of the platform (managed runtime version, base image, hosting tier). The destination is named as `framework@version` (or `runtime@version` for a pure runtime bump like `node@22` / `go@1.23`).
@@ -131,9 +131,11 @@ Runtime gate: Fastify 5 needs Node 20+ (verify) per `skill: version-feature-matr
 | 3 | body parsing / validation -> **schema-based** | semantic | Replace `body-parser` + ad-hoc checks with JSON Schema route validation; keep response contracts identical. Route to `node-developer`. |
 | 4 | error handler + 404 -> **`setErrorHandler`/`setNotFoundHandler`** | semantic | Centralize; ensure the error envelope shape is unchanged. Route to `node-developer`. |
 
-### `--target spring-boot@3.x` (from Spring Boot 2)
+### `--target spring-boot@3.x` / `spring-boot@4.x` (from Spring Boot 2 or 3)
 
-Runtime gate: Spring Boot 3 requires **JDK 17+** and the **jakarta.\*** namespace (verify GA versions against your toolchain) per `skill: version-feature-matrix`. The 2.x -> 3.0 jump is the breaking one; later 3.x feature passes are a separate Jump.
+Runtime gate: Spring Boot 3 requires **JDK 17+** and the **jakarta.\*** namespace; Spring Boot 4 (current line, on Spring Framework 7 / Jakarta EE 11) also baselines JDK 17 but is first-class on a newer LTS (verify GA versions and the JDK floor against your toolchain) per `skill: version-feature-matrix`. The 2.x -> 3.0 jump is the breaking one (`javax` -> `jakarta`); the 3.x -> 4.x jump is a separate Jump driven by default-shifts (Jackson 2 -> 3, JSpecify null-safety, modularized starters). Walk one major at a time — a Boot 2.7 -> 4.x target lands on 3.x first, then 4.x.
+
+**Jump A — Boot 2.x -> 3.0 (the `javax` -> `jakarta` breaking landing):**
 
 | Order | Class | Kind | Notes |
 |-------|-------|------|-------|
@@ -143,27 +145,36 @@ Runtime gate: Spring Boot 3 requires **JDK 17+** and the **jakarta.\*** namespac
 | 4 | Hibernate 5 -> **6** dialect/query sweep | semantic | Single auto-detected dialect, removed legacy types, `@GeneratedValue` defaults; watch N+1 and transaction boundaries. Route to `jvm-backend-developer`. |
 | 5 | `spring.factories` -> **`AutoConfiguration.imports`** | mechanical-ish | Move auto-config registration to the new file. Delegate to `be-code-fixer`. |
 
-### `--target django@5.x` / `fastapi@0.11x` (Python web)
+**Jump B — Boot 3.x -> 4.x (current line, only when `--target` is `spring-boot@4.x`; a separate Jump after Jump A is `committed`):**
 
-Runtime gate: `requires-python` must allow the target's Python floor (Django 5.x needs Python 3.10+, verify) — otherwise raise the floor first. Per `skill: version-feature-matrix`.
+| Order | Class | Kind | Notes |
+|-------|-------|------|-------|
+| 1 | bump Boot parent -> 4.0; OpenRewrite `UpgradeSpringBoot_4_0` dry pass; refresh modularized-starter coordinates | mechanical | The starter jars were split/renamed; let the recipe remap coordinates + the BOM. Delegate to `be-code-fixer`. |
+| 2 | Jackson 2 -> **3** default mapper sweep | semantic | Boot 4 ships Jackson 3 as the default; a Jackson 2 module remains for un-migrated libs. Re-check custom `ObjectMapper` config, serializers, and the JSON envelope shape with request/response transcripts. Route to `jvm-backend-developer`. |
+| 3 | Hibernate 6 -> **7** sweep (Jakarta Persistence 3.2) | semantic | Boot 4 ships Hibernate 7 (JPA 3.2 / Jakarta EE 11): removed deprecated APIs, Entity Graph API changes; re-check N+1, fetch strategies, and transaction boundaries. Keep the Hibernate floor aligned with `skill: version-feature-matrix`. Route to `jvm-backend-developer`. |
+| 4 | JSpecify null-safety + API-versioning / HTTP Service Client adoption | semantic | Adopt where it adds value (not blocking) — annotate nullability, optionally move to first-class API versioning / `@ImportHttpServices`. Keep the public contract identical. Route to `jvm-backend-developer`. |
+
+### `--target django@5.x` / `fastapi@0.1xx` (Python web)
+
+Runtime gate: `requires-python` must allow the target's Python floor (Django 5.x needs Python 3.10+; current FastAPI requires Pydantic v2, verify) — otherwise raise the floor first. Per `skill: version-feature-matrix`.
 
 | Order | Class | Kind | Notes |
 |-------|-------|------|-------|
 | 1 | `ruff check --select UP --fix` + dependency bump | mechanical | `pyupgrade` idioms + pin Django/FastAPI to target. Delegate to `be-code-fixer`. |
 | 2 | settings / `urls.py` deprecation sweep | semantic | Remove `USE_L10N`, update `STORAGES`, `url()` -> `re_path()`/`path()`, async-view readiness. Verify against the target "Release notes". Route to `python-backend-developer`. |
 | 3 | ORM / migration sweep | semantic | Regenerate and review migrations; check `on_delete`, index changes, and N+1 under the new ORM defaults. Verify migration logs are clean. Route to `python-backend-developer`. |
-| 4 | FastAPI: Pydantic v1 -> **v2** models | semantic | `BaseSettings` -> `pydantic-settings`, validators -> `field_validator`/`model_validator`, `Config` -> `model_config`. Keep response schemas identical. Route to `python-backend-developer`. |
+| 4 | FastAPI: Pydantic v1 -> **v2** models | semantic | **Mandatory for a current FastAPI bump** — FastAPI dropped Pydantic v1 (the `pydantic.v1` shim is a temporary stopgap, not a destination), so this class gates the FastAPI upgrade, not an optional polish. `BaseSettings` -> `pydantic-settings`, validators -> `field_validator`/`model_validator`, `Config` -> `model_config`. Keep response schemas identical. Route to `python-backend-developer`. |
 
-### `--target dotnet@9.0` / `go@1.23` (runtime bumps)
+### `--target dotnet@10.0` / `go@1.26` (runtime bumps)
 
-Runtime gate: confirm the SDK / toolchain and base image ship the target (`<TargetFramework>net9.0`, `go 1.23` in `go.mod`) per `skill: version-feature-matrix`.
+Runtime gate: confirm the SDK / toolchain and base image ship the target (`<TargetFramework>net10.0`, `go 1.26` in `go.mod`) per `skill: version-feature-matrix`. Pin .NET service code to the current LTS (.NET 10) — an STS line (.NET 9) is not a service-code baseline; the matrix holds the live LTS/STS floors.
 
 | Order | Class | Kind | Notes |
 |-------|-------|------|-------|
 | 1 (.NET) | bump `<TargetFramework>` + package versions; `dotnet format` | mechanical | Refresh ASP.NET Core / EF Core pins. Delegate to `be-code-fixer`. |
 | 2 (.NET) | minimal-API / nullable-reference / removed-API sweep | semantic | Address breaking changes in the target's migration guide; keep endpoint contracts stable. Route to `dotnet-developer`. |
-| 1 (Go) | bump `go` directive; `go fix` + `gofmt -w` | mechanical | Update `go.mod`, run `go mod tidy`. Delegate to `be-code-fixer`. |
-| 2 (Go) | per-iteration loopvar / deprecated stdlib sweep | semantic | Remove now-unneeded `x := x` loop captures (Go 1.22+ loopvar), replace deprecated stdlib calls. Verify with `go vet`. Route to `go-developer`. |
+| 1 (Go) | bump `go` directive; `go fix` + `gofmt -w`; golangci-lint v1->v2 config migration | mechanical | Update `go.mod`, run `go mod tidy`; if a v1 `.golangci.yml` is present, run `golangci-lint migrate` (v2 renamed `enable-all`/`disable-all` -> `linters.default`, moved exclusions, split `golangci-lint fmt`). Delegate to `be-code-fixer`. |
+| 2 (Go) | remove obsolete loopvar capture shims / deprecated stdlib sweep | semantic | Remove now-obsolete `x := x` per-iteration loop captures — loopvar is baseline on every supported toolchain (Go 1.22+), so the shims are dead code, not a migration target; replace deprecated stdlib calls. Verify with `go vet`. Route to `go-developer`. |
 
 > Ruby (Rails) and PHP (Laravel/Symfony) follow the same shape: bump the framework pin + run the official upgrade codemod (mechanical), then sweep deprecated APIs / config and rework breaking framework hooks (semantic), routing to `backend-developer:ruby-developer` / `backend-developer:php-developer`. See `skill: version-feature-matrix` for each line's floor and fallback rows.
 
@@ -292,7 +303,7 @@ Suggestion: Pass a directory or file that exists, e.g. /backend-developer:code-m
 ### Missing or invalid --target
 ```
 Error: --target is required and must be <framework@version> (or <runtime@version>),
-e.g. spring-boot@3.4, node@22, fastify@5, django@5.1, dotnet@9.0, go@1.23.
+e.g. spring-boot@4.0, node@22, fastify@5, django@5.2, dotnet@10.0, go@1.26.
 Suggestion: /backend-developer:code-modernize . --target spring-boot@3.4 --dry-run
 ```
 

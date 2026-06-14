@@ -39,21 +39,21 @@ Start here when you have a behavior, not a topic name.
 
 ## Engine / Tool Version Snapshot (verify against your stack)
 
-Floors this plugin assumes. Engine behavior and driver defaults shift between releases — confirm with `SELECT version();` / the driver changelog and the [version-feature-matrix](../_shared/version-feature-matrix.md) before pinning in CI.
+Floors this plugin assumes. Engine behavior and driver defaults shift between releases — confirm with `SELECT version();` / the driver changelog and the canonical [version-feature-matrix](../_shared/version-feature-matrix.md) (the single home for engine + ORM floors) before pinning in CI. The notes below are the *why*; the floors live in the matrix.
 
 | Tool | Assumed floor | Why |
 |------|---------------|-----|
-| PostgreSQL | 14+ baseline (16+ preferred) | `CREATE INDEX CONCURRENTLY`, generated columns, `MERGE` (15+), logical replication maturity *(verify)* |
-| MySQL | 8.0+ | online DDL (`ALGORITHM=INPLACE`), CTEs, window functions, `INVISIBLE` indexes |
-| MongoDB | 6.0+ | multi-document transactions, `$lookup`, change streams, time-series collections |
-| Redis | 7.x | functions, `CLIENT NO-EVICT`, ACLs; Valkey fork tracks 7.x semantics *(verify)* |
-| Prisma | 5.x | interactive transactions, driver adapters, `relationJoins` preview |
-| Drizzle | current stable | relational queries, prepared statements, no codegen |
-| TypeORM | 0.3.x | `DataSource` API (0.2 `Connection` removed) |
-| GORM | v2 (`gorm.io/gorm`) | context-aware API, `Preload`, prepared-stmt cache |
-| Hibernate | 6.x | Jakarta Persistence 3.1, `@FetchProfile`, JPQL improvements |
-| EF Core | 8+ | bulk `ExecuteUpdate`/`ExecuteDelete`, JSON columns, compiled models |
-| SQLAlchemy | 2.0 | unified ORM/Core API, `select()` style, async engine |
+| PostgreSQL | matrix floor (16+ baseline; 18 the modern target) | `CREATE INDEX CONCURRENTLY`, generated columns, `MERGE` (15+), skip scan + async I/O + `uuidv7()` (18) *(verify)* |
+| MySQL | matrix floor (8.4 LTS; 8.0 EOL'd) | online DDL (`ALGORITHM=INPLACE`), CTEs, window functions, `INVISIBLE` indexes |
+| MongoDB | matrix floor (8.0 LTS target) | multi-document transactions, `$lookup`, change streams, time-series + queryable-encryption maturity |
+| Redis / Valkey | matrix floor (Redis 8 / Valkey 8.1+) | functions, `CLIENT NO-EVICT`, ACLs; **license fork** — Redis 8 is AGPLv3, Valkey is BSD-3 (drop-in Redis-OSS replacement) — see Caching note |
+| Prisma | matrix floor (6.x; 7.x Rust-free default) | interactive transactions, driver adapters (GA), Rust-free TS query compiler (7) |
+| Drizzle | matrix floor (current 0.4x stable; v1 in beta) | relational queries, prepared statements, no codegen |
+| TypeORM | matrix floor (0.3.x; 1.0 GA'd) | `DataSource` API (0.2 `Connection` removed); 1.0 modernizes the platform floor |
+| GORM | matrix floor (v2, `gorm.io/gorm`) | context-aware API, `Preload`, prepared-stmt cache |
+| Hibernate | matrix floor (7.x; 6.x prior) | Jakarta Persistence 3.2 (7.0), Jakarta Data, type-safe queries; 6.x is Jakarta 3.1 |
+| EF Core | matrix floor (10 LTS; 8 prior LTS) | bulk `ExecuteUpdate`/`ExecuteDelete`, JSON columns, compiled models, `LeftJoin`/`RightJoin` (10) |
+| SQLAlchemy | matrix floor (2.0) | unified ORM/Core API, `select()` style, async engine |
 
 ## Decision Tree
 
@@ -86,6 +86,7 @@ Data-layer task?
 - **Indexes are part of the schema, not an afterthought.** A query change that needs an index ships with the migration that adds it (`CONCURRENTLY` in Postgres). See [query-optimization](query-optimization/SKILL.md).
 - **Single-command Bash invocations.** Use `psql -f mig.sql`, `prisma migrate deploy`, `go test ./...` — never `cd`-chains. Scoped Bash allowlists do not match compound commands.
 - **Untrusted input never concatenates into SQL.** Parameterize everything; the ORM's query builder or prepared statements are the boundary. See [secure-coding](../_shared/secure-coding/SKILL.md).
+- **Redis vs Valkey is now a license decision, not just a version one.** Redis 8+ ships under AGPLv3 (plus the source-available RSALv2/SSPLv1); Valkey is the BSD-3 Linux-Foundation fork (AWS/Google/Oracle-backed) and a drop-in Redis-OSS replacement tracking the same command surface. Pick per your license posture; the cache patterns in [caching-strategies](caching-strategies/SKILL.md) apply to both. Confirm the engine + floor in the [version-feature-matrix](../_shared/version-feature-matrix.md).
 
 ## Related Skills
 

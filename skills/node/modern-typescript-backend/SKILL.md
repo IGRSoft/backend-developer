@@ -67,7 +67,7 @@ relative imports).
 // package.json
 {
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=22" },          // set to your supported LTS floor — skill: version-feature-matrix
   "packageManager": "pnpm@9.12.0",
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
@@ -75,9 +75,11 @@ relative imports).
 }
 ```
 
-Node 22+ can `require()` a synchronous ESM graph; Node 20 cannot — do not rely
-on it for a library meant to run on 20. Relative imports in ESM need the
-extension: `import { db } from "./db.js"` (the `.js`, not `.ts`).
+`require()` of a synchronous ESM graph is now unflagged on the current LTS lines
+(it throws `ERR_REQUIRE_ASYNC_MODULE` if the target or its deps use top-level
+`await`) — but confirm your floor in skill: version-feature-matrix before relying
+on it for a library meant to run on an older runtime. Relative imports in ESM
+need the extension: `import { db } from "./db.js"` (the `.js`, not `.ts`).
 
 ## Validate at the Boundary (zod / valibot)
 
@@ -196,11 +198,12 @@ Framework wiring (modules, guards, pipes, interceptors) lives in
 | `using` / `await using` | 5.2 | deterministic resource cleanup (db client, span, file) | `try/finally` with explicit `close()` |
 | Inferred type predicates | 5.5 | `arr.filter(Boolean)` narrows without a manual guard | hand-written `(x): x is T =>` guard |
 | `--isolatedDeclarations` | 5.5 | fast `.d.ts` emit for libraries/monorepos | normal `tsc` declaration emit |
+| `import defer` (deferred module evaluation) | 5.9 | lazy-evaluate a heavy module until first use | manual dynamic `import()` |
 | `const` type parameters | 5.0 | preserve literal tuples in generic helpers | `as const` at the call site |
 | `satisfies` | 4.9 | typecheck a config object without widening | explicit annotation + manual checks |
 
 ```ts
-// using: scope-bound cleanup (TS 5.2 + Node 24 / Symbol.dispose polyfill)
+// using: scope-bound cleanup (TS 5.2 + a runtime with Symbol.dispose, or a polyfill)
 async function withTx() {
   await using tx = await pool.begin();   // tx[Symbol.asyncDispose]() runs on scope exit
   await tx.query("...");
@@ -208,9 +211,18 @@ async function withTx() {
 }
 ```
 
-`using` requires a runtime with `Symbol.dispose`/`asyncDispose` (Node 24 native;
-earlier needs the `disposablestack` polyfill and `lib: ["esnext.disposable"]`).
-Gate before shipping: skill: version-feature-matrix.
+`using` requires a runtime with `Symbol.dispose`/`asyncDispose` (native on the
+newest LTS line; the prior LTS needs the `disposablestack` polyfill and
+`lib: ["esnext.disposable"]`) — gate on **both** the TS version and the runtime,
+not the TS version alone. Confirm the exact runtime floor: skill:
+version-feature-matrix.
+
+**Compiler outlook**: the native Go port of `tsc` ("tsgo", shipped as
+`@typescript/native-preview` / the TypeScript 7 beta) offers ~10x faster
+type-checking and lower memory. Treat it as a preview accelerator for local/CI
+typecheck loops; keep classic `tsc` as the authoritative emit + declaration gate
+until your `--build`/project-reference and declaration-emit scenarios are fully
+supported there.
 
 ## Diagnostics
 
@@ -222,7 +234,7 @@ Gate before shipping: skill: version-feature-matrix.
 | `Cannot find module './db'` at runtime (ESM) | missing `.js` extension | `import "./db.js"` under `NodeNext` | this file, ESM |
 | NestJS "Nest can't resolve dependencies" | decorator metadata not emitted | `emitDecoratorMetadata: true`; check provider in module | [nest-express-fastify-patterns](../nest-express-fastify-patterns/SKILL.md) |
 | `tsc` clean but bundle crashes on a type-only import | `isolatedModules`/`verbatimModuleSyntax` mismatch | use `import type`; enable both flags | this file, Strict Baseline |
-| `Symbol.dispose is not defined` using `using` | runtime predates Node 24 | polyfill + `lib: esnext.disposable`, or drop to `try/finally` | this file, TS 5.x |
+| `Symbol.dispose is not defined` using `using` | runtime predates native explicit-resource-management (older LTS) | polyfill + `lib: esnext.disposable`, or drop to `try/finally` | this file, TS 5.x |
 
 ## Deep-Dive References
 

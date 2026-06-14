@@ -14,22 +14,22 @@ description: >-
 
 Every JVM back-end decision starts here. Pick the framework/feature that fits the runtime you target; if your platform is pinned lower, use the fallback column.
 
-| Need | Minimum platform | Fallback |
-|------|------------------|----------|
-| Annotation-driven REST + DI + auto-config | Spring Boot 3.x (Java 17+) | Spring Boot 2.7 (Java 8/11, `javax.*`) |
-| `jakarta.*` namespace (Servlet, Persistence, Validation) | Spring Boot 3.x | `javax.*` on Boot 2.x — do not mix |
-| Records as request/response DTOs | Java 17 | classes with Lombok `@Value` |
-| Virtual threads for blocking I/O endpoints | Java 21 + Boot 3.2 (`spring.threads.virtual.enabled`) | bounded platform-thread pool / WebFlux |
+| Need | Current line | Fallback |
+|------|--------------|----------|
+| Annotation-driven REST + DI + auto-config | Spring Boot 4.x (Java 25/21) | Spring Boot 3.5/3.x (Java 17+) |
+| `jakarta.*` namespace (Servlet, Persistence, Validation) | Spring Boot 4.x / 3.x | `javax.*` on Boot 2.x (EOL) — do not mix |
+| Records as request/response DTOs | records (since Java 17) | classes with Lombok `@Value` |
+| Virtual threads for blocking I/O endpoints | opt-in `spring.threads.virtual.enabled` (since Java 21 + Boot 3.2; JDK 24+ recommended) | bounded platform-thread pool / WebFlux |
 | Reactive non-blocking stack | Spring WebFlux (Reactor) | MVC + virtual threads (simpler) |
-| Coroutine-based services / `suspend` controllers | Kotlin 1.6+ on Spring 6 | Reactor `Mono`/`Flux` |
-| Null-safety enforced at compile time | Kotlin 2.x | Java + JSpecify `@Nullable` + NullAway |
-| Sealed hierarchies for domain modeling | Kotlin `sealed` / Java 17 `sealed` | enums + visitor |
-| Pattern matching `switch` over sealed types | Java 21 | `instanceof` chains / Kotlin `when` |
-| GraalVM native image (fast startup, low RSS) | Spring Boot 3 AOT + GraalVM | JIT JVM (default; safest) |
-| Lightweight non-Spring HTTP server (Kotlin) | Ktor 2.x/3.x | Spring Boot (batteries-included) |
-| Build + reproducible deps | Gradle 8.x (Kotlin DSL) or Maven 3.9 | either — pin the wrapper |
+| Coroutine-based services / `suspend` controllers | Kotlin 2.3 on Spring 6/7 | Reactor `Mono`/`Flux` |
+| Null-safety enforced at compile time | Kotlin 2.x (K2) | Java + JSpecify `@Nullable` + NullAway |
+| Sealed hierarchies for domain modeling | Kotlin `sealed` / Java `sealed` (since Java 17) | enums + visitor |
+| Pattern matching `switch` over sealed types | `switch` patterns (since Java 21) | `instanceof` chains / Kotlin `when` |
+| GraalVM native image (fast startup, low RSS) | Spring AOT + GraalVM (Boot 3+) | JIT JVM (default; safest) |
+| Lightweight non-Spring HTTP server (Kotlin) | Ktor 3.x | Spring Boot (batteries-included) |
+| Build + reproducible deps | Gradle 9.x (Kotlin DSL) or Maven 3.9 | either — pin the wrapper |
 
-**Platform reality (2026):** Spring Boot 3.x requires Java 17 as a hard floor and runs on the `jakarta.*` namespace; Boot 2.x (`javax.*`) is end-of-OSS-support — new services start on 3.x. Java 21 LTS makes virtual threads and pattern matching baseline. Kotlin 2.x (K2 compiler) is the default for Kotlin services. Library support lags platform releases, so gate on the actual versions in your `pom.xml` / `build.gradle.kts` rather than trusting version tables from memory.
+**Platform reality (2026):** Spring Boot 4.x is the current line, built on Spring Framework 7 (Jakarta EE 11) and running on the `jakarta.*` namespace; Boot 3.5 is the supported fallback and Boot 2.x (`javax.*`) is EOL — new services start on the current line. Java 25 is the current LTS; Java 21 is the prior LTS and Java 17 the Spring Boot 4 minimum (see the matrix). Virtual threads are opt-in (`spring.threads.virtual.enabled`, JDK 24+ recommended), not default-on. Kotlin 2.x (K2 compiler) is the default for Kotlin services, with Boot 4 requiring Kotlin 2.2+. Library support lags platform releases, so gate on the actual versions in your `pom.xml` / `build.gradle.kts` rather than trusting version tables from memory.
 
 Per-feature platform minimums: skill `version-feature-matrix` (`../_shared/version-feature-matrix.md`).
 
@@ -78,7 +78,7 @@ JVM back-end task?
 | File | Purpose |
 |------|---------|
 | [_index.md](_index.md) | Full navigation for the jvm/ subtree |
-| [spring-boot/SKILL.md](spring-boot/SKILL.md) | Spring Boot 3.x: controllers, DI, transactions, JPA, validation, security, WebFlux |
+| [spring-boot/SKILL.md](spring-boot/SKILL.md) | Spring Boot 3.5/4.x: controllers, DI, transactions, JPA, validation, security, WebFlux |
 | [kotlin-backend/SKILL.md](kotlin-backend/SKILL.md) | Kotlin back-ends: coroutines, null-safety, data/sealed classes, Spring + Kotlin, Ktor |
 
 ## Related Skills

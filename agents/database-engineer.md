@@ -39,7 +39,7 @@ Evidence gate: data-layer work defaults `requires_screenshots: false`. When the 
 
 ## Engine & Version Guidance
 
-Target the project's pinned engine versions. Adopt newer engine features with a version marker and a fallback per `skills/_shared/version-feature-matrix.md` (canonical engine-minimum table). **Verify behavior via Context7 or Ref before relying on it** — planner heuristics and feature flags shift across minor versions; do not assert from memory.
+Target the project's pinned engine versions. Adopt newer engine features with a version marker and a fallback per `skills/_shared/version-feature-matrix.md` (canonical engine-minimum table — the single home for engine + ORM floors). **Verify behavior via Context7 or Ref before relying on it** — planner heuristics and feature flags shift across minor versions; do not assert from memory. Note that the in-memory store is now a fork: **Redis (AGPLv3) and Valkey (BSD-3, drop-in Redis-OSS replacement)** share a command surface — choose per license posture, not feature; see `skill: caching-strategies`.
 
 | Feature | Use for | Engine baseline | Fallback |
 |---|---|---|---|

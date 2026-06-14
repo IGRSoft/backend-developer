@@ -29,7 +29,7 @@ encapsulation, and exception filters →
 
 | Framework | Pick it when | Validation | Notable |
 |-----------|--------------|------------|---------|
-| **Express** | Smallest surface, max ecosystem, you'll assemble your own structure | bring your own (zod in middleware) | callback-era; async errors need wiring (Express 5 improves this) |
+| **Express** | Smallest surface, max ecosystem, you'll assemble your own structure | bring your own (zod in middleware) | Express 5 is GA — rejected promises auto-forward to the error handler; the `asyncHandler` wrapper is now optional |
 | **NestJS** | Large team/app, want opinionated DI + modules + decorators (Angular-like) | pipes (`ZodValidationPipe`, `class-validator`) | batteries included; heavier; great for microservices/GraphQL |
 | **Fastify** | Throughput matters; you want schema-driven validation + fast serialization | JSON Schema per route (built-in) | plugin encapsulation, hooks, lowest overhead of the three |
 | **Hono** | Edge/serverless (Cloudflare Workers, Bun, Deno, Lambda), tiny + Web-standard | `@hono/zod-validator` | runs on Web `Request`/`Response`; multi-runtime |
@@ -69,9 +69,12 @@ app.use((err, _req, res, _next) => {
 });
 ```
 
-On Express 4, a thrown error inside an `async` handler is *not* caught
-automatically — `await` and `next(err)`, or wrap with a helper. Express 5
-forwards rejected promises to the error handler. See
+Express 5 (GA, and the default in NestJS 11) forwards rejected promises returned
+from `async` handlers/middleware straight to the error handler — `return` the
+promise (or `await` inside the handler) and a throw lands in your one error
+middleware, no `asyncHandler` wrapper needed. On **legacy Express 4** a thrown
+error inside an `async` handler is *not* caught automatically — `await` and
+`next(err)`, or wrap with a helper. See
 [references/framework-deep-dive.md](references/framework-deep-dive.md).
 
 ## NestJS: Modules, DI, Pipes, Guards

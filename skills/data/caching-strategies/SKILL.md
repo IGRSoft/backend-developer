@@ -1,7 +1,7 @@
 ---
 name: caching-strategies
 description: >-
-  Cache correctly with Redis: cache-aside and write-through patterns,
+  Cache correctly with Redis or Valkey: cache-aside and write-through patterns,
   invalidation, TTL and eviction policy, distributed locks, idempotency stores,
   rate-limit counters, and hot-key mitigation. Use when adding a cache, fixing
   stale reads, designing invalidation, building a rate limiter, making an
@@ -40,7 +40,7 @@ idempotent and lets the next read repopulate from the source of truth; updating 
 cache risks writing a value that loses a race with a concurrent DB write.
 
 ```ts
-// Cache-aside read (Redis 7, node-redis / ioredis)
+// Cache-aside read (Redis 8 / Valkey, node-redis / ioredis — same command surface)
 async function getUser(id: string): Promise<User> {
   const key = `user:${id}`;
   const hit = await redis.get(key);
@@ -158,13 +158,14 @@ if (n > LIMIT) throw new TooManyRequests();
 
 | Feature | Needs | Fallback |
 |---------|-------|----------|
-| `SET key val NX PX ttl` (atomic lock) | Redis 2.6.12+ | `SETNX` + separate `EXPIRE` (non-atomic — avoid) |
-| `FUNCTION`/server-side functions | Redis 7.0+ | `EVAL` Lua scripts |
-| `CLIENT NO-EVICT` / fine ACLs | Redis 7.x | network ACLs + separate instances |
-| Valkey (open fork) | tracks Redis 7.x API *(verify)* | Redis OSS |
+| `SET key val NX PX ttl` (atomic lock) | Redis 2.6.12+ / any Valkey | `SETNX` + separate `EXPIRE` (non-atomic — avoid) |
+| `FUNCTION`/server-side functions | Redis 7.0+ / Valkey 7.2+ | `EVAL` Lua scripts |
+| `CLIENT NO-EVICT` / fine ACLs | Redis 7.x+ / Valkey 7.2+ | network ACLs + separate instances |
+| Hash-field TTL (`HEXPIRE`/`HGETEX`) | Redis 7.4+ / Valkey 9 | separate keyed entries with per-key TTL |
+| Valkey (BSD-3 open fork) | drop-in Redis-OSS replacement (LF-stewarded) | Redis 8 (AGPLv3) |
 | `OBJECT FREQ` (LFU introspection) | `maxmemory-policy` set to `*-lfu` | `OBJECT IDLETIME` (LRU) |
 
-Confirm against the [version-feature-matrix](../../_shared/version-feature-matrix.md).
+**Redis 8 vs Valkey — license fork, same patterns.** Redis 8 (GA 2025) ships under AGPLv3 (plus source-available RSALv2/SSPLv1); Valkey is the permissive BSD-3 fork stewarded by the Linux Foundation (AWS/Google/Oracle-backed), a drop-in replacement for Redis OSS tracking the same command surface. Everything in this skill applies to both — choose per your license posture, not per feature. Confirm floors against the [version-feature-matrix](../../_shared/version-feature-matrix.md).
 
 ## Diagnostics
 

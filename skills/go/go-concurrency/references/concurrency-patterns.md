@@ -114,7 +114,10 @@ wg.Wait()
 ```
 
 This also doubles as a rate/resource limit for outbound calls — pair it with
-`api-security`'s unrestricted-resource-consumption (API4) defenses.
+`api-security`'s unrestricted-resource-consumption (API4) defenses. On Go 1.25+,
+`wg.Go(func(){ … })` replaces the `wg.Add(1)` + `go func(){ defer wg.Done(); … }()`
+boilerplate above (one call, no `Add`/`Done` mismatch); `errgroup.SetLimit` remains
+the choice when a worker can return an error.
 
 ## Graceful Shutdown
 

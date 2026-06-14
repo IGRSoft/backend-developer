@@ -15,6 +15,8 @@ They compose: Pact for the partners you know, schema validation/fuzzing for ever
 
 The consumer records the interactions it depends on; the provider proves it satisfies them. The contract (a "pact" file) is the shared truth, exchanged via a **broker**.
 
+Target the **Pact Specification v4** (current; ratified 2022) via each language's V4 API — `PactV4` (Pact-JS), PactNet 5.x (.NET), the V4 DSL on the JVM/Python/Go guides. V4 allows mixing HTTP and async-message interactions in one pact file and adds plugin support (e.g. gRPC/Protobuf); PactFlow renders V4 pacts. Older V3 pacts still verify, but write new contracts against V4.
+
 ### Consumer side — record expectations
 
 ```ts
@@ -74,11 +76,11 @@ Assert in integration tests that real responses conform to the documented schema
 
 ### Property-based fuzzing with Schemathesis
 
-Schemathesis reads the OpenAPI spec and generates malformed, boundary, and unexpected inputs to find crashes and contract violations automatically:
+Schemathesis (v4+) reads the OpenAPI/GraphQL spec and generates malformed, boundary, and unexpected inputs to find crashes and contract violations automatically. The CLI entrypoint is `st` and the example-count flag is `--max-examples` (`-n`); the v3 `--hypothesis-max-examples` flag was removed in v4:
 
 ```bash
-schemathesis run http://localhost:8080/openapi.json \
-  --checks all --hypothesis-max-examples 200
+st run http://localhost:8080/openapi.json \
+  --checks all --max-examples 200          # --mode all also exercises negative inputs
 ```
 
 It surfaces: unhandled 500s, responses that don't match the declared schema, missing `Content-Type`, and spec/implementation drift. It overlaps API security (it'll find inputs that bypass validation) — pair it with the [api-security](../../api-security/SKILL.md) work.
@@ -121,4 +123,5 @@ Versions: skill [version-feature-matrix](../../../_shared/version-feature-matrix
 - [ ] Provider verification seeds the declared `given` states.
 - [ ] `can-i-deploy` gates promotion of both sides.
 - [ ] Public REST API responses validated against the OpenAPI spec; spec kept honest.
-- [ ] Schemathesis fuzzes the spec for 500s and contract drift in CI.
+- [ ] Schemathesis (v4, `st run --checks all --max-examples N`) fuzzes the spec for 500s and contract drift in CI.
+- [ ] New Pact contracts written against the V4 spec (V4 API / PactNet 5.x); verified via the broker.

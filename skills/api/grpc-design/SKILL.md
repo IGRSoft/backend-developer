@@ -168,8 +168,8 @@ Enforce these rules in CI with `buf breaking`.
 
 | Capability | Floor | Fallback when unavailable |
 |------------|-------|---------------------------|
-| Breaking-change detection | `buf breaking` (current) | manual review against the merged proto |
-| Proto editions | edition 2023 (newer toolchains) | stick to proto3 syntax |
+| Breaking-change detection | `buf breaking` (current v1.x) | manual review against the merged proto |
+| Proto editions | editions 2023 / 2024 (Edition 2024 ships in protoc 32.x+) | stick to proto3 syntax |
 | gRPC for browsers | gRPC-Web + Envoy/proxy, or Connect | expose a REST/JSON gateway |
 | Rich error details | `google.rpc.Status` + `errdetails` | status code + plain message |
 

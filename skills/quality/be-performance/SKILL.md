@@ -69,7 +69,7 @@ export default function () {
 k6 run --env BASE_URL=http://localhost:8080 load.js   # single scoped command
 ```
 
-Use `constant-arrival-rate` (open model) to measure latency under a fixed request rate — it exposes queueing that a fixed-VU (closed) model hides. Thresholds make k6 a pass/fail CI gate. Full executors, ramping, and CI wiring: [references/load-testing-k6.md](references/load-testing-k6.md).
+Use `constant-arrival-rate` (open model) to measure latency under a fixed request rate — it exposes queueing that a fixed-VU (closed) model hides. Thresholds make k6 a pass/fail CI gate. k6 is now **Grafana k6** (stable v1.x). Full executors, ramping, distributed runs (k6 Operator), and CI wiring: [references/load-testing-k6.md](references/load-testing-k6.md).
 
 ## N+1 and Slow Queries
 

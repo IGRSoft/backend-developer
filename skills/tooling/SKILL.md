@@ -43,10 +43,10 @@ Floors this plugin assumes. Runtime and library support shift between minor rele
 
 | Tool | Assumed floor | Why |
 |------|---------------|-----|
-| Docker Engine / BuildKit | 24+ (BuildKit default) | `--mount=type=cache`, `--mount=type=secret`, multi-stage |
-| Docker Compose | v2 (`docker compose`) | Compose Spec, `depends_on: condition: service_healthy` |
-| OpenTelemetry SDK | current stable per language | stable traces+metrics API; logs API maturing *(verify)* |
-| OTel Collector | current stable | OTLP receive/export, batch, tail sampling |
+| Docker Engine / BuildKit | current stable (BuildKit is the default builder) | `--mount=type=cache`, `--mount=type=secret`, multi-stage |
+| Docker Compose | v2 only (`docker compose`) | Compose Spec, `depends_on: condition: service_healthy`; the Python v1 `docker-compose` is EOL/removed — see [version-feature-matrix](../_shared/version-feature-matrix.md) |
+| OpenTelemetry SDK | current stable per language | traces, metrics, **and logs** APIs/SDKs are now stable in the spec (logs Bridge API + SDK + OTLP graduated) — confirm per-language status |
+| OTel Collector | current stable | OTLP receive/export, batch, tail sampling; component stability is still mixed (per-component, not one v1) — pin tested components |
 | Node.js | 20 LTS / 22 LTS | `--prof`, `node:diagnostics_channel`, heap snapshots |
 | Go | 1.22+ | `pprof`, `runtime/trace`, `GODEBUG` knobs *(verify)* |
 | JVM (Java/Kotlin) | 17 / 21 LTS | JFR, async-profiler, `jcmd`, `-XX:+HeapDumpOnOutOfMemoryError` |

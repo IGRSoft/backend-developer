@@ -20,11 +20,11 @@ uv/ruff/packaging, pytest mechanics — defer to the system-developer python ski
 
 | Framework | Headline (one line) |
 |-----------|---------------------|
-| FastAPI 0.115+ | Pydantic v2 validation, async-first routes, `Annotated` dependency injection, automatic OpenAPI 3.1; Starlette ASGI core |
-| Django 5.x (5.0/5.1/5.2 LTS) | Async views/ORM (`acreate`/`aget`/async querysets), DRF 3.15 serializers + viewsets, `db_default`, `GeneratedField` |
-| Flask 3.1 | App factory + blueprints, optional async views (ASGI via `asgiref`), Werkzeug 3 server gateway |
+| FastAPI (current 0.1xx) | Pydantic **v2 required** (v1 support dropped), async-first routes, `Annotated` dependency injection, automatic OpenAPI 3.1, default strict `Content-Type` checking; Starlette ASGI core |
+| Django (5.2 LTS / 6.0 STS) | Async views/ORM (`acreate`/`aget`/async querysets), `CompositePrimaryKey` (5.2), built-in Tasks framework + async pagination + native CSP (6.0), DRF 3.17 serializers + viewsets, `db_default`, `GeneratedField` |
+| Flask 3.1 (Werkzeug 3.1) | App factory + blueprints, optional async views (ASGI via `asgiref`), Werkzeug 3.1 server gateway; Flask-SQLAlchemy 3.1 typed API |
 | Pydantic 2.x | Rust `pydantic-core`, `model_validate`/`model_dump`, `Annotated` constraints — the validation spine across FastAPI |
-| SQLAlchemy 2.x | `Mapped[]`/`mapped_column` typed ORM, `select()` 2.0 style, async engine (`asyncpg`) |
+| SQLAlchemy 2.x | `Mapped[]`/`mapped_column` typed ORM, `select()` 2.0 style, async engine (`asyncpg`); 2.1 in beta |
 
 Framework minutiae shift between releases — pin in `pyproject.toml`/`uv.lock` and
 verify against your interpreter (`python3 -VV`) and installed versions

@@ -107,7 +107,7 @@ order = CreateOrder.model_validate(payload)        # raises ValidationError → 
 - `extra="forbid"` rejects unexpected fields. FastAPI does this automatically when you type the body as the model.
 - The validated model is your typed internal representation; do not pass the raw `dict` past this point.
 
-Ruby (Rails strong params + ActiveModel validations), PHP (Laravel `FormRequest` rules / Symfony Validator), and .NET (DataAnnotations / FluentValidation on a request model) follow the same shape: a declared schema, unknown fields rejected, bound to a request type — never the persistence model. Version-specific validator features are in [version-feature-matrix.md](../version-feature-matrix.md).
+Ruby (Rails strong params + ActiveModel validations), PHP (Laravel `FormRequest` rules / Symfony Validator), and .NET (DataAnnotations / FluentValidation on a request model) follow the same shape: a declared schema, unknown fields rejected, bound to a request type — never the persistence model. Version-specific validator features are in [version-feature-matrix.md](../../version-feature-matrix.md).
 
 ## Safe Number and Length Parsing
 
@@ -213,4 +213,4 @@ A response from a remote service is untrusted input even when the service is "ou
 
 - `command-execution-and-injection.md` — injection-safe queries/execution, SSRF egress allowlists, the dynamic-code-execution ban, supply-chain scanning
 - `../SKILL.md` — non-negotiable rules, OWASP API Top 10 mapping, authorization-boundary and diagnostic tables
-- `../version-feature-matrix.md` — validator/framework version and fallback lookup
+- `../../version-feature-matrix.md` — validator/framework version and fallback lookup

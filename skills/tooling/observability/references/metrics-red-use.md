@@ -58,7 +58,7 @@ USE explains *why* RED went bad: a latency spike (RED Duration) with a saturated
 | Distribution (latency, payload size) | **Histogram** |
 | Expensive-to-read current value (RAM, open FDs) | **Observable Gauge** (callback) |
 
-Naming (OTel semantic conventions): lowercase dotted names with a unit, e.g. `http.server.duration` (ms), `db.client.connections.usage`, `messaging.process.duration`. Prefer the standard semantic-convention names so backends and dashboards understand them out of the box.
+Naming (OTel semantic conventions): lowercase dotted names with a unit, e.g. `http.server.request.duration` (s), `db.client.connection.count`, `messaging.process.duration`. Prefer the standard semantic-convention names so backends and dashboards understand them out of the box. The **HTTP and database** conventions are now **stable** (semconv 1.x) — older instrumentations used different names (e.g. `http.server.duration` in ms), so a migrating library may expose `OTEL_SEMCONV_STABILITY_OPT_IN` (`http`/`database`, or `…/dup` for a phased dual-emit). Pin which convention version your dashboards target.
 
 ## Histograms & Buckets
 
@@ -95,8 +95,9 @@ This is the bridge that turns "p99 is bad" into "here is the exact slow request"
 
 - **OTLP → Collector** (push): app exports OTLP; the Collector relabels, batches, and forwards to Prometheus/Tempo/your vendor. Preferred for a uniform pipeline alongside traces.
 - **Prometheus scrape** (pull): expose `/metrics`; Prometheus scrapes it. Common in Kubernetes; the OTel Prometheus exporter or a native client serves it.
+- **OTLP → Prometheus directly** (push): Prometheus 3.x is a native OTLP receiver (`/api/v1/otlp/v1/metrics`), so you can push OTLP straight in without a Collector hop. Prometheus 3.x also enabled **UTF-8** metric/label names by default, so OTel dotted names (`http.server.duration`) survive without the old dot-to-underscore mangling — the two ecosystems finally line up.
 
-Keep one export path per signal and let the Collector fan out — don't double-export.
+Keep one export path per signal and let the Collector fan out — don't double-export. Prefer **native histograms** (a single, high-resolution, lower-cost histogram type — stable in recent Prometheus 3.x) over fixed explicit buckets where your backend supports them; fall back to explicit-bucket histograms otherwise.
 
 ## Alerting on SLOs
 

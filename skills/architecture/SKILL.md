@@ -28,7 +28,7 @@ Every architecture decision starts here. Pick the simplest pattern that meets th
 | Guaranteed processing despite duplicates | Idempotent consumer + dedup key | At-most-once delivery (accept loss) |
 | Quarantine poison messages | Dead-letter queue + redrive | Drop-on-failure (lossy) |
 
-**Distributed reality (2026):** every distributed pattern below trades the local ACID transaction for eventual consistency, partial failure, and at-least-once delivery. Reach for them only when a modular monolith genuinely cannot meet the scaling, isolation, or deploy-cadence requirement — most teams adopt distribution one boundary at a time. Gate broker/runtime feature use (Kafka exactly-once semantics, RabbitMQ quorum queues, SQS FIFO) on your actual versions rather than version tables from memory.
+**Distributed reality (2026):** every distributed pattern below trades the local ACID transaction for eventual consistency, partial failure, and at-least-once delivery. Reach for them only when a modular monolith genuinely cannot meet the scaling, isolation, or deploy-cadence requirement — most teams adopt distribution one boundary at a time. The broker landscape has hardened: Kafka 4.x is KRaft-only (ZooKeeper removed) and now ships native queue/share-group semantics alongside the log; RabbitMQ 4.x dropped classic mirrored queues, so quorum queues (and streams) are the only replicated/HA option. Gate broker/runtime feature use (Kafka exactly-once semantics and share groups, RabbitMQ quorum queues, SQS FIFO) on your actual versions rather than version tables from memory.
 
 Per-runtime / broker feature minimums: see skill: version-feature-matrix (`../_shared/version-feature-matrix.md`).
 

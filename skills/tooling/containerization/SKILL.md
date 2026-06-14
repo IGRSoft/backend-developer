@@ -146,7 +146,7 @@ These defend the **API8 security-misconfiguration** and supply-chain edges of th
 
 ## Version & Fallbacks
 
-Distroless tags, BuildKit syntax, and Compose Spec features track engine versions — confirm with `docker version` / `docker compose version` and the version-feature-matrix (skill: version-feature-matrix). Notable floors: BuildKit cache/secret mounts need the `# syntax=docker/dockerfile:1` directive and a modern Docker Engine; `depends_on: condition:` needs Compose v2; if BuildKit is unavailable, fall back to ordered layers + a `.dockerignore` (no secret mounts — use a runtime secret injector instead).
+Distroless tags, BuildKit syntax, and Compose Spec features track engine versions — confirm with `docker version` / `docker compose version` and the version-feature-matrix (skill: version-feature-matrix). Notable floors: BuildKit cache/secret mounts need the `# syntax=docker/dockerfile:1` directive and a modern Docker Engine (BuildKit is the default builder on current engines); `depends_on: condition:` needs Compose **v2** — the Python `docker-compose` v1 is end-of-life and removed from official images, so always invoke `docker compose` (space, no hyphen). If BuildKit is somehow unavailable, fall back to ordered layers + a `.dockerignore` (no secret mounts — use a runtime secret injector instead). Distroless images still pull from the `gcr.io/distroless/*` URLs (the backend moved to Artifact Registry transparently); `-debian12` is the current default with `-debian13` variants also published.
 
 ## Related Skills
 
