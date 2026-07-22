@@ -81,7 +81,7 @@ When analyzing existing code, look for:
 | Security boundary / authorization-model review of the architecture | `backend-developer:be-security-auditor` (via the router) |
 | Framework / runtime documentation, version specifics | Context7 or Ref MCP tools |
 
-## Workflow Stage Participation (igrsoft v3.17.0)
+## Workflow Stage Participation (igrsoft v3.36.0)
 
 See `_base/backend-agent.md § Workflow Stage Participation` for the binding handoff contract.
 

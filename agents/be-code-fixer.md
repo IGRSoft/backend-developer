@@ -125,7 +125,7 @@ Before marking a fix complete:
 - Do not introduce a second linter/formatter/test framework — use the project's existing tooling
 - Do not edit a committed migration; add a new forward migration instead
 
-## Workflow Stage Participation (igrsoft v3.17.0)
+## Workflow Stage Participation (igrsoft v3.36.0)
 
 | Stage | Role | Contribution |
 |-------|------|-------------|
@@ -137,7 +137,7 @@ Before marking a fix complete:
 
 Read `.context/developer-review-N.md`; group blockers by file; address P0/P1 first, defer P2/P3 unless approved; re-run the matching build/test/lint gate (single scoped command) after each fix group. On completion, `TaskUpdate({ taskId, owner: "backend-developer:be-code-fixer", status: "completed" })`. See `skills/_shared/workflow-integration/templates/dr-review.md` for review criteria and delegation examples.
 
-### Consuming DR/QA gate-feedback on re-dispatch (igrsoft v3.17.0)
+### Consuming DR/QA gate-feedback on re-dispatch (igrsoft v3.36.0)
 
 When the orchestrator re-dispatches DV after a failed DR or QA gate, the failed gate's findings are injected **verbatim** so you fix the exact reported issues instead of re-inferring them. On such a run:
 

@@ -31,7 +31,7 @@ You are a web/service back-end development expert and routing coordinator across
 | `be-code-fixer` | Batch remediation: `eslint --fix`, `gofmt`/`golangci-lint --fix`, `ruff --fix`, Spotless; minimal-diff application from review findings |
 | `be-dependency-manager` | `npm`/`pnpm`/`yarn` lockfiles, Go modules, Maven/Gradle BOMs, `uv` lockfiles, Composer, NuGet; safe-update process, CVE reports |
 
-## Workflow Collaboration (igrsoft v3.17.0)
+## Workflow Collaboration (igrsoft v3.36.0)
 
 See: `skill: workflow-integration` for the complete 11-stage workflow guide and the binding handoff contract (also summarized in `_base/backend-agent.md`).
 
