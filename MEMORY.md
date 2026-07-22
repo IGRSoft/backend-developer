@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| Plugin version | 1.1.0 |
-| igrsoft compatibility | v3.17.0 |
+| Plugin version | 1.2.0 |
+| igrsoft compatibility | v3.36.0 |
 | Claude Code min required | 2.1.169 |
-| Last updated | 2026-06-15 |
+| Last updated | 2026-07-22 |
 
 Version strings move together (plugin.json, marketplace.json metadata, README
 header, this table) per the igrsoft `/cc-update` convention.
@@ -23,8 +23,8 @@ layers, rather than the C/C++/Python/Bash *languages* system-developer owns.
 
 ## CC Features Adopted at 1.0.0
 
-Born on the igrsoft v3.17.0 / CC 2.1.169 baseline; adopts the current capability
-set from the start:
+Born on the igrsoft v3.17.0 / CC 2.1.169 baseline (current compatibility: igrsoft
+v3.36.0); adopts the current capability set from the start:
 
 - **Tiered `maxTurns`** — haiku/low 20 (`be-dependency-manager`), haiku/medium 30
   (`be-code-fixer`), sonnet/medium 40 (`backend-developer` router), sonnet/high 50
@@ -91,6 +91,39 @@ Deliberately **not** implemented here:
   rather than the memory-safety CWE Top 25 that anchors system-developer.
 
 ## Version History
+
+### 1.2.0 — 2026-07-22 igrsoft v3.36.0 Port
+
+Compatibility ported v3.17.0 → v3.36.0 (~20 refs across README, this file, the agent
+stage-participation headers, the skill catalog, and the `workflow-integration` skill). The
+Dynamic Worktask Sizing table was already current (DR0 at every tier); the PL0 stamp note
+now also names `metadata.test_mode` (`build-only`/`scoped`/`full`) and `metadata.ui_visual_check`
+(N/A for backend/API work — left `false`), citing igrsoft `estimation-methodology § PL0
+Stage-Set` as the source of truth. The v3.17.0 / CC 2.1.169 birth record is preserved as history.
+
+Three workflow-contract learnings ported from igrsoft v3.36.0: (1) a **CLI evidence-freshness
+rule** — every `cli-fallback` transcript (curl/httpie request/response, test output, k6 report,
+migration dry-run/log) must be produced *this run* from the actual invocation, never reused;
+the systems analog of igrsoft's ov151 evidence-integrity gate (QA direct-reads evidence and
+cross-checks the `### build-evidence` log paths, re-opening DV on a stale/duplicated transcript).
+(2) The **state-patch pointer form** — the manual `read → merge → temp → fsync → rename`
+atomic-write prose is replaced by the two-mode `state-patch.sh --stage <CODE> --prev <PREV>`
+contract (run when its path is supplied, else silently skip; Layers 2/3 repair from the
+unconditional `handoff:` frontmatter). (3) Benchmark-driven **Output Budgets** on DV (`_base`,
+with the five Build-Evidence lines exempt), AR, DV-support, and DR-support agents, plus a
+**Complexity Triage** gate on `backend-architector` that self-limits scope at Low complexity.
+
+Repo-structure linters added: `section-lint.sh` (≤1000-char section cap, warn-only — baseline
+405 sections over cap across 118 files, burn-down tracked separately) and `desc-lint.sh`
+(three-tier frontmatter `description` brake: agents 450 / commands 250 / skills 750). The
+companion patch `docs/company-workflow-patch.md` is marked **applied upstream** (company-workflow's
+`agents/developer.md` now carries the backend-developer Task grants and routing).
+
+Follow-ups: the agent-description diet toward the ≤250 sibling-plugin ideal is eval-gated — ten
+agents currently exceed 250 (the `backend-developer` router at 420; brake set at 450) — and waits
+on evidence that shorter descriptions still route reliably. Skill descriptions' worst is ~695
+against the 750 brake. There is no CI in this repo yet, so the linters run manually via
+`scripts/run-checks.sh` until a workflow lands.
 
 ### 1.1.0 — 2026-06 Best-Practices Refresh
 

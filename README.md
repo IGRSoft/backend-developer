@@ -1,8 +1,8 @@
 # Backend Developer Plugin
 
-Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the igrsoft (company-workflow) plugin v3.17.0 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
+Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the igrsoft (company-workflow) plugin v3.36.0 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
 
-**Version**: 1.1.0 | **igrsoft Compatibility**: v3.17.0 | **claude-code min version**: "2.1.169"
+**Version**: 1.2.0 | **igrsoft Compatibility**: v3.36.0 | **claude-code min version**: "2.1.169"
 
 ## Boundaries
 
@@ -110,9 +110,9 @@ claude plugins install backend-developer@backend-developer
 
 After editing `settings.json`, run `/plugins` (or restart the session) to load the plugin.
 
-## Workflow Integration (igrsoft v3.17.0)
+## Workflow Integration (igrsoft v3.36.0)
 
-This plugin collaborates with the **igrsoft** (company-workflow) plugin v3.17.0 for 11-stage workflow orchestration. igrsoft owns orchestration, worktree isolation, and `state.json` merge; backend-developer agents stay invoked specialists and follow the handoff-protocol. During the DV stage, `igrsoft:developer` routes to the appropriate backend-developer specialist based on file/marker detection.
+This plugin collaborates with the **igrsoft** (company-workflow) plugin v3.36.0 for 11-stage workflow orchestration. igrsoft owns orchestration, worktree isolation, and `state.json` merge; backend-developer agents stay invoked specialists and follow the handoff-protocol. During the DV stage, `igrsoft:developer` routes to the appropriate backend-developer specialist based on file/marker detection.
 
 | Stage | backend-developer Role | Contribution |
 |-------|------------------------|--------------|

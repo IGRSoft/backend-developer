@@ -125,7 +125,7 @@ Before marking a fix complete:
 - Do not introduce a second linter/formatter/test framework — use the project's existing tooling
 - Do not edit a committed migration; add a new forward migration instead
 
-## Workflow Stage Participation (igrsoft v3.17.0)
+## Workflow Stage Participation (igrsoft v3.36.0)
 
 | Stage | Role | Contribution |
 |-------|------|-------------|
@@ -137,7 +137,7 @@ Before marking a fix complete:
 
 Read `.context/developer-review-N.md`; group blockers by file; address P0/P1 first, defer P2/P3 unless approved; re-run the matching build/test/lint gate (single scoped command) after each fix group. On completion, `TaskUpdate({ taskId, owner: "backend-developer:be-code-fixer", status: "completed" })`. See `skills/_shared/workflow-integration/templates/dr-review.md` for review criteria and delegation examples.
 
-### Consuming DR/QA gate-feedback on re-dispatch (igrsoft v3.17.0)
+### Consuming DR/QA gate-feedback on re-dispatch (igrsoft v3.36.0)
 
 When the orchestrator re-dispatches DV after a failed DR or QA gate, the failed gate's findings are injected **verbatim** so you fix the exact reported issues instead of re-inferring them. On such a run:
 
@@ -147,3 +147,7 @@ When the orchestrator re-dispatches DV after a failed DR or QA gate, the failed 
 4. **Enforce minimal-diff across rework cycles** — change only what the blockers require; the diff must not grow with each retry. Re-run the build/test/lint gate after each fix group.
 
 You **consume** this contract — the injection itself is orchestrator-owned (igrsoft `worktask/SKILL.md`). See `skills/_shared/workflow-integration/SKILL.md § Gate-Feedback Contract`.
+
+### Output Budget (DR support)
+
+Fix log ≤2 lines per finding: `path:line` + what changed — no before/after code listings (the diff is in the tree). Final return ≤200 tok. Cite each blocker's `file:line` resolution; do not restate the review or paste patched bodies.
