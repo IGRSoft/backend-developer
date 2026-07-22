@@ -42,7 +42,7 @@ table in sync with it.
 | `dotnet-developer` | sonnet | high | 50 | → `opus` + `xhigh` for EF Core / minimal-API boundary design |
 | `api-designer` | sonnet | high | 50 | → `opus` + `xhigh` for large contract/versioning trade-offs |
 | `database-engineer` | sonnet | high | 50 | → `opus` + `xhigh` for sharding / multi-region schema design |
-| `backend-architector` | opus | xhigh | 60 | already top tier |
+| `backend-architector` | opus | xhigh | 60 | already top tier; self-limits scope at Low complexity per § Complexity Triage |
 | `be-test-generator` | sonnet | high | 50 | — sonnet sufficient for pattern work |
 | `be-performance-engineer` | sonnet | high | 50 | → `opus` + `xhigh` for deep load-trace analysis (review-only: `disallowed-tools: Write, Edit`) |
 | `be-security-auditor` | sonnet | high | 50 | → `opus` + `xhigh` for deep threat modeling (review-only: `disallowed-tools: Write, Edit`) |

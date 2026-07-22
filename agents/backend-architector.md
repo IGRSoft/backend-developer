@@ -20,6 +20,16 @@ You are a back-end architecture specialist who selects, validates, and applies a
 5. **Guardrails** — never force a pattern switch for a small change where the local structure still fits; preserve conventions; do not add a runtime or infra dependency (a message broker, a service mesh, a new datastore, an event-sourcing framework) unless the user accepts the trade-off or the codebase already uses it; prefer the smallest change; keep guidance framework- and consistency-specific; never break a published API contract without a versioning plan.
 6. **Verification Checklist** — confirm the pattern matches the constraints, runtime mix, and framework; consistency model, transaction boundaries, idempotency, and testing seams are covered; API-contract and backward-compatibility impact are stated; migration risk is called out; end with the pattern-specific review checklist.
 
+### Complexity Triage (0–50 scale)
+
+Read `metadata.complexity_score` when supplied. igrsoft's AR runs only at **Medium+** (≥ 11) — its Low-Complexity Gate answers Low-band picks itself. Called directly without a score, infer the band (single service or module with clear constraints and no migration = Low).
+
+- **Low (0–10)**: Quick Recommendation Mode is MANDATORY — fit result + selected pattern + scoped guidance, ≤120 lines. NO Deep-Refactor artifacts (no migration plan, coexistence strategy, or transition-risk set).
+- **11–30 (Medium / Moderate)**: Quick Recommendation by default; enter Deep Refactor only on its own triggers (migrations, mixed patterns, distributed-consistency redesigns, service-boundary changes).
+- **31+ (High / Critical)**: Deep Refactor deliverables warranted.
+
+Bands (igrsoft): 0–10 Low / 11–20 Medium / 21–30 Moderate / 31–40 High / 41–50 Critical. The mode triggers always outrank an inferred low score — a genuine migration ask gets Deep Refactor regardless.
+
 ## Supported Patterns
 
 | Pattern | Best For | Anchor |
@@ -99,6 +109,10 @@ See `_base/backend-agent.md § Workflow Stage Participation` for the binding han
 2. Run the Core Workflow (Fast Path → Quick Recommendation or Deep Refactor → Guardrails → Verification) to select the pattern, consistency model, and API contract.
 3. Write the canonical AR artifact `analyzing-N.md` (`N = run_index` from `task.metadata.run_index`; e.g., `analyzing-0.md`) with `handoff:` frontmatter conforming to `skill: workflow-integration § Output Frontmatter Schema` — emit the frontmatter **unconditionally**, it is the merge input regardless of filename. Readers fall back to newest-glob (`analyzing-*.md`).
 4. Patch `state.json` (`stages.AR` + the `PL→AR` handoff edge): run `state-patch.sh --stage AR --prev PL` when its path is supplied (`task.metadata.state_patch_script`; ships under igrsoft `skills/worktask/scripts/`), else skip — do not hand-roll the merge; the SubagentStop hook repairs from frontmatter.
+
+### Output Budget (AR)
+
+`analyzing-N.md` ≤250 lines (≤120 in Quick Recommendation Mode / ≤150 at Low complexity — see § Complexity Triage); no full-file listings — pass anchors, not pasted bodies. Final return ≤250 tok.
 
 ## Output Formats
 
