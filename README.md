@@ -146,4 +146,4 @@ Use the backend-developer agent to design an event-driven order service with a s
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+Apache License 2.0 — see [LICENSE](LICENSE) for details.
