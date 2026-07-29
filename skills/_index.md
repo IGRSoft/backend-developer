@@ -18,7 +18,7 @@ patterns). **21 SKILL.md across 10 domains, plus shared references.** Start at
 | [data/](data/SKILL.md) | [`_index.md`](data/_index.md) | 1 + 2 leaves | Schema design, safe migrations, query performance, Postgres/MySQL/Mongo/Redis |
 | [architecture/](architecture/SKILL.md) | [`_index.md`](architecture/_index.md) | 1 + 2 leaves | Layered/hexagonal, event-driven/CQRS, idempotency, messaging, caching |
 | [tooling/](tooling/SKILL.md) | [`_index.md`](tooling/_index.md) | 1 + 2 leaves | Containerization with Docker/Compose, observability with OpenTelemetry |
-| [quality/](quality/SKILL.md) | [`_index.md`](quality/_index.md) | 1 + 2 leaves | Test pyramid, integration and load testing, code-review gates |
+| [quality/](quality/SKILL.md) | [`_index.md`](quality/_index.md) | 1 + 2 leaves | Test pyramid, integration and load testing, code review gates |
 
 ## All Skills
 
@@ -104,7 +104,7 @@ patterns). **21 SKILL.md across 10 domains, plus shared references.** Start at
 |-------|------|-------------|
 | **quality** (entry) | [`quality/SKILL.md`](quality/SKILL.md) | Quality skills navigation: testing strategy, load testing, review gates |
 | **testing-strategy** | [`quality/testing-strategy/SKILL.md`](quality/testing-strategy/SKILL.md) | Test pyramid for services, integration with Testcontainers, contract tests, k6 load tests |
-| **review-gates** | [`quality/review-gates/SKILL.md`](quality/review-gates/SKILL.md) | DR criteria, P0-P3 severity, coverage and load/perf budgets, security-scan gate |
+| **review-gates** | [`quality/review-gates/SKILL.md`](quality/review-gates/SKILL.md) | DR criteria, P0-P3 severity, coverage and load/perf budgets, `analyze-security` gate |
 
 ## Child Indexes
 

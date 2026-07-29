@@ -27,7 +27,7 @@ handoff:
 |-------|---------|--------|------------|
 | unit | `pnpm vitest run` | 128/128 pass | .context/logs/vitest-<worktask_id>.log |
 | integration | `pnpm vitest run --project integration` | 31/31 pass (Testcontainers Postgres) | .context/logs/integration-<worktask_id>.log |
-| security-scan | `npm audit --omit=dev` | 0 high/critical | .context/logs/audit-<worktask_id>.log |
+| analyze-security | `npm audit --omit=dev` | 0 high/critical | .context/logs/audit-<worktask_id>.log |
 
 Gate (both required for `go` — workflow-integration/SKILL.md § QA Gate):
 - [ ] All tests pass (full suite, not only new tests; integration tests against real deps)

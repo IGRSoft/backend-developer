@@ -1,7 +1,6 @@
 ---
-name: api-scaffold
 description: Scaffold endpoints/services/handlers from an OpenAPI, GraphQL SDL, or gRPC proto contract
-argument-hint: "<schema: openapi.yaml|schema.graphql|service.proto> [--stack node|go|jvm|python] [--dry-run]"
+argument-hint: <schema: openapi.yaml|schema.graphql|service.proto> [--stack node|go|jvm|python] [--dry-run]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 2000
@@ -12,7 +11,7 @@ estimated-cost:
     opus: 15%
 ---
 
-# API Scaffold
+# API Scaffolding
 <!-- Updated: June 2026 -->
 
 Turn an API contract — OpenAPI, GraphQL SDL, or a gRPC `.proto` — into runnable server-side scaffolding: handler stubs, typed request/response DTOs with validation, route/resolver/service wiring, and a matching test skeleton. The contract is the source of truth; the generated code conforms to it, never the reverse. Detection picks the target stack from the repository (or `--stack`), then the owning stack developer fills in the bodies.
@@ -36,19 +35,19 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Scaffold from an OpenAPI contract, auto-detecting the stack
-/backend-developer:api-scaffold api/openapi.yaml
+/backend-developer:gen-api api/openapi.yaml
 
 # Force the Go stack
-/backend-developer:api-scaffold api/openapi.yaml --stack go
+/backend-developer:gen-api api/openapi.yaml --stack go
 
 # Scaffold a GraphQL resolver layer
-/backend-developer:api-scaffold graph/schema.graphql --stack node
+/backend-developer:gen-api graph/schema.graphql --stack node
 
 # Scaffold gRPC service stubs from a proto, JVM target
-/backend-developer:api-scaffold proto/order.proto --stack jvm
+/backend-developer:gen-api proto/order.proto --stack jvm
 
 # Preview the file plan without writing anything
-/backend-developer:api-scaffold api/openapi.yaml --dry-run
+/backend-developer:gen-api api/openapi.yaml --dry-run
 ```
 
 ## Options
@@ -75,7 +74,7 @@ If the file matches no marker (e.g. a JSON Schema fragment, a Postman collection
 
 ## Stack Detection
 
-Scan the repository root (and `schema`'s directory upward) and apply the **first** match top-down. This map mirrors the router's `skill: stack-detection` — keep it in sync, do not fork the routing logic.
+Scan the repository root (and `schema`'s directory upward) and apply the **first** match top-down. This map mirrors the router's `skill: language-detection` — keep it in sync, do not fork the routing logic.
 
 | Priority | Marker | Stack | Owning agent |
 |----------|--------|-------|--------------|
@@ -222,7 +221,7 @@ When the codegen tool is missing, the stack developer parses the contract and wr
 ### Schema not found
 ```
 Error: Schema not found: {schema}
-Suggestion: Pass a contract file that exists, e.g. /backend-developer:api-scaffold api/openapi.yaml
+Suggestion: Pass a contract file that exists, e.g. /backend-developer:gen-api api/openapi.yaml
 ```
 
 ### Unrecognized schema
@@ -248,9 +247,9 @@ Print the install hint from Tool Availability, mark the plan as hand-roll, and h
 
 ## See Also
 
-- `skill: stack-detection` — canonical manifest → stack → agent routing (keep the priority table in sync).
-- `skill: api-contracts` — OpenAPI 3.x, GraphQL SDL, and proto3 conventions; operationId/resource modeling; error-response shapes.
-- `skill: _shared/version-feature-matrix` — framework/runtime version markers and fallbacks (Express/NestJS/Fastify/Hono, Gin/Echo/chi, Spring Boot, FastAPI/Django) used to pick generator targets.
-- `/backend-developer:db-schema` — when the contract implies persistence; generate migrations and ORM models to back the DTOs.
-- `/backend-developer:api-test` — once handlers exist, expand the test skeleton into contract + integration tests (Testcontainers, request/response transcripts).
-- `/backend-developer:security-review` — audit the scaffolded endpoints against the OWASP API Security Top 10 (BOLA, broken auth, missing function-level authz).
+- `skill: language-detection` — canonical manifest → stack → agent routing (keep the priority table in sync).
+- `skill: openapi-contracts` — OpenAPI 3.x, GraphQL SDL, and proto3 conventions; operationId/resource modeling; error-response shapes.
+- `skill: version-feature-matrix` — framework/runtime version markers and fallbacks (Express/NestJS/Fastify/Hono, Gin/Echo/chi, Spring Boot, FastAPI/Django) used to pick generator targets.
+- `/backend-developer:db-migrate` — when the contract implies persistence; generate migrations and ORM models to back the DTOs.
+- `/backend-developer:gen-tests` — once handlers exist, expand the test skeleton into contract + integration tests (Testcontainers, request/response transcripts).
+- `/backend-developer:analyze-security` — audit the scaffolded endpoints against the OWASP API Security Top 10 (BOLA, broken auth, missing function-level authz).

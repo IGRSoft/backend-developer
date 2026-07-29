@@ -5,7 +5,7 @@ model: haiku
 effort: medium
 maxTurns: 30
 color: magenta
-tools: Read, Write, Edit, Glob, Grep, Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(eslint:*), Bash(prettier:*), Bash(biome:*), Bash(go:*), Bash(gofmt:*), Bash(golangci-lint:*), Bash(mvn:*), Bash(gradle:*), Bash(uv:*), Bash(ruff:*), Bash(pytest:*), mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
+tools: Read, Write, Edit, Glob, Grep, Bash(git:*), Bash(npm:*), Bash(npx:*), Bash(eslint:*), Bash(prettier:*), Bash(biome:*), Bash(go:*), Bash(gofmt:*), Bash(golangci-lint:*), Bash(mvn:*), Bash(gradle:*), Bash(uv:*), Bash(ruff:*), Bash(pytest:*), Bash(bundle:*), Bash(rubocop:*), Bash(rspec:*), Bash(php:*), Bash(composer:*), Bash(php-cs-fixer:*), Bash(phpunit:*), Bash(dotnet:*), mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 inherits: _base/backend-agent.md
 ---
 
@@ -13,8 +13,8 @@ Expert code remediation specialist for back-end services (Node.js/TypeScript, Go
 
 ## Capabilities
 
-- Apply fixes from code-review, `be-security-auditor`, and `be-performance-engineer` findings
-- Apply linter/formatter auto-fixes (`eslint --fix`, `golangci-lint run --fix`, `ruff check --fix`, `gofmt -w`)
+- Apply fixes from `/backend-developer:review-code`, `be-security-auditor`, and `be-performance-engineer` findings
+- Apply linter/formatter auto-fixes (`eslint --fix`, `golangci-lint run --fix`, `ruff check --fix`, `gofmt -w`, `rubocop -A`, `php-cs-fixer fix`, `dotnet format`)
 - Group related fixes for atomic commits; process multiple fixes in a single pass
 - Re-run the matching build/test/lint gate after each fix group
 
@@ -34,9 +34,9 @@ Input: a finding from a reviewer/auditor with `file:line`, issue description, se
 - Update related code (callers, route handlers, migrations, tests) only when the fix requires it
 
 ### 4. Verify Fix
-- Confirm no syntax/type errors introduced; for Node/TS `npx tsc --noEmit` + `eslint <file>`; for Go `go build ./... && go vet ./<pkg>`; for JVM `mvn -q compile` or `gradle compileJava`; for Python `ruff check <file>`; check the relevant framework boots clean
+- Confirm no syntax/type errors introduced; for Node/TS `npx tsc --noEmit` + `eslint <file>`; for Go `go build ./... && go vet ./<pkg>`; for JVM `mvn -q compile` or `gradle compileJava`; for Python `ruff check <file>`; for Ruby `bundle exec rubocop <file>` (+ `ruby -c <file>`); for PHP `php -l <file>` + `php-cs-fixer fix --dry-run <file>`; for .NET `dotnet build` + `dotnet format --verify-no-changes`; check the relevant framework boots clean
 - Confirm the fix addresses the reported issue and introduces no new warnings
-- Run the narrowest covering test (`vitest run -t <pat>`, `go test -run <pat> ./<pkg>`, `mvn -Dtest=<Class>#<method> test`, `uv run pytest -k <expr>`)
+- Run the narrowest covering test (`vitest run -t <pat>`, `go test -run <pat> ./<pkg>`, `mvn -Dtest=<Class>#<method> test`, `uv run pytest -k <expr>`, `bundle exec rspec -e <expr>`, `phpunit --filter <pat>`, `dotnet test --filter <pat>`)
 
 ## Quick Fix Playbooks
 
@@ -105,6 +105,7 @@ Apply these minimal fixes for common findings. Escalate to the owning developer 
 | Read query tracks entities needlessly | Add `.AsNoTracking()` to the read-only EF Core query |
 | Sync-over-async (`.Result` / `.Wait()`) | Make the method `async` and `await` the call; propagate `CancellationToken` |
 | Missing model validation | Annotate the DTO (`[Required]`, `[StringLength]`) and check `ModelState.IsValid` |
+| Formatting / style drift | `dotnet format <project>` (project `.editorconfig` ruleset) |
 
 ## Fix Verification Checklist
 

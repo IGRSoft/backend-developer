@@ -9,7 +9,7 @@ Quick navigation for cross-cutting references shared by all backend-developer ag
 | `workflow-integration/SKILL.md` | Guide for integrating with igrsoft 11-stage workflow system — DV/DR/QA contracts, API/transcript cli-fallback evidence, gate feedback |
 | `workflow-integration/templates/dv-development.md` | Copy-paste `development-N.md` artifact template (Build/Test Evidence, anchors, frontmatter) |
 | `workflow-integration/templates/dr-review.md` | Copy-paste `developer-review-N.md` template with back-end review checklist (API contract, transactions, N+1, idempotency, auth boundaries, migration safety) |
-| `workflow-integration/templates/qa-testing.md` | Copy-paste `testing-N.md` template with unit+integration+security-scan gate evidence |
+| `workflow-integration/templates/qa-testing.md` | Copy-paste `testing-N.md` template with unit+integration+`analyze-security` gate evidence |
 
 ## Routing & Versions
 

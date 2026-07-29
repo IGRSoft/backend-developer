@@ -1,7 +1,6 @@
 ---
-name: security-scan
-description: OWASP API Top 10 security scan — authz boundary review, injection, secret scan, and dependency CVEs
-argument-hint: "[path/scope (default: working changes)] [--deep] [--secrets] [--deps]"
+description: Scan for OWASP API Top 10 defects — authz boundaries, injection, secrets, and dependency CVEs
+argument-hint: [path/scope (default: working changes)] [--deep] [--secrets] [--deps]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 3000
@@ -24,7 +23,7 @@ Scan back-end changes for the OWASP API Security Top 10 (2023) — authorization
 You MUST follow these rules exactly. Violating any of them is a failure.
 
 1. **Resolve the scope before scanning.** Apply the scope precedence (explicit args > working diff > branch/PR diff) exactly once, list the concrete files under review, and pass that same file list to the auditor and every scanner. Do NOT let the auditor re-scope independently.
-2. **The auditor is read-only.** The `be-security-auditor` pass MUST NOT write or edit. It returns structured findings only. This command never applies fixes — route remediation to `/backend-developer:fix` or the `be-code-fixer` separately.
+2. **The auditor is read-only.** The `be-security-auditor` pass MUST NOT write or edit. It returns structured findings only. This command never applies fixes — route remediation to `/backend-developer:review-code --fix` or the `be-code-fixer` separately.
 3. **OWASP API Top 10 is the spine.** Every finding maps to an OWASP API ID (API1–API10) where it fits the taxonomy, and to a CWE where applicable. Authorization-boundary review (API1 BOLA, API3 object-property authz, API5 BFLA) is mandatory on every run, not optional.
 4. **Flags arm scanners; they do not change the auditor's core duty.** The base auditor pass always runs. `--secrets`, `--deps`, and `--deep` add scanner passes that run alongside the auditor and feed the same synthesis. Do NOT skip the authz/injection review because a flag was set.
 5. **Synthesize, deduplicate, normalize.** Merge the auditor output with each scanner's output, drop duplicates and speculative claims, and normalize every survivor to `{file, line, owasp, category (CWE), severity, why, fix, confidence}` before ranking into P0-P3.
@@ -36,26 +35,26 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Scan your current working changes (staged + unstaged)
-/backend-developer:security-scan
+/backend-developer:analyze-security
 
 # Scan a specific directory
-/backend-developer:security-scan src/routes/
+/backend-developer:analyze-security src/routes/
 
 # Scan a single file
-/backend-developer:security-scan src/controllers/orders.ts
+/backend-developer:analyze-security src/controllers/orders.ts
 
 # Scan a branch or PR against the base
-/backend-developer:security-scan feature/checkout-api
-/backend-developer:security-scan 142            # PR number
+/backend-developer:analyze-security feature/checkout-api
+/backend-developer:analyze-security 142            # PR number
 
 # Add secret scanning (gitleaks/trufflehog over the scope + history)
-/backend-developer:security-scan --secrets
+/backend-developer:analyze-security --secrets
 
 # Add dependency CVE scanning (osv-scanner/govulncheck/trivy)
-/backend-developer:security-scan --deps
+/backend-developer:analyze-security --deps
 
 # Deep taint analysis (semgrep) plus all of the above
-/backend-developer:security-scan --deep --secrets --deps
+/backend-developer:analyze-security --deep --secrets --deps
 ```
 
 ## Options
@@ -83,7 +82,7 @@ After resolving, **print the concrete file list** and the line ranges (where a d
 
 ## Stack Detection
 
-Detect which back-end stacks appear in the resolved file list using the canonical `skill: stack-detection` table — do not fork its routing logic. The auditor adapts its injection/ORM/HTTP-client checks to the stacks present:
+Detect which back-end stacks appear in the resolved file list using the canonical `skill: language-detection` table — do not fork its routing logic. The auditor adapts its injection/ORM/HTTP-client checks to the stacks present:
 
 | Files in scope | Stack / framework signals |
 |----------------|---------------------------|
@@ -214,7 +213,7 @@ Suggestion: Pass an explicit path, or check that your changes include reviewable
 ### No changes detected (default scope)
 ```
 Note: No staged or unstaged changes to scan.
-Suggestion: Name a path, branch, or PR number, e.g. /backend-developer:security-scan src/routes/
+Suggestion: Name a path, branch, or PR number, e.g. /backend-developer:analyze-security src/routes/
 ```
 
 ### `gh` unavailable for a PR scope
@@ -239,16 +238,16 @@ Print the relevant install hint, note reduced depth in the report, and continue 
 If no scanner flag is armed, the base auditor pass still runs — the OWASP API audit does not depend on any external binary.
 
 ### Ambiguous stack
-If detection cannot classify a file (e.g. an extensionless script or a polyglot service), apply `skill: stack-detection` tie-break rules; if still ambiguous, route it to `backend-developer:backend-developer` and note the routing in the report.
+If detection cannot classify a file (e.g. an extensionless script or a polyglot service), apply `skill: language-detection` tie-break rules; if still ambiguous, route it to `backend-developer:backend-developer` and note the routing in the report.
 
 ## See Also
 
-- `skill: stack-detection` — canonical signal → stack → agent routing (keep this command's detection in sync).
+- `skill: language-detection` — canonical signal → stack → agent routing (keep this command's detection in sync).
 - `skill: severity-matrix` — P0-P3 definitions used by the synthesis ranking.
 - `skill: api-security` — OWASP API Top 10 patterns and authz-boundary checklists the auditor draws on.
 - `skills/_shared/version-feature-matrix.md` — runtime/framework version lookup for version-specific checks.
-- `/backend-developer:code-review` — broader correctness/quality review (this command is the security-focused subset).
-- `/backend-developer:deps-audit` — full dependency audit, license inventory, and gated upgrades when `--deps` surfaces advisories.
-- `/backend-developer:fix` — hand confirmed P0/P1 findings to `be-code-fixer` for minimal-diff remediation.
+- `/backend-developer:review-code` — broader correctness/quality review (this command is the security-focused subset).
+- `/backend-developer:deps` — full dependency audit, license inventory, and gated upgrades when `--deps` surfaces advisories.
+- `/backend-developer:review-code --fix` — hand confirmed P0/P1 findings to `be-code-fixer` for minimal-diff remediation.
 
 If there are no material issues, say that directly instead of manufacturing feedback.

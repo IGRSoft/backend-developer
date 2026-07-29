@@ -210,7 +210,7 @@ Containerization and observability for all runtimes, plus runtime diagnostics.
 
 ## Quality
 
-Testing strategy, load testing, API security, and code-review gates across the stack.
+Testing strategy, load testing, API security, and code review gates across the stack.
 
 **Start here:** [quality/SKILL.md](quality/SKILL.md)
 
@@ -218,7 +218,7 @@ Testing strategy, load testing, API security, and code-review gates across the s
 |-------|------|-------------|
 | **be-testing** | [quality/be-testing/SKILL.md](quality/be-testing/SKILL.md) | Test pyramid for services (unit/integration/contract/e2e), Testcontainers for real DBs/brokers, k6 load tests, coverage targets |
 | **be-performance** | [quality/be-performance/SKILL.md](quality/be-performance/SKILL.md) | Performance review gate, k6 load budgets, p95/p99 latency targets, DR perf criteria, profiling workflow |
-| **api-security** | [quality/api-security/SKILL.md](quality/api-security/SKILL.md) | OWASP API Security Top 10 (2023) checklist, auth/authz review patterns, injection and SSRF scanning, security-scan gate for DR/QA |
+| **api-security** | [quality/api-security/SKILL.md](quality/api-security/SKILL.md) | OWASP API Security Top 10 (2023) checklist, auth/authz review patterns, injection and SSRF scanning, `analyze-security` gate for DR/QA |
 
 ---
 
