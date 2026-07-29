@@ -1,7 +1,6 @@
 ---
-name: build-test
 description: Detect the back-end stack, build, and run unit + integration tests (Testcontainers where present)
-argument-hint: "[path (default .)] [--clean] [--no-test] [--integration]"
+argument-hint: [path (default .)] [--clean] [--no-test] [--integration]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 1500
@@ -272,7 +271,7 @@ Print the install hint from Tool Availability, skip the stack, continue. Only wh
 
 - `skill: stack-detection` — canonical marker → runtime → agent routing (keep the priority table in sync).
 - `skills/_shared/version-feature-matrix.md` — canonical runtime/framework version lookup for behaviour that differs by version.
-- `/backend-developer:lint-fix` — run linters/formatters/type-checks before building to cut noise.
-- `/backend-developer:generate-tests` — add a test suite (unit or Testcontainers integration) when detection finds no test target.
-- `/backend-developer:deps-audit` — when an `install`-stage failure is a missing, outdated, or vulnerable dependency.
+- `/backend-developer:fix-quick` — run linters/formatters/type-checks before building to cut noise.
+- `/backend-developer:gen-tests` — add a test suite (unit or Testcontainers integration) when detection finds no test target.
+- `/backend-developer:deps` — when an `install`-stage failure is a missing, outdated, or vulnerable dependency.
 - `/backend-developer:security-review` — once the build is green, run the OWASP API Security Top 10 pass over it.

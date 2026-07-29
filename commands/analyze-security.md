@@ -1,7 +1,6 @@
 ---
-name: security-scan
-description: OWASP API Top 10 security scan — authz boundary review, injection, secret scan, and dependency CVEs
-argument-hint: "[path/scope (default: working changes)] [--deep] [--secrets] [--deps]"
+description: Scan for OWASP API Top 10 defects — authz boundaries, injection, secrets, and dependency CVEs
+argument-hint: [path/scope (default: working changes)] [--deep] [--secrets] [--deps]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 3000
@@ -36,26 +35,26 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Scan your current working changes (staged + unstaged)
-/backend-developer:security-scan
+/backend-developer:analyze-security
 
 # Scan a specific directory
-/backend-developer:security-scan src/routes/
+/backend-developer:analyze-security src/routes/
 
 # Scan a single file
-/backend-developer:security-scan src/controllers/orders.ts
+/backend-developer:analyze-security src/controllers/orders.ts
 
 # Scan a branch or PR against the base
-/backend-developer:security-scan feature/checkout-api
-/backend-developer:security-scan 142            # PR number
+/backend-developer:analyze-security feature/checkout-api
+/backend-developer:analyze-security 142            # PR number
 
 # Add secret scanning (gitleaks/trufflehog over the scope + history)
-/backend-developer:security-scan --secrets
+/backend-developer:analyze-security --secrets
 
 # Add dependency CVE scanning (osv-scanner/govulncheck/trivy)
-/backend-developer:security-scan --deps
+/backend-developer:analyze-security --deps
 
 # Deep taint analysis (semgrep) plus all of the above
-/backend-developer:security-scan --deep --secrets --deps
+/backend-developer:analyze-security --deep --secrets --deps
 ```
 
 ## Options
@@ -214,7 +213,7 @@ Suggestion: Pass an explicit path, or check that your changes include reviewable
 ### No changes detected (default scope)
 ```
 Note: No staged or unstaged changes to scan.
-Suggestion: Name a path, branch, or PR number, e.g. /backend-developer:security-scan src/routes/
+Suggestion: Name a path, branch, or PR number, e.g. /backend-developer:analyze-security src/routes/
 ```
 
 ### `gh` unavailable for a PR scope
@@ -247,8 +246,8 @@ If detection cannot classify a file (e.g. an extensionless script or a polyglot 
 - `skill: severity-matrix` — P0-P3 definitions used by the synthesis ranking.
 - `skill: api-security` — OWASP API Top 10 patterns and authz-boundary checklists the auditor draws on.
 - `skills/_shared/version-feature-matrix.md` — runtime/framework version lookup for version-specific checks.
-- `/backend-developer:code-review` — broader correctness/quality review (this command is the security-focused subset).
-- `/backend-developer:deps-audit` — full dependency audit, license inventory, and gated upgrades when `--deps` surfaces advisories.
+- `/backend-developer:review-code` — broader correctness/quality review (this command is the security-focused subset).
+- `/backend-developer:deps` — full dependency audit, license inventory, and gated upgrades when `--deps` surfaces advisories.
 - `/backend-developer:fix` — hand confirmed P0/P1 findings to `be-code-fixer` for minimal-diff remediation.
 
 If there are no material issues, say that directly instead of manufacturing feedback.

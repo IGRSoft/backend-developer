@@ -104,16 +104,16 @@
         "./agents/be-dependency-manager.md"
       ],
       "commands": [
-        "./commands/code-review.md",
+        "./commands/analyze-security.md",
+        "./commands/review-code.md",
+        "./commands/gen-api.md",
+        "./commands/gen-tests.md",
+        "./commands/fix-quick.md",
+        "./commands/fix-modernize.md",
+        "./commands/fix-performance.md",
         "./commands/build-test.md",
-        "./commands/generate-tests.md",
-        "./commands/api-scaffold.md",
         "./commands/db-migrate.md",
-        "./commands/lint-fix.md",
-        "./commands/profile-performance.md",
-        "./commands/code-modernize.md",
-        "./commands/deps-audit.md",
-        "./commands/security-scan.md"
+        "./commands/deps.md"
       ]
     }
   ]

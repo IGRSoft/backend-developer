@@ -1,7 +1,6 @@
 ---
-name: api-scaffold
 description: Scaffold endpoints/services/handlers from an OpenAPI, GraphQL SDL, or gRPC proto contract
-argument-hint: "<schema: openapi.yaml|schema.graphql|service.proto> [--stack node|go|jvm|python] [--dry-run]"
+argument-hint: <schema: openapi.yaml|schema.graphql|service.proto> [--stack node|go|jvm|python] [--dry-run]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 2000
@@ -12,7 +11,7 @@ estimated-cost:
     opus: 15%
 ---
 
-# API Scaffold
+# API Scaffolding
 <!-- Updated: June 2026 -->
 
 Turn an API contract — OpenAPI, GraphQL SDL, or a gRPC `.proto` — into runnable server-side scaffolding: handler stubs, typed request/response DTOs with validation, route/resolver/service wiring, and a matching test skeleton. The contract is the source of truth; the generated code conforms to it, never the reverse. Detection picks the target stack from the repository (or `--stack`), then the owning stack developer fills in the bodies.
@@ -36,19 +35,19 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Scaffold from an OpenAPI contract, auto-detecting the stack
-/backend-developer:api-scaffold api/openapi.yaml
+/backend-developer:gen-api api/openapi.yaml
 
 # Force the Go stack
-/backend-developer:api-scaffold api/openapi.yaml --stack go
+/backend-developer:gen-api api/openapi.yaml --stack go
 
 # Scaffold a GraphQL resolver layer
-/backend-developer:api-scaffold graph/schema.graphql --stack node
+/backend-developer:gen-api graph/schema.graphql --stack node
 
 # Scaffold gRPC service stubs from a proto, JVM target
-/backend-developer:api-scaffold proto/order.proto --stack jvm
+/backend-developer:gen-api proto/order.proto --stack jvm
 
 # Preview the file plan without writing anything
-/backend-developer:api-scaffold api/openapi.yaml --dry-run
+/backend-developer:gen-api api/openapi.yaml --dry-run
 ```
 
 ## Options
@@ -222,7 +221,7 @@ When the codegen tool is missing, the stack developer parses the contract and wr
 ### Schema not found
 ```
 Error: Schema not found: {schema}
-Suggestion: Pass a contract file that exists, e.g. /backend-developer:api-scaffold api/openapi.yaml
+Suggestion: Pass a contract file that exists, e.g. /backend-developer:gen-api api/openapi.yaml
 ```
 
 ### Unrecognized schema

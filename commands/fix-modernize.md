@@ -1,7 +1,6 @@
 ---
-name: code-modernize
 description: Upgrade frameworks/runtimes one migration class at a time, gated on a green build + test run
-argument-hint: "[path (default .)] [--target <framework@version>] [--dry-run]"
+argument-hint: [path (default .)] [--target <framework@version>] [--dry-run]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 2000
@@ -12,7 +11,7 @@ estimated-cost:
     opus: 15%
 ---
 
-# Code Modernize
+# Legacy Code Modernization
 <!-- Updated: June 2026 -->
 
 Move a web/service back-end to a newer framework or runtime incrementally and safely. Modernization is sequenced as a ledger of discrete *migration classes* (e.g. "CommonJS -> ESM", "javax -> jakarta", "Express -> Fastify route adapters", "Django settings sweep"), and every class is verified by a full build + test run before its commit and before the next class begins. Mechanical rewrites are delegated to `backend-developer:be-code-fixer`; semantic migrations that need judgment go to the owning language developer (`backend-developer:node-developer`, `backend-developer:jvm-backend-developer`, `backend-developer:python-backend-developer`, `backend-developer:go-developer`, `backend-developer:dotnet-developer`, ...).
@@ -37,19 +36,19 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Preview the Spring Boot 3 migration ledger without touching any source
-/backend-developer:code-modernize . --target spring-boot@3.4 --dry-run
+/backend-developer:fix-modernize . --target spring-boot@3.4 --dry-run
 
 # Migrate a Spring Boot 2.7 service to 3.0 (the javax -> jakarta jump)
-/backend-developer:code-modernize src/main/java --target spring-boot@3.0
+/backend-developer:fix-modernize src/main/java --target spring-boot@3.0
 
 # Move a Node service from CommonJS to ESM on the Node 22 runtime
-/backend-developer:code-modernize . --target node@22
+/backend-developer:fix-modernize . --target node@22
 
 # Bump a FastAPI / Django project to a newer Python + framework line
-/backend-developer:code-modernize . --target django@5.2
+/backend-developer:fix-modernize . --target django@5.2
 
 # Roll a .NET service to the current LTS
-/backend-developer:code-modernize src/ --target dotnet@10.0
+/backend-developer:fix-modernize src/ --target dotnet@10.0
 ```
 
 ## Options
@@ -297,14 +296,14 @@ Exact flag spellings and recipe ids vary across tool releases — verify against
 ### Path not found
 ```
 Error: Path not found: {path}
-Suggestion: Pass a directory or file that exists, e.g. /backend-developer:code-modernize . --target spring-boot@3.0 --dry-run
+Suggestion: Pass a directory or file that exists, e.g. /backend-developer:fix-modernize . --target spring-boot@3.0 --dry-run
 ```
 
 ### Missing or invalid --target
 ```
 Error: --target is required and must be <framework@version> (or <runtime@version>),
 e.g. spring-boot@4.0, node@22, fastify@5, django@5.2, dotnet@10.0, go@1.26.
-Suggestion: /backend-developer:code-modernize . --target spring-boot@3.4 --dry-run
+Suggestion: /backend-developer:fix-modernize . --target spring-boot@3.4 --dry-run
 ```
 
 ### More than one breaking major requested
@@ -337,6 +336,6 @@ Print the install hint from Tool Availability, skip the class (or language), con
 - `skill: version-feature-matrix` — canonical framework/runtime -> minimum-floor + feature/fallback tables (gate every adopted feature here).
 - `skill: language-detection` — marker -> stack -> agent routing (keep per-service detection in sync).
 - `/backend-developer:build-test` — the build + test gate (unit + Testcontainers integration) run after every migration class.
-- `/backend-developer:lint-fix` — the shallow mechanical pass (codemods, `ruff --select UP`, formatters) for a single stack; this command sequences those plus semantic migrations across version jumps.
-- `/backend-developer:code-review` — review the modernized diff for contract drift, transaction correctness, N+1 regressions, and auth-boundary changes once the ledger is complete.
-- `/backend-developer:deps-audit` — the dependency side of an upgrade (outdated report, CVE lookup, one-at-a-time bumps); pair it with this command when a major framework jump pulls transitive majors.
+- `/backend-developer:fix-quick` — the shallow mechanical pass (codemods, `ruff --select UP`, formatters) for a single stack; this command sequences those plus semantic migrations across version jumps.
+- `/backend-developer:review-code` — review the modernized diff for contract drift, transaction correctness, N+1 regressions, and auth-boundary changes once the ledger is complete.
+- `/backend-developer:deps` — the dependency side of an upgrade (outdated report, CVE lookup, one-at-a-time bumps); pair it with this command when a major framework jump pulls transitive majors.

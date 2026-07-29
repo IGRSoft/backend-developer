@@ -1,21 +1,22 @@
 ---
-name: profile-performance
-description: Load-test (k6), profile hot paths, and analyze slow queries, routing findings to be-performance-engineer
-argument-hint: "[target: url|service|path] [--load] [--profile] [--queries] [--vus N] [--duration 30s]"
-allowed-tools: Read, Glob, Grep, Bash
+description: Load-test, profile hot paths, and analyze slow queries; optionally apply the ranked fixes behind a checkpoint
+argument-hint: [target: url|service|path] [--load] [--profile] [--queries] [--apply] [--vus N] [--duration 30s]
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 2000
-  max-tokens: 18000
+  max-tokens: 26000
   model-distribution:
     haiku: 15%
     sonnet: 70%
     opus: 15%
 ---
 
-# Profile Performance
+# Performance Profiling and Optimization
 <!-- Updated: June 2026 -->
 
 Load-test an HTTP endpoint with `k6`, attach a CPU/heap profiler to a hot service, and capture slow-query / EXPLAIN ANALYZE evidence — then hand the raw artifacts to `be-performance-engineer` for interpretation. Data collection is pure Bash; the agent is engaged only to read the reports and rank hot paths, slow queries, and saturation points. The command never guesses at bottlenecks itself.
+
+**The default run is measure-only.** No file is written, edited, or otherwise mutated by any phase before the PHASE CHECKPOINT in Phase 5 — profiling, load testing, and interpretation are read-and-collect operations, and their only outputs are artifacts under `.context/logs/`. `Write`/`Edit` exist in `allowed-tools` solely to serve the optional apply phase, which runs only when `--apply` is passed *and* the user approves at the checkpoint.
 
 [Extended thinking: Backend performance is a measure-first discipline, so this command's job is to produce *trustworthy* measurements and then defer judgment. It is runtime-aware — Go gets `pprof`, Node gets `clinic`/`0x`, the JVM gets `async-profiler`, Python web gets `py-spy`, and any HTTP surface gets `k6` load — because the same intent maps to different tools per stack. The single most common way backend profiling lies is the wrong environment: profiling a `NODE_ENV=development` server, an unoptimized JIT that never warmed up, or a database with cold caches and no representative data relocates the hot path entirely. The prerequisite check refuses a dev-mode/non-warmed target and tells the user how to run a production-like build (release binary, `NODE_ENV=production`, JIT-warmed, seeded DB) rather than profiling garbage. Every artifact lands under `.context/logs/profile-<timestamp>/` so the engineer (and the user) can re-open the k6 summary, the flame graph, and the EXPLAIN plans. `--queries` is the database path: EXPLAIN (ANALYZE, BUFFERS) on the slow statements plus an N+1 scan of the ORM logs, so the root cause is the plan, not a guess. Interpretation — top-N hotspots with `file:line`, p95/p99 versus threshold, the offending query and its plan, a fix plan ranked by effort/impact — is the agent's deliverable, not this command's.]
 
@@ -28,27 +29,31 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 3. **Save every artifact under `.context/logs/profile-<timestamp>/`.** Create the directory once per run; write the k6 JSON summary, the profile/flame graph, the EXPLAIN output, slow-query logs, and a `meta.txt` (target, modes, runtime, framework, tool, env config) there. The directory is the single source of truth for interpretation — do not rely on terminal scrollback.
 4. **Single-command Bash invocations.** Use each tool's own flags for output paths and target selection. Never `cd`-chain or `&&`-chain directory changes — scoped Bash patterns do not match compound commands.
 5. **Pick the runtime tool, do not invent flags.** Resolve the runtime once (package manifest / binary), then run the matching tool from the Runtime / Tool Matrix exactly as written. If a flag is rejected, consult `--help` or `skill: observability` — never guess flag spellings.
-6. **`--load` measures, never auto-edits.** Load mode runs k6 with `--vus`/`--duration` and p95/p99 thresholds. It does not change code. The optimization itself is the agent's plan plus a follow-up `code-review` run.
-7. **Tool-missing never hard-fails.** If k6 or the runtime profiler is absent, print the install hint, skip that collection, and report what was skipped. If no tool is available for the requested mode, report the aggregated hints and stop without erroring out the session.
-8. **Never enter plan mode.** This command IS the procedure — execute it.
+6. **Measurement never edits.** Phases 1-4 collect and interpret; none of them may write or edit a source file. k6 runs with `--vus`/`--duration` and p95/p99 thresholds and changes nothing. The only mutation path in this command is Phase 5, and it is unreachable without `--apply`.
+7. **`--apply` stops at the PHASE CHECKPOINT.** When `--apply` is passed, present the engineer's ranked fix plan and STOP. Use AskUserQuestion to get explicit approval, and apply only the items the user approves. Never infer approval from the fact that `--apply` was passed — the flag opts into being *asked*, not into being edited.
+8. **Tool-missing never hard-fails.** If k6 or the runtime profiler is absent, print the install hint, skip that collection, and report what was skipped. If no tool is available for the requested mode, report the aggregated hints and stop without erroring out the session.
+9. **Never enter plan mode.** This command IS the procedure — execute it.
 
 ## Usage
 
 ```bash
 # Load-test an HTTP endpoint at default VUs/duration
-/backend-developer:profile-performance http://localhost:3000/api/orders --load
+/backend-developer:fix-performance http://localhost:3000/api/orders --load
 
 # Load-test with explicit virtual users and duration
-/backend-developer:profile-performance http://localhost:8080/health --load --vus 100 --duration 60s
+/backend-developer:fix-performance http://localhost:8080/health --load --vus 100 --duration 60s
 
 # CPU profile a running Node service while it takes traffic
-/backend-developer:profile-performance services/orders --profile
+/backend-developer:fix-performance services/orders --profile
 
 # Analyze slow queries against the project's database
-/backend-developer:profile-performance . --queries
+/backend-developer:fix-performance . --queries
 
 # Full pass: load, profile, and slow-query analysis together
-/backend-developer:profile-performance http://localhost:3000/api/orders --load --profile --queries
+/backend-developer:fix-performance http://localhost:3000/api/orders --load --profile --queries
+
+# Measure, then offer to apply the ranked fixes (stops for approval first)
+/backend-developer:fix-performance . --queries --apply
 ```
 
 ## Options
@@ -59,6 +64,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 | `--load` | off | Run a `k6` load test against the URL with p95/p99 latency and error-rate thresholds; export the JSON summary. |
 | `--profile` | off | Attach a CPU/heap profiler to the running service (Go pprof, Node clinic/0x, JVM async-profiler, Python py-spy) and capture a flame graph. |
 | `--queries` | off | Capture slow-query logs and run `EXPLAIN (ANALYZE, BUFFERS)` on the offending statements; scan ORM logs for N+1 patterns. |
+| `--apply` | off | Unlock the optional apply phase. After interpretation, present the ranked fix plan at a PHASE CHECKPOINT and — only on explicit approval — hand the approved items to `be-code-fixer`, re-running the build/test gate and re-measuring. Without this flag the command is strictly measure-only. |
 | `--vus N` | `10` | k6 virtual users (concurrency). Ignored unless `--load`. |
 | `--duration 30s` | `30s` | k6 test duration (Go-style duration string). Ignored unless `--load`; for `--profile` attach, bounds the sampling window. |
 
@@ -157,9 +163,35 @@ After artifacts are written, hand them to the performance engineer for the ranke
 
 Model note: `be-performance-engineer` defaults to sonnet/high; for a large or cross-service profile a caller may raise it to opus/xhigh — pass `model="opus"` on the Task call when the trace/plan set is complex enough to warrant it.
 
-### Phase 5: Report (Bash)
+### Phase 5: Apply (optional — `--apply` only)
 
-Emit the Output Format summary, pointing at `{OUT}` and folding in the engineer's ranked findings (or the skip/error note when collection did not run).
+Skip this phase entirely unless `--apply` was passed. Everything up to this point has been read-only; this is the first and only phase that may modify the repository.
+
+---
+
+#### PHASE CHECKPOINT
+
+**Completed:** Phases 1-4 — collection and interpretation. Artifacts are in `{OUT}`; `be-performance-engineer` has returned a fix plan ranked by effort/impact. **Nothing has been modified.**
+
+**Next:** Phase 5 would hand approved items to `backend-developer:be-code-fixer`, which edits source, and re-run the build/test gate.
+
+Stop here. Present the ranked fix plan as a numbered list, each item showing the target file/statement, the proposed change, and its expected win. Use the AskUserQuestion tool to ask which items to apply — offering at minimum "apply all", "apply a subset I name", and "apply none (report only)". Apply only what the user names. If the user declines, jump straight to Phase 6 and report the plan unapplied.
+
+---
+
+Once items are approved:
+
+1. Record the approved subset (ids, targets, expected wins) in `"$OUT/approved-fixes.md"` so the applied set is auditable against the plan.
+2. **Use Task tool with subagent_type="backend-developer:be-code-fixer"**
+   Prompt: "Apply these approved performance fixes to `{target}` ({runtime}/{framework}), one at a time and in the order given: {approved items, each with file/statement, the ranked finding it resolves, and the proposed change from `{OUT}/approved-fixes.md`}. Constraints: minimal diff; do NOT re-decide scope or add fixes that are not on the approved list; preserve behavior — a performance fix that changes results is a bug. After each item, run `/backend-developer:build-test` and stop on the first red build or failing test, reverting that item and reporting which one broke. Return a per-item ledger of what changed."
+   - Expected output: per-item ledger (item, files touched, build/test result).
+   - Error handling: on a red gate, revert that item, stop applying, and report — do not continue down the list on a broken build.
+3. Schema/index changes go to `backend-developer:database-engineer`, not the code fixer, and a new index or column ships as a migration through `/backend-developer:db-migrate` rather than an ad-hoc DDL statement.
+4. **Re-measure.** Re-run the same collection modes with the same `--vus`/`--duration` into a fresh `"$OUT2=.context/logs/profile-<new-timestamp>"`, so the before/after comparison is like-for-like. A fix that does not move the measured number is reported as *no measured win*, not as a success.
+
+### Phase 6: Report (Bash)
+
+Emit the Output Format summary, pointing at `{OUT}` and folding in the engineer's ranked findings (or the skip/error note when collection did not run). When Phase 5 ran, add the applied-fix ledger and the before/after comparison from the re-measurement.
 
 ## Tool Availability
 
@@ -189,6 +221,7 @@ Exact flag spellings vary across tool releases — verify against your toolchain
 **Framework:** {Express | NestJS | Gin | Spring Boot | FastAPI | Rails | Laravel | ASP.NET Core}
 **Tools:** {k6 | pprof | clinic/0x | async-profiler | py-spy | dotnet-trace | EXPLAIN ANALYZE}
 **Environment:** production-like ✅ | (dev/cold: ❌ — stopped)
+**Mode:** measure-only | measure + apply (`--apply`, {n} of {m} items approved)
 **Artifacts:** .context/logs/profile-{timestamp}/
 
 | Step | Result | Notes |
@@ -196,6 +229,7 @@ Exact flag spellings vary across tool releases — verify against your toolchain
 | Environment prerequisite | ✅ / ❌ run-correctly / ⏭ N/A | {prod mode, warmed, seeded — or hint} |
 | Collection | ✅ / ❌ / ⏭ skipped | {tools, vus/duration, or skip reason} |
 | Interpretation | ✅ / ⏭ | {delegated to be-performance-engineer} |
+| Apply | ⏭ not requested / ⏭ declined at checkpoint / ✅ {n} applied | {be-code-fixer ledger, build/test gate result} |
 
 ### Load Test Summary
 <!-- from be-performance-engineer; --load -->
@@ -225,6 +259,16 @@ Exact flag spellings vary across tool releases — verify against your toolchain
 1. {high-impact / low-effort fix} — implement via backend-developer:{agent}
 2. {next} — ...
 
+### Applied Fixes
+<!-- --apply only; omit the whole section on a measure-only run -->
+| # | Fix | Files touched | Build+test gate | Measured win |
+|--:|-----|---------------|-----------------|--------------|
+| 1 | add index on orders(user_id) | migrations/0042_orders_user_id.sql | ✅ | 210 ms → 4 ms mean |
+| 2 | eager-load order.items | src/orders/order.service.ts | ✅ | p95 412 ms → 180 ms |
+| 3 | {declined at checkpoint} | — | — | not applied |
+
+**Before / after:** p95 {before} → {after}; p99 {before} → {after}; re-measured into .context/logs/profile-{new-timestamp}/ with identical `--vus`/`--duration`.
+
 <!-- on skip/error only -->
 ### Skipped / Environment
 - {tool}: {missing — install hint above} | {pprof endpoint not exposed} | {py-spy attach denied — run as process owner} | {psql auth failed}
@@ -237,7 +281,7 @@ Exact flag spellings vary across tool releases — verify against your toolchain
 Error: Target not reachable: {target}
 Suggestion: Pass a reachable URL, a running service path, a directory to detect,
 or a valid DATABASE_URL, e.g.
-/backend-developer:profile-performance http://localhost:3000/api/orders --load
+/backend-developer:fix-performance http://localhost:3000/api/orders --load
 ```
 
 ### Dev-mode / cold target (load or profile)
@@ -245,7 +289,7 @@ or a valid DATABASE_URL, e.g.
 Error: {target} is running in dev/debug mode or is not warmed — profiling it yields wrong hot paths.
 Run a production-like instance (optimized build, prod mode, warmed JIT, seeded data):
   NODE_ENV=production node dist/server.js   # or: go build -trimpath ... && ./bin/svc
-Then re-run: /backend-developer:profile-performance {target} --{mode}
+Then re-run: /backend-developer:fix-performance {target} --{mode}
 ```
 This is a STOP, not a skip — do not profile a dev-mode/cold target.
 
@@ -273,11 +317,26 @@ be-performance-engineer for analysis.
 ### Tool missing
 Print the install hint from Tool Availability, skip the collection, continue. Only when *every* eligible tool for the requested modes is absent does the command report "no profiling tool available" with the aggregated hints (no hard failure).
 
+### Build or tests go red while applying (`--apply`)
+```
+Stopped applying at item {n} ({fix}): /backend-developer:build-test came back red.
+That item has been reverted; items 1..{n-1} remain applied and green.
+Remaining approved items were NOT attempted. Failure output: {OUT}/apply-{n}.log
+```
+A red gate halts the apply loop — never continue down the list on a broken build.
+
+### `--apply` with no fix plan
+```
+Note: --apply was passed but be-performance-engineer returned no actionable fixes
+(or collection was skipped for every requested mode). Nothing to apply; reporting
+the measurement only.
+```
+
 ### Ambiguous target in a directory
 ```
 Error: Could not resolve a single profilable service or database under {path}.
 Suggestion: Pass the explicit URL, service path, or DATABASE_URL, e.g.
-/backend-developer:profile-performance http://localhost:8080/health --load
+/backend-developer:fix-performance http://localhost:8080/health --load
 ```
 
 ## See Also
@@ -285,6 +344,8 @@ Suggestion: Pass the explicit URL, service path, or DATABASE_URL, e.g.
 - `skill: observability` — canonical profiling-tools flag reference (k6/pprof/clinic/0x/async-profiler/py-spy/dotnet-trace/EXPLAIN), the measure→fix→re-measure loop, and the symptom→tool table. Keep the Runtime / Tool Matrix in sync with it.
 - `skill: _shared/version-feature-matrix.md` — runtime/framework version markers and fallbacks for the profilers above.
 - `skill: language-detection` — runtime and DB-engine resolution for the matrix.
-- `/backend-developer:build-test` — produce a production-like build first before profiling.
-- `/backend-developer:code-review` — apply the ranked algorithmic / query / index fixes the engineer recommends (DR criteria include N+1 queries and transaction correctness).
-- `/backend-developer:deps-audit` — when the bottleneck is a dependency, not your code — audit/upgrade before micro-optimizing.
+- `/backend-developer:build-test` — produce a production-like build first before profiling; also the gate `--apply` runs after every applied item.
+- `/backend-developer:review-code` — review the applied diff for contract drift, transaction correctness, and N+1 regressions (DR criteria include both).
+- `/backend-developer:db-migrate` — ships an index or schema change from the fix plan as a reviewable migration instead of ad-hoc DDL.
+- `/backend-developer:fix-refactor` — when the ranked plan calls for a structural change (extracting a boundary, moving a transaction) rather than a local fix.
+- `/backend-developer:deps` — when the bottleneck is a dependency, not your code — audit/upgrade before micro-optimizing.

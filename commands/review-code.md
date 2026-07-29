@@ -1,7 +1,6 @@
 ---
-name: code-review
-description: Language-aware back-end code review — per-stack reviewers + API-contract pass + security pass, synthesized into a P0-P3 report
-argument-hint: "[scope: file/dir/PR#/branch — default: working changes] [--quick] [--fix] [--lang node|go|jvm|python|ruby|php|dotnet] [--security-focus]"
+description: Review code per stack with an API-contract and security pass, synthesized into a P0-P3 report
+argument-hint: [scope: file/dir/PR#/branch — default: working changes] [--quick] [--fix] [--lang node|go|jvm|python|ruby|php|dotnet] [--security-focus]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 4000
@@ -12,7 +11,7 @@ estimated-cost:
     opus: 10%
 ---
 
-# Language-Aware Back-End Code Review
+# Language-Aware Code Review
 <!-- Updated: June 2026 -->
 
 Review back-end changes with the right stack specialist per runtime, plus a dedicated API-contract pass and a cross-cutting security pass, then synthesize one deduplicated, prioritized P0-P3 report. Scope defaults to your working changes; reviewers run read-only and in parallel; `--fix` hands the blocking findings to the code fixer under a minimal-diff gate.
@@ -36,29 +35,29 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Review your current working changes (staged + unstaged)
-/backend-developer:code-review
+/backend-developer:review-code
 
 # Review a specific directory
-/backend-developer:code-review src/api/
+/backend-developer:review-code src/api/
 
 # Review a single file
-/backend-developer:code-review src/routes/orders.ts
+/backend-developer:review-code src/routes/orders.ts
 
 # Review a branch or PR against the base
-/backend-developer:code-review feature/order-webhooks
-/backend-developer:code-review 142            # PR number
+/backend-developer:review-code feature/order-webhooks
+/backend-developer:review-code 142            # PR number
 
 # Fast single-agent pass for quick feedback
-/backend-developer:code-review src/ --quick
+/backend-developer:review-code src/ --quick
 
 # Review, then auto-fix the P0/P1 findings
-/backend-developer:code-review src/ --fix
+/backend-developer:review-code src/ --fix
 
 # Force a stack when detection is ambiguous (e.g. polyglot monorepo)
-/backend-developer:code-review services/ --lang go
+/backend-developer:review-code services/ --lang go
 
 # Raise the security pass priority for an auth/permissions change
-/backend-developer:code-review src/auth/ --security-focus
+/backend-developer:review-code src/auth/ --security-focus
 ```
 
 ## Options
@@ -235,7 +234,7 @@ Suggestion: Pass an explicit path, or check that your changes include reviewable
 ### No changes detected (default scope)
 ```
 Note: No staged or unstaged changes to review.
-Suggestion: Name a path, branch, or PR number, e.g. /backend-developer:code-review src/api/
+Suggestion: Name a path, branch, or PR number, e.g. /backend-developer:review-code src/api/
 ```
 
 ### `gh` unavailable for a PR scope
@@ -268,8 +267,8 @@ If detection cannot classify a file (e.g. a shared schema, or `.ts` that may be 
 - `skill: severity-matrix` — P0-P3 definitions used by the synthesis ranking.
 - `skill: secure-coding` — OWASP API Top 10, injection, and authz-boundary patterns the security pass draws on.
 - `skills/_shared/version-feature-matrix.md` — canonical framework/runtime version → feature lookup.
-- `/backend-developer:lint-fix` — run formatters/linters first to clear P3 noise before review.
+- `/backend-developer:fix-quick` — run formatters/linters first to clear P3 noise before review.
 - `/backend-developer:build-test` — confirm the change builds and tests green (unit + integration) before or after review.
-- `/backend-developer:deps-audit` — escalate a supply-chain CVE finding to a full dependency audit.
+- `/backend-developer:deps` — escalate a supply-chain CVE finding to a full dependency audit.
 
 If there are no material issues, say that directly instead of manufacturing feedback.

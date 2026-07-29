@@ -1,7 +1,6 @@
 ---
-name: lint-fix
-description: Run per-ecosystem linters and formatters (eslint/biome, gofmt/golangci-lint, ktlint, rubocop, php-cs-fixer, dotnet format)
-argument-hint: "[path (default .)] [--check] [--fix] [--stack node|go|jvm|python|ruby|php|dotnet]"
+description: Run per-ecosystem linters and formatters and apply the safe, mechanical auto-fixes
+argument-hint: [path (default .)] [--check] [--fix] [--stack node|go|jvm|python|ruby|php|dotnet]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 800
@@ -12,12 +11,12 @@ estimated-cost:
     opus: 3%
 ---
 
-# Lint & Fix
+# Quick Fix
 <!-- Updated: June 2026 -->
 
-Run each ecosystem's standard linter and formatter over the target back-end, report violations, and — in `--fix` mode — apply the safe, deterministic auto-fixes, then re-check. Fast, cheap, and reversible: this is the deterministic-cleanup pass, not a review. Deep, judgment-bearing fixes escalate to `/backend-developer:code-review --fix`.
+Run each ecosystem's standard linter and formatter over the target back-end, report violations, and — in `--fix` mode — apply the safe, deterministic auto-fixes, then re-check. Fast, cheap, and reversible: this is the deterministic-cleanup pass, not a review. Deep, judgment-bearing fixes escalate to `/backend-developer:review-code --fix`.
 
-[Extended thinking: This command is the backend-developer analogue of a pre-commit / CI lint stage. It detects which stacks are present, discovers each stack's config (so it honors project rules instead of imposing its own), and runs linters/formatters in a fixed order per stack. `--check` is the CI mode — no edits, exit-code-honest, with a per-rule violation count — and `--fix` applies only the mechanical fixes (`eslint --fix`, `biome check --write`, `gofmt -w`, `ruff check --fix`, `rubocop -a`, `php-cs-fixer fix`, `dotnet format`) then re-runs the linters to confirm. Anything a formatter or `--fix` rule cannot resolve mechanically (type errors, security findings, semantic lint) is reported, not forced; those land in `code-review --fix`. Keep it mostly on haiku: the work is tool invocation and table assembly, not analysis — sonnet only when a mixed-stack monorepo needs disambiguation. Version-sensitive flag spellings: see `skills/_shared/version-feature-matrix.md`.]
+[Extended thinking: This command is the backend-developer analogue of a pre-commit / CI lint stage. It detects which stacks are present, discovers each stack's config (so it honors project rules instead of imposing its own), and runs linters/formatters in a fixed order per stack. `--check` is the CI mode — no edits, exit-code-honest, with a per-rule violation count — and `--fix` applies only the mechanical fixes (`eslint --fix`, `biome check --write`, `gofmt -w`, `ruff check --fix`, `rubocop -a`, `php-cs-fixer fix`, `dotnet format`) then re-runs the linters to confirm. Anything a formatter or `--fix` rule cannot resolve mechanically (type errors, security findings, semantic lint) is reported, not forced; those land in `review-code --fix`. Keep it mostly on haiku: the work is tool invocation and table assembly, not analysis — sonnet only when a mixed-stack monorepo needs disambiguation. Version-sensitive flag spellings: see `skills/_shared/version-feature-matrix.md`.]
 
 ## CRITICAL BEHAVIORAL RULES
 
@@ -29,23 +28,23 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 4. **Type/semantic linters are report-only.** `tsc --noEmit`, `mypy`, `go vet`, `phpstan`, and security-flavored rules are never auto-fixed — they always land in the report and, when they need judgment, under "Needs review". Never force a fix that changes behavior.
 5. **Single-command Bash invocations.** Use each tool's own path/glob/recursion flags. Never `cd`-chain or `&&`-chain directory changes — scoped Bash patterns do not match compound commands. Run a package-manager script (`npm run lint`, `pnpm lint`) only when it maps to the same report-only behavior.
 6. **Tool-missing never hard-fails.** If a linter/formatter binary is absent, print the install hint, skip that stack's pass, and continue. Report what was skipped.
-7. **This is the shallow pass.** Do NOT attempt semantic refactors, API redesigns, transaction-boundary changes, or fixes that alter behavior. When a finding needs judgment, list it under "Needs review" and point to `/backend-developer:code-review --fix`. Do not delegate to an agent from this command.
+7. **This is the shallow pass.** Do NOT attempt semantic refactors, API redesigns, transaction-boundary changes, or fixes that alter behavior. When a finding needs judgment, list it under "Needs review" and point to `/backend-developer:review-code --fix`. Do not delegate to an agent from this command.
 8. **Never enter plan mode.** This command IS the procedure — execute it.
 
 ## Usage
 
 ```bash
 # Report violations across all detected stacks (CI-safe, no edits)
-/backend-developer:lint-fix . --check
+/backend-developer:fix-quick . --check
 
 # Auto-fix everything fixable, then re-check
-/backend-developer:lint-fix . --fix
+/backend-developer:fix-quick . --fix
 
 # Fix only the Node/TypeScript service under a subtree
-/backend-developer:lint-fix services/api --fix --stack node
+/backend-developer:fix-quick services/api --fix --stack node
 
 # Check just the Go module (exit non-zero if any violation)
-/backend-developer:lint-fix cmd/ --check --stack go
+/backend-developer:fix-quick cmd/ --check --stack go
 ```
 
 ## Options
@@ -205,7 +204,7 @@ git checkout -- {files}
 <!-- when mechanical fixes cannot resolve everything -->
 ### Needs review ({count})
 - {file}:{line}: {tsc/mypy/go vet/phpstan finding that needs judgment}
-- Escalate with: `/backend-developer:code-review --fix {path}`
+- Escalate with: `/backend-developer:review-code --fix {path}`
 
 <!-- on skipped stacks only -->
 ### Skipped
@@ -220,7 +219,7 @@ In `--check` mode, the "Violations" column doubles as the per-rule summary: each
 ### Path not found
 ```
 Error: Path not found: {path}
-Suggestion: Pass a directory or file that exists, e.g. /backend-developer:lint-fix . --check
+Suggestion: Pass a directory or file that exists, e.g. /backend-developer:fix-quick . --check
 ```
 
 ### No lintable sources
@@ -245,7 +244,7 @@ Print the install hint from Tool Availability, skip that stack's pass, continue.
 
 - `skill: stack-detection` — canonical manifest → stack → agent routing (keep detection in sync).
 - `/backend-developer:build-test` — run before building to cut compiler/transpiler-warning noise; build green first, then lint.
-- `/backend-developer:code-review --fix` — escalation target for findings that need judgment (semantic refactors, auth-boundary or transaction changes, API-contract fixes) beyond mechanical lint fixes.
-- `/backend-developer:code-modernize` — for cross-version modernization (`ruff --select UP`, `golangci-lint` modernizers, framework migrations) which goes deeper than this command's mechanical pass.
+- `/backend-developer:review-code --fix` — escalation target for findings that need judgment (semantic refactors, auth-boundary or transaction changes, API-contract fixes) beyond mechanical lint fixes.
+- `/backend-developer:fix-modernize` — for cross-version modernization (`ruff --select UP`, `golangci-lint` modernizers, framework migrations) which goes deeper than this command's mechanical pass.
 - `skills/_shared/version-feature-matrix.md` — canonical lookup for which linter/formatter version supports which flag.
 ```

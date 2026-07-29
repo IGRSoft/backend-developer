@@ -1,7 +1,6 @@
 ---
-name: generate-tests
 description: Generate unit, integration, and contract tests for back-end code using the project framework
-argument-hint: "[path/scope (default: working changes)] [--coverage-gaps] [--integration] [--contract]"
+argument-hint: [path/scope (default: working changes)] [--coverage-gaps] [--integration] [--contract]
 allowed-tools: Read, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 2000
@@ -12,7 +11,7 @@ estimated-cost:
     opus: 10%
 ---
 
-# Generate Tests
+# Test Generation
 <!-- Updated: June 2026 -->
 
 Generate a runnable test suite for back-end code — unit, integration, and contract — register it with the project's test runner, and prove it discovers and runs before reporting success. The product is *passing, discoverable tests* — not test source files on disk.
@@ -35,19 +34,19 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ```bash
 # Detect the framework and generate + register + verify unit tests for the working changes
-/backend-developer:generate-tests
+/backend-developer:gen-tests
 
 # Generate tests for one module/package
-/backend-developer:generate-tests src/orders
+/backend-developer:gen-tests src/orders
 
 # Target untested branches surfaced by a coverage run
-/backend-developer:generate-tests src/orders --coverage-gaps
+/backend-developer:gen-tests src/orders --coverage-gaps
 
 # Add Testcontainers-backed integration tests for a repository layer
-/backend-developer:generate-tests src/repositories --integration
+/backend-developer:gen-tests src/repositories --integration
 
 # Pin the HTTP API surface with consumer-driven contract tests
-/backend-developer:generate-tests src/api --contract
+/backend-developer:gen-tests src/api --contract
 ```
 
 ## Options
@@ -151,7 +150,7 @@ For empty-project scaffolding, also pin the dependency: add the framework + (if 
 
 ### Phase 5: Verification Gate (Bash) — MANDATORY
 
-Reuse `/backend-developer:build-test`'s detect → install → build → test logic. Tee to `.context/logs/generate-tests-<timestamp>.log`.
+Reuse `/backend-developer:build-test`'s detect → install → build → test logic. Tee to `.context/logs/gen-tests-<timestamp>.log`.
 
 1. **Build/compile (TS/Go/Java/C# only):** type-check / compile the test target.
    ```bash
@@ -218,7 +217,7 @@ Never hard-fail on a missing tool — print the hint, skip that test type/stack,
 **Framework:** {Vitest | Jest | go testing | pytest | JUnit 5 | RSpec | PHPUnit | xUnit} ({detected in-use | matrix default})
 **Test types:** {unit | unit + integration (Testcontainers) | unit + contract (Pact/schema)}
 **Coverage mode:** {broad | --coverage-gaps targeting N gaps}
-**Log:** .context/logs/generate-tests-{timestamp}.log
+**Log:** .context/logs/gen-tests-{timestamp}.log
 
 ### Tests Generated ({count})
 
@@ -261,7 +260,7 @@ Never hard-fail on a missing tool — print the hint, skip that test type/stack,
 ### Path not found
 ```
 Error: Path not found: {path}
-Suggestion: Pass a file, package, or directory that exists, e.g. /backend-developer:generate-tests src/orders
+Suggestion: Pass a file, package, or directory that exists, e.g. /backend-developer:gen-tests src/orders
 ```
 
 ### Framework conflict
@@ -280,7 +279,7 @@ Suggestion: Point at the source file/module to test, or scope to a package with 
 ### --coverage-gaps with no runnable suite
 ```
 Warning: --coverage-gaps needs an existing suite that already builds and runs to measure.
-None found — falling back to broad generation. Run generate-tests once, then re-run
+None found — falling back to broad generation. Run gen-tests once, then re-run
 with --coverage-gaps to target the remaining gaps.
 ```
 
@@ -300,8 +299,8 @@ Print the install hint from Tool Availability, skip that language/test type, con
 ## See Also
 
 - `/backend-developer:build-test` — the detect/install/build/test logic the verification gate reuses; run it first to confirm the project builds before adding tests.
-- `/backend-developer:security-scan` — run the new tests' suite alongside an OWASP API Top 10 scan once they are green; auth-boundary tests pair with the scan's BOLA/BFLA checks.
-- `/backend-developer:code-review` — review the code before adding tests to it; `--coverage-gaps` pairs well after a review.
+- `/backend-developer:analyze-security` — run the new tests' suite alongside an OWASP API Top 10 scan once they are green; auth-boundary tests pair with the scan's BOLA/BFLA checks.
+- `/backend-developer:review-code` — review the code before adding tests to it; `--coverage-gaps` pairs well after a review.
 - `skill: testing-strategy` — test pyramid, framework matrix, coverage targets, AAA/naming, Testcontainers and contract-testing conventions.
 - `skill: language-detection` — canonical marker → language → agent routing (keep the framework table in sync).
 - `skill: _shared/version-feature-matrix.md` — canonical framework/runtime version → feature lookup and fallbacks.

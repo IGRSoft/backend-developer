@@ -10,11 +10,11 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 
 | Concern | Route to |
 |---------|----------|
-| Python *language* layer (typing, asyncio, free-threading, packaging) | `system-developer:python-developer` (`python-backend-developer` owns the web-framework + persistence layer) |
-| C / C++ native services or extensions | `system-developer:c-developer` / `cpp-developer` |
-| Shell / CI scripts | `system-developer:bash-developer` |
-| Browser UI consuming the API | `frontend-developer:*` |
-| Native mobile clients | `apple-developer:*` |
+| Python *language* layer (typing, asyncio, free-threading, packaging) | `/system-developer:python-developer` (`python-backend-developer` owns the web-framework + persistence layer) |
+| C / C++ native services or extensions | `/system-developer:c-developer` / `cpp-developer` |
+| Shell / CI scripts | `/system-developer:bash-developer` |
+| Browser UI consuming the API | `/frontend-developer:*` |
+| Native mobile clients | `/apple-developer:*` |
 
 ## What's in 1.0.0
 
@@ -32,7 +32,7 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 | `node-developer` | sonnet / high | Node.js/TypeScript — Express/NestJS/Fastify/Hono, async, streams. |
 | `go-developer` | sonnet / high | Go — goroutines/channels, stdlib-first, Gin/Echo/chi, error wrapping. |
 | `jvm-backend-developer` | sonnet / high | Java/Kotlin — Spring Boot, JPA, reactive. |
-| `python-backend-developer` | sonnet / high | FastAPI/Django/Flask; delegates language layer to `system-developer:python-developer`. |
+| `python-backend-developer` | sonnet / high | FastAPI/Django/Flask; delegates language layer to `/system-developer:python-developer`. |
 | `ruby-developer` | sonnet / high | Ruby on Rails. |
 | `php-developer` | sonnet / high | Laravel/Symfony. |
 | `dotnet-developer` | sonnet / high | C#/.NET, ASP.NET Core, EF Core. |
@@ -51,16 +51,16 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 
 | Command | Description |
 |---------|-------------|
-| `/backend-developer:code-review` | Language-aware review — per-language reviewers + API-contract pass + security pass → P0-P3. Supports `--quick` and `--fix`. |
+| `/backend-developer:review-code` | Language-aware review — per-language reviewers + API-contract pass + security pass → P0-P3. Supports `--quick` and `--fix`. |
 | `/backend-developer:build-test` | Detect the stack, build, and run unit + integration tests (Testcontainers where present). |
-| `/backend-developer:generate-tests` | Unit/integration/contract tests via the project's framework. Supports `--coverage-gaps`. |
-| `/backend-developer:api-scaffold` | Scaffold endpoint/service/handler from an OpenAPI/GraphQL schema. |
+| `/backend-developer:gen-tests` | Unit/integration/contract tests via the project's framework. Supports `--coverage-gaps`. |
+| `/backend-developer:gen-api` | Scaffold endpoint/service/handler from an OpenAPI/GraphQL schema. |
 | `/backend-developer:db-migrate` | Generate/apply/verify migrations; safe forward + rollback plan. |
-| `/backend-developer:lint-fix` | Per-ecosystem linters/formatters (eslint/biome, gofmt/golangci-lint, ktlint, rubocop, php-cs-fixer, dotnet format) — `--check`/`--fix`. |
-| `/backend-developer:profile-performance` | Load test (k6), profile hot paths, analyze slow queries; route to `be-performance-engineer`. |
-| `/backend-developer:code-modernize` | Framework/runtime upgrades one class at a time, gated on green build+test. Supports `--dry-run`. |
-| `/backend-developer:deps-audit` | CVE/license/outdated across ecosystems + safe upgrades with a build+test gate. |
-| `/backend-developer:security-scan` | OWASP API Top 10 checks, authz boundary review, secret scan, dependency CVEs. |
+| `/backend-developer:fix-quick` | Per-ecosystem linters/formatters (eslint/biome, gofmt/golangci-lint, ktlint, rubocop, php-cs-fixer, dotnet format) — `--check`/`--fix`. |
+| `/backend-developer:fix-performance` | Load test (k6), profile hot paths, analyze slow queries; route to `be-performance-engineer`. |
+| `/backend-developer:fix-modernize` | Framework/runtime upgrades one class at a time, gated on green build+test. Supports `--dry-run`. |
+| `/backend-developer:deps` | CVE/license/outdated across ecosystems + safe upgrades with a build+test gate. |
+| `/backend-developer:analyze-security` | OWASP API Top 10 checks, authz boundary review, secret scan, dependency CVEs. |
 
 All commands degrade gracefully when a tool is missing: they print an install hint, skip that stack, and never hard-fail.
 
@@ -74,7 +74,7 @@ Entry + leaf `SKILL.md` skills across ten domains, plus shared references. Versi
 | `node` | `node-skills` | modern-typescript-backend, nest-express-fastify-patterns, node-async-streams |
 | `go` | `go-skills` | modern-go, go-concurrency |
 | `jvm` | `jvm-skills` | spring-boot, kotlin-backend |
-| `python-web` | `python-web-skills` | fastapi, django, flask (language depth → `system-developer:python/*`) |
+| `python-web` | `python-web-skills` | fastapi, django, flask (language depth → `/system-developer:python/*`) |
 | `api` | `api-skills` | rest-design, graphql-design, grpc-design, api-versioning, openapi-contracts |
 | `data` | `data-skills` | schema-design, migrations, query-optimization, orm-patterns, caching-strategies |
 | `architecture` | `architecture-skills` | microservices-patterns, event-driven, cqrs-event-sourcing, saga-orchestration |
@@ -120,7 +120,7 @@ This plugin collaborates with the **igrsoft** (company-workflow) plugin v3.36.0 
 | **DV** | Primary | Endpoints/services/migrations; emits `development-N.md` with a Build Evidence section. |
 | **DR** | Support | `be-code-fixer` applies findings (minimal-diff gate); `backend-architector` for pattern concerns. |
 | SR | Context Provider | `be-security-auditor`: OWASP API Top 10, authn/authz, injection, secrets, supply chain, rate limiting. |
-| QA | Support | `be-test-generator`; QA gate = unit+integration pass **and** security-scan clean. |
+| QA | Support | `be-test-generator`; QA gate = unit+integration pass **and** analyze-security clean. |
 | RE | Context Provider | `be-dependency-manager`: lockfile freeze, container image, DB migration plan, semver. |
 
 **Evidence norm**: service and API work defaults to `requires_screenshots: false`. When a gate demands evidence, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) rather than screenshots.
@@ -132,13 +132,13 @@ This plugin collaborates with the **igrsoft** (company-workflow) plugin v3.36.0 
 /backend-developer:build-test .
 
 # Language-aware review, then auto-apply minimal-diff fixes
-/backend-developer:code-review src/ --fix
+/backend-developer:review-code src/ --fix
 
 # Scaffold a service from an OpenAPI contract
-/backend-developer:api-scaffold openapi.yaml
+/backend-developer:gen-api openapi.yaml
 
 # OWASP API Top 10 security scan
-/backend-developer:security-scan .
+/backend-developer:analyze-security .
 
 # Use an agent directly, outside the workflow
 Use the backend-developer agent to design an event-driven order service with a saga for checkout

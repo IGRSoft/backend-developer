@@ -1,7 +1,6 @@
 ---
-name: db-migrate
 description: Generate, apply, and verify database migrations with a safe forward + rollback plan
-argument-hint: "<generate|apply|verify|rollback> [--name NAME] [--dry-run]"
+argument-hint: <generate|apply|verify|rollback> [--name NAME] [--dry-run]
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 estimated-cost:
   min-tokens: 1500
@@ -12,7 +11,7 @@ estimated-cost:
     opus: 10%
 ---
 
-# Database Migrate
+# Database Migration
 <!-- Updated: June 2026 -->
 
 Detect a project's migration tool, then generate, apply, verify, or roll back schema migrations with a single command. The happy path is pure Bash — no agent delegation. Agents are only engaged when a migration is unsafe, fails, or needs schema design, and only the agent that owns the failing concern is consulted, with the relevant migration log excerpt.
@@ -284,5 +283,5 @@ Print the install hint from Tool Availability, skip the tool, continue. Only whe
 - `skill: zero-downtime-migrations` — expand-contract pattern, batched idempotent backfills, `CREATE INDEX CONCURRENTLY`, lock-timeout guards, online schema-change tools (gh-ost, pt-online-schema-change).
 - `/backend-developer:db-migrate verify` — always run before `apply` against a shared database.
 - `/backend-developer:api-test` — re-run the API request/response suite after a migration to confirm contracts still hold.
-- `/backend-developer:deps-audit` — when a migration tool itself is outdated or carries a CVE.
+- `/backend-developer:deps` — when a migration tool itself is outdated or carries a CVE.
 - Route schema *design* (new tables, indexes, partitioning, normalization) to `database-engineer` via the Task tool before generating the migration.

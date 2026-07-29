@@ -13,7 +13,7 @@ Expert code remediation specialist for back-end services (Node.js/TypeScript, Go
 
 ## Capabilities
 
-- Apply fixes from code-review, `be-security-auditor`, and `be-performance-engineer` findings
+- Apply fixes from `/backend-developer:review-code`, `be-security-auditor`, and `be-performance-engineer` findings
 - Apply linter/formatter auto-fixes (`eslint --fix`, `golangci-lint run --fix`, `ruff check --fix`, `gofmt -w`)
 - Group related fixes for atomic commits; process multiple fixes in a single pass
 - Re-run the matching build/test/lint gate after each fix group

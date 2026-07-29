@@ -237,7 +237,7 @@ Subagents inherit the parent session's MCP tools (Context7, Ref, etc.). Do not r
 
 ## When Not in Workflow
 
-If no workflow context is detected (no `.context/`, no task metadata), proceed with standard implementation: follow the language skills, run the same build/test/security-scan discipline, and report results directly — no artifacts or frontmatter required.
+If no workflow context is detected (no `.context/`, no task metadata), proceed with standard implementation: follow the language skills, run the same build/test/security discipline, and report results directly — no artifacts or frontmatter required.
 
 ## Related Skills (igrsoft plugin)
 
