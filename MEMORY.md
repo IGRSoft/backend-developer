@@ -4,13 +4,13 @@
 
 | Field | Value |
 |-------|-------|
-| Plugin version | 1.2.0 |
+| Plugin version | 1.3.0 |
 | igrsoft compatibility | v3.36.0 |
 | Claude Code min required | 2.1.169 |
-| Last updated | 2026-07-22 |
+| Last updated | 2026-07-29 |
 
 Version strings move together (plugin.json, marketplace.json metadata, README
-header, this table) per the igrsoft `/cc-update` convention.
+header, CHANGELOG.md, this table) per the igrsoft `/cc-update` convention.
 
 ## Template Lineage
 
@@ -91,6 +91,40 @@ Deliberately **not** implemented here:
   rather than the memory-safety CWE Top 25 that anchors system-developer.
 
 ## Version History
+
+### 1.3.0 — 2026-07-29 Cross-Plugin Command Unification
+
+The command surface moved onto the verb families shared with apple-developer
+(`arch-*`, `analyze-*`, `review-*`, `gen-*`, `fix-*`), growing from 10 to 18
+commands. Eight were renamed (`code-review`→`review-code`, `lint-fix`→`fix-quick`,
+`code-modernize`→`fix-modernize`, `profile-performance`→`fix-performance`,
+`generate-tests`→`gen-tests`, `deps-audit`→`deps`, `security-scan`→`analyze-security`,
+`api-scaffold`→`gen-api`); `build-test` and `db-migrate` kept theirs. Eight are new:
+`arch-select`, `arch-review`, `analyze-tech-debt`, `analyze-accessibility`, `gen-docs`,
+`debug`, `fix-refactor`, `develop-feature`. Old names are removed, not aliased — the
+migration table lives in README.md.
+
+Three conventions worth carrying forward:
+
+1. **No `name:` key in command frontmatter.** All ten pre-1.3.0 commands carried one;
+   every one was stripped. The command name derives from the filename, so a `name:`
+   key is at best redundant and at worst a silent shadow that survives a rename and
+   makes the file's real invocation name unguessable. `scripts/validate.sh` does not
+   catch this — `grep -rn '^name:' commands/` must return nothing.
+2. **`analyze-*` is read-only by tool grant.** No command in that family carries
+   `Write` or `Edit` in `allowed-tools`. Enforcing the read-only contract at the
+   permission surface (rather than in prose the model may reinterpret) is what makes
+   the family name mean something.
+3. **A mutating mode is never the fallback.** `deps` dispatches on its first token
+   (`audit` | `upgrade` | `add`) and an unrecognized token resolves to the read-only
+   `audit`, never to a mutating mode. Likewise `fix-performance --apply` opts into
+   being *asked* at a PHASE CHECKPOINT, not into being edited; the whole measure path
+   stays read-only, and `Write`/`Edit` exist in its grant solely for the post-approval
+   phase.
+
+`scripts/validate.sh --strict` exits 1 on this branch because of 10 pre-existing
+skills-size warnings (SKILL.md >8KB with no `references/` sibling). That is unchanged
+from master — the baseline exits 1 identically. Errors are 0 both before and after.
 
 ### 1.2.0 — 2026-07-22 igrsoft v3.36.0 Port
 

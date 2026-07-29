@@ -2,7 +2,7 @@
 
 Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the igrsoft (company-workflow) plugin v3.36.0 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
 
-**Version**: 1.2.0 | **igrsoft Compatibility**: v3.36.0 | **claude-code min version**: "2.1.169"
+**Version**: 1.3.0 | **igrsoft Compatibility**: v3.36.0 | **claude-code min version**: "2.1.169"
 
 ## Boundaries
 
@@ -16,10 +16,10 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 | Browser UI consuming the API | `/frontend-developer:*` |
 | Native mobile clients | `/apple-developer:*` |
 
-## What's in 1.0.0
+## What's in 1.3.0
 
 - **16 agents** — a `backend-developer` router; four core stack developers (`node-developer`, `go-developer`, `jvm-backend-developer`, `python-backend-developer`); three optional runtimes (`ruby-developer`, `php-developer`, `dotnet-developer`); `backend-architector`, `api-designer`, `database-engineer`; and five Tier-2 specialists (`be-test-generator`, `be-performance-engineer`, `be-security-auditor`, `be-code-fixer`, `be-dependency-manager`). All inherit `agents/_base/backend-agent.md`.
-- **10 commands** — language-aware review, build/test, test generation, API scaffolding, DB migrations, lint/format, profiling/load testing, framework modernization, dependency auditing, and OWASP API security scanning, each with restrictive `allowed-tools` and an `estimated-cost` band.
+- **18 commands** — unified onto the cross-plugin `arch-*` / `analyze-*` / `review-*` / `gen-*` / `fix-*` naming families shared with apple-developer, so a command learned in one plugin is findable in the other. Each carries restrictive `allowed-tools` and an `estimated-cost` band; the `analyze-*` family is read-only by tool grant, not merely by convention.
 - **Complete skills tree** — entry + leaf `SKILL.md` skills across `_shared`, `node`, `go`, `jvm`, `python-web`, `api`, `data`, `architecture`, `tooling`, and `quality`, with deep reference files. Every framework/runtime feature carries a version marker and a fallback; the canonical runtime/framework table lives in `skills/_shared/version-feature-matrix.md`.
 - **Plugin-scoped advisory hooks** — `audit-tooluse`, `audit-subagent`, `precompact-checkpoint`, wired in `plugin.json` with igrsoft-compatible dedupe keys. Advisory only: never merges `state.json` (orchestrator-owned). See [`hooks/README.md`](hooks/README.md).
 - **CC capabilities adopted** — tiered `maxTurns` runaway-loop backstops, `disallowed-tools: Write, Edit` on the two review-only auditors, fully-qualified `Task(backend-developer:<agent>)` delegations, and scoped `Bash(cmd:*)` allowlists per toolchain.
@@ -47,20 +47,52 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 
 > `be-performance-engineer` and `be-security-auditor` are review-only by default; callers may override them to `opus` + `xhigh` for the hardest analyses (Opus 4.8 honors `xhigh`; Sonnet falls back to `high`, so the model must be raised too).
 
-## Commands (10)
+## Commands (18)
+
+Commands are grouped into the verb families shared with the other igrsoft platform plugins.
 
 | Command | Description |
 |---------|-------------|
+| `/backend-developer:develop-feature` | End-to-end feature pipeline: architect → stack developer → tests → OWASP security pass, phase-gated. |
+| `/backend-developer:arch-select` | Choose a back-end architecture pattern — service decomposition, data architecture, consistency model. |
+| `/backend-developer:arch-review` | Review a codebase against its pattern: boundary violations, dependency direction, transaction scope. |
+| `/backend-developer:analyze-security` | OWASP API Top 10 checks, authz boundary review, secret scan, dependency CVEs. Read-only. |
+| `/backend-developer:analyze-tech-debt` | Quantify and prioritize technical debt into a P0-P3 remediation ledger. Read-only. |
+| `/backend-developer:analyze-accessibility` | Review server-produced HTML, emails, error payloads, and response metadata. Read-only, deliberately narrow. |
 | `/backend-developer:review-code` | Language-aware review — per-language reviewers + API-contract pass + security pass → P0-P3. Supports `--quick` and `--fix`. |
-| `/backend-developer:build-test` | Detect the stack, build, and run unit + integration tests (Testcontainers where present). |
+| `/backend-developer:gen-api` | Scaffold endpoint/service/handler from an OpenAPI/GraphQL/proto contract. |
 | `/backend-developer:gen-tests` | Unit/integration/contract tests via the project's framework. Supports `--coverage-gaps`. |
-| `/backend-developer:gen-api` | Scaffold endpoint/service/handler from an OpenAPI/GraphQL schema. |
-| `/backend-developer:db-migrate` | Generate/apply/verify migrations; safe forward + rollback plan. |
+| `/backend-developer:gen-docs` | OpenAPI reference, per-language doc comments, and service READMEs derived from the code. |
 | `/backend-developer:fix-quick` | Per-ecosystem linters/formatters (eslint/biome, gofmt/golangci-lint, ktlint, rubocop, php-cs-fixer, dotnet format) — `--check`/`--fix`. |
-| `/backend-developer:fix-performance` | Load test (k6), profile hot paths, analyze slow queries; route to `be-performance-engineer`. |
+| `/backend-developer:fix-refactor` | Architect plans the refactor, `be-code-fixer` applies it, every step gated on a green build. |
 | `/backend-developer:fix-modernize` | Framework/runtime upgrades one class at a time, gated on green build+test. Supports `--dry-run`. |
-| `/backend-developer:deps` | CVE/license/outdated across ecosystems + safe upgrades with a build+test gate. |
-| `/backend-developer:analyze-security` | OWASP API Top 10 checks, authz boundary review, secret scan, dependency CVEs. |
+| `/backend-developer:fix-performance` | Load test (k6), profile hot paths, analyze slow queries. Measure-only by default; `--apply` unlocks a checkpointed fix phase. |
+| `/backend-developer:build-test` | Detect the stack, build, and run unit + integration tests (Testcontainers where present). |
+| `/backend-developer:db-migrate` | Generate/apply/verify migrations; safe forward + rollback plan. |
+| `/backend-developer:deps` | `audit` (default), `upgrade`, or `add` — CVE/license reporting and exact pins behind a build+test gate. |
+| `/backend-developer:debug` | Configure debuggers, tracing, and log capture, or triage and root-cause a specific failure. |
+
+### Migration: old → new names
+
+Version 1.3.0 renamed eight commands. The old names are gone, not aliased — update scripts and muscle memory:
+
+| Old (≤ 1.2.0) | New (1.3.0) |
+|---------------|-------------|
+| `/backend-developer:code-review` | `/backend-developer:review-code` |
+| `/backend-developer:lint-fix` | `/backend-developer:fix-quick` |
+| `/backend-developer:code-modernize` | `/backend-developer:fix-modernize` |
+| `/backend-developer:profile-performance` | `/backend-developer:fix-performance` |
+| `/backend-developer:generate-tests` | `/backend-developer:gen-tests` |
+| `/backend-developer:deps-audit` | `/backend-developer:deps audit` |
+| `/backend-developer:security-scan` | `/backend-developer:analyze-security` |
+| `/backend-developer:api-scaffold` | `/backend-developer:gen-api` |
+
+`build-test` and `db-migrate` keep their names.
+
+Two renames also changed behavior:
+
+- **`deps`** now dispatches on a subcommand (`audit` | `upgrade` | `add`) rather than an `--upgrade` flag. `deps` with no subcommand still runs the read-only audit, and a bare `--upgrade` flag is still accepted as a back-compat alias.
+- **`fix-performance`** stays measure-only by default. The new `--apply` flag routes `be-performance-engineer` findings to `be-code-fixer`, but only after an explicit PHASE CHECKPOINT — nothing is mutated before that approval.
 
 All commands degrade gracefully when a tool is missing: they print an install hint, skip that stack, and never hard-fail.
 
@@ -139,6 +171,10 @@ This plugin collaborates with the **igrsoft** (company-workflow) plugin v3.36.0 
 
 # OWASP API Top 10 security scan
 /backend-developer:analyze-security .
+
+# Pick an architecture for a new service, then build the feature end to end
+/backend-developer:arch-select "checkout service with async fulfilment"
+/backend-developer:develop-feature "idempotent order webhooks"
 
 # Use an agent directly, outside the workflow
 Use the backend-developer agent to design an event-driven order service with a saga for checkout
