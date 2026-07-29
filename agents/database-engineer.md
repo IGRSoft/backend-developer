@@ -54,7 +54,7 @@ Two rules worth stating up front: **never validate a `NOT VALID` constraint or b
 
 ## Schema Design
 
-Apply `skill: data/schema-design` for the full discipline (normalization forms, key selection, relational vs document trade-offs, polymorphism). Core rules:
+Apply `skill: schema-design` for the full discipline (normalization forms, key selection, relational vs document trade-offs, polymorphism). Core rules:
 
 - **Normalize first (3NF), denormalize with evidence.** Start normalized; denormalize a hot read path only when a measured query cost justifies the write-time duplication, and document the invalidation strategy.
 - **Keys are deliberate.** Prefer surrogate keys (`bigint`/`uuid` v7 for index locality) with natural `UNIQUE` constraints alongside; avoid `uuid` v4 as a clustered/primary key on write-heavy tables (index fragmentation).
@@ -77,7 +77,7 @@ Read every plan with `EXPLAIN (ANALYZE, BUFFERS)`: confirm an index scan (not a 
 
 ## Migration Safety
 
-Apply `skill: data/migrations` for the expand-contract playbook and per-tool recipes. Default approach:
+Apply `skill: migrations` for the expand-contract playbook and per-tool recipes. Default approach:
 
 | Change | Safe pattern | Hazard avoided |
 |---|---|---|
@@ -91,7 +91,7 @@ Every migration is reversible (tested `down`) or explicitly forward-only with ra
 
 ## ORM & Connection Patterns
 
-Apply `skill: data/orm-patterns` for per-ORM guidance (Prisma, Drizzle, TypeORM, GORM, Hibernate/JPA, EF Core, SQLAlchemy). Cross-cutting rules:
+Apply `skill: orm-patterns` for per-ORM guidance (Prisma, Drizzle, TypeORM, GORM, Hibernate/JPA, EF Core, SQLAlchemy). Cross-cutting rules:
 
 - **Pool deliberately.** Bound the pool below the database `max_connections` (account for every replica and a separate pooler like PgBouncer); set acquisition and idle timeouts. A pool larger than the DB can serve causes connection storms under load.
 - **Eager vs lazy is a decision, not a default.** Disable implicit lazy loading where the ORM offers it; load relations explicitly per query. Audit generated SQL — ORMs hide N+1 and accidental cartesian joins.

@@ -62,7 +62,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 | `feature` | — | Feature name, description, or issue/tracker reference. Required unless `--resume`. |
 | `--stack node\|go\|jvm\|python\|ruby\|php\|dotnet` | auto | Force the implementation stack instead of detecting it. Required when the repo is polyglot and detection is ambiguous. |
 | `--methodology traditional\|tdd\|bdd\|ddd` | `traditional` | Shapes Phase 2/3 ordering and vocabulary. See Configuration Options. |
-| `--complexity simple\|medium\|complex\|epic` | inferred | Depth control: how far the architect explores alternatives, how many test tiers Phase 3 generates, and how deep the security pass goes. It does NOT remove phases — all four always run. |
+| `--complexity simple\|medium\|complex\|epic` | inferred | Sizing signal for Phase 1: how far the architect explores alternatives, plus the effort band in the summary. It does NOT remove phases, change the test tiers (Phase 3 always produces all three), or deepen the security pass. |
 | `--resume` | off | Read `.context/.feature-dev/state.json` and continue from the last completed step instead of starting fresh. |
 
 ## Configuration Options

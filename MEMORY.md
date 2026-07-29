@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| Plugin version | 1.3.0 |
+| Plugin version | 1.4.0 |
 | igrsoft compatibility | v3.36.0 |
 | Claude Code min required | 2.1.169 |
 | Last updated | 2026-07-29 |
@@ -91,6 +91,41 @@ Deliberately **not** implemented here:
   rather than the memory-safety CWE Top 25 that anchors system-developer.
 
 ## Version History
+
+### 1.4.0 — 2026-07-29 Polyglot-Consistency Audit
+
+Swept for one defect class: a rule true for some of the seven advertised stacks,
+written as though it held for all. The load-bearing instances were all in the
+ecosystem-agnostic *specialist* agents — the per-stack developers are correctly
+scoped, so nobody noticed the shared ones had quietly narrowed.
+
+#### What was broken
+
+`be-code-fixer` prescribed `rubocop -A` and `php-cs-fixer fix` in its own
+playbooks while granting neither binary (and no .NET toolchain), so fixes on
+those stacks degraded to unverified hand-editing. `be-dependency-manager` named
+Ruby in its description and had no Bundler row, grant, or lockfile rule anywhere.
+Both widened to the stacks they already claimed — `be-test-generator` was the
+precedent, having granted the full set all along.
+
+`deps --upgrade` was worse than inert: dispatch routed it to read-only `audit`,
+so a caller asking for a pinned upgrade got an audit and no mutation. Now a hard
+error. Three other commands advertised flags with no downstream path.
+
+#### The reference rot
+
+Twenty-six `skill:`/command refs pointed at names that do not exist. The sharpest
+were eleven `skill: stack-detection` pointers (the file is `language-detection`)
+attached to "keep this list in sync with it, do not fork the routing logic" — an
+agent that follows the pointer finds nothing and forks the table, exactly what
+the sentence forbids.
+
+#### Deliberately left
+
+`be-performance-engineer` profiles four of seven stacks and grants only `psql`.
+That is honest narrowing, not an over-broad claim — it enumerates the four it
+handles and says "over PostgreSQL". Inventing the missing recipes would fabricate
+capability, the failure mode this audit removes.
 
 ### 1.3.0 — 2026-07-29 Cross-Plugin Command Unification
 

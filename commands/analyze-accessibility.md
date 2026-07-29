@@ -1,6 +1,6 @@
 ---
 description: Review server-produced HTML, emails, error messages, and response metadata for accessibility defects
-argument-hint: [path to templates, email/document generators, error handlers, or middleware]
+argument-hint: [path to templates, email/document generators, error handlers, or middleware] [--html] [--emails] [--errors] [--metadata]
 allowed-tools: Read, Glob, Grep
 model: haiku
 estimated-cost:
@@ -128,6 +128,8 @@ With no flag, run whichever categories the scope actually contains — detected 
 ## Workflow
 
 Single read-only pass. There is no fan-out — this review is small by design.
+
+**Resolve `{active_categories}` first.** If any of `--html`, `--emails`, `--errors`, `--metadata` is passed, `{active_categories}` is exactly the set named by those flags — the flags restrict, and they override content detection even when the scope contains more. If none is passed, `{active_categories}` is the set content detection found in the scope. Either way, state the resolved set and its source (flags or detection) in the report, and skip the numbered checks below for every category not in the set — a restricted run must not report findings for a category the caller excluded.
 
 **Use Task tool with subagent_type="backend-developer:backend-developer"**
 - Prompt: "Read-only accessibility review of server-produced content in: {file_list}. Categories active: {active_categories}. Check ONLY what the server emits: (1) server-rendered HTML templates — semantic elements, `lang` attribute, heading order, `<label for>` association, `alt` on server-generated images, `<th scope>`/`<caption>`; (2) transactional emails and generated PDFs/documents — plain-text multipart alternative, image `alt`, logical reading order, hardcoded contrast pairs in the template against WCAG AA, descriptive link text; (3) error and validation responses — human-readable messages rather than raw codes or stack traces, field-level errors carrying a stable field identifier a client can bind to a control, no sensory-only phrasing such as 'fix the red field', no leaked internals, one consistent error envelope; (4) response metadata — `Content-Language` matching the returned body, correct `Content-Type` with explicit charset, honest HTTP status semantics (no error bodies under 200), `Retry-After` on 429/503, session/timeout windows against WCAG 2.2 § 2.2.1 Enough Time, and pagination/`Link` metadata sufficient for a client to render navigation. Do NOT check client-side rendering, focus management, keyboard navigation, screen-reader behavior, rendered-UI contrast, or native-app accessibility — those are out of scope and belong to the frontend/apple/android plugins. Do NOT edit any file. Do NOT assert anything about the rendered page; report only what the template or handler emits. Return findings as `{file, line, category, wcag_criterion, severity (P0-P3), what_is_emitted, fix}`. For any category with no material issue, say so in one line rather than inventing findings."

@@ -342,7 +342,7 @@ Suggestion: Pass the explicit URL, service path, or DATABASE_URL, e.g.
 ## See Also
 
 - `skill: observability` — canonical profiling-tools flag reference (k6/pprof/clinic/0x/async-profiler/py-spy/dotnet-trace/EXPLAIN), the measure→fix→re-measure loop, and the symptom→tool table. Keep the Runtime / Tool Matrix in sync with it.
-- `skill: _shared/version-feature-matrix.md` — runtime/framework version markers and fallbacks for the profilers above.
+- `skill: version-feature-matrix.md` — runtime/framework version markers and fallbacks for the profilers above.
 - `skill: language-detection` — runtime and DB-engine resolution for the matrix.
 - `/backend-developer:build-test` — produce a production-like build first before profiling; also the gate `--apply` runs after every applied item.
 - `/backend-developer:review-code` — review the applied diff for contract drift, transaction correctness, and N+1 regressions (DR criteria include both).

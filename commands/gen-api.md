@@ -74,7 +74,7 @@ If the file matches no marker (e.g. a JSON Schema fragment, a Postman collection
 
 ## Stack Detection
 
-Scan the repository root (and `schema`'s directory upward) and apply the **first** match top-down. This map mirrors the router's `skill: stack-detection` — keep it in sync, do not fork the routing logic.
+Scan the repository root (and `schema`'s directory upward) and apply the **first** match top-down. This map mirrors the router's `skill: language-detection` — keep it in sync, do not fork the routing logic.
 
 | Priority | Marker | Stack | Owning agent |
 |----------|--------|-------|--------------|
@@ -247,9 +247,9 @@ Print the install hint from Tool Availability, mark the plan as hand-roll, and h
 
 ## See Also
 
-- `skill: stack-detection` — canonical manifest → stack → agent routing (keep the priority table in sync).
-- `skill: api-contracts` — OpenAPI 3.x, GraphQL SDL, and proto3 conventions; operationId/resource modeling; error-response shapes.
-- `skill: _shared/version-feature-matrix` — framework/runtime version markers and fallbacks (Express/NestJS/Fastify/Hono, Gin/Echo/chi, Spring Boot, FastAPI/Django) used to pick generator targets.
-- `/backend-developer:db-schema` — when the contract implies persistence; generate migrations and ORM models to back the DTOs.
-- `/backend-developer:api-test` — once handlers exist, expand the test skeleton into contract + integration tests (Testcontainers, request/response transcripts).
-- `/backend-developer:security-review` — audit the scaffolded endpoints against the OWASP API Security Top 10 (BOLA, broken auth, missing function-level authz).
+- `skill: language-detection` — canonical manifest → stack → agent routing (keep the priority table in sync).
+- `skill: openapi-contracts` — OpenAPI 3.x, GraphQL SDL, and proto3 conventions; operationId/resource modeling; error-response shapes.
+- `skill: version-feature-matrix` — framework/runtime version markers and fallbacks (Express/NestJS/Fastify/Hono, Gin/Echo/chi, Spring Boot, FastAPI/Django) used to pick generator targets.
+- `/backend-developer:db-migrate` — when the contract implies persistence; generate migrations and ORM models to back the DTOs.
+- `/backend-developer:gen-tests` — once handlers exist, expand the test skeleton into contract + integration tests (Testcontainers, request/response transcripts).
+- `/backend-developer:analyze-security` — audit the scaffolded endpoints against the OWASP API Security Top 10 (BOLA, broken auth, missing function-level authz).

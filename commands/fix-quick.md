@@ -60,7 +60,7 @@ When neither `--check` nor `--fix` is given, default to `--check`.
 
 ## Stack Detection
 
-Detect which stacks are present, then run each one's pass. The manifest → stack map is canonical in `skill: stack-detection` — do not fork it. For this command, detect **per file/subtree**, not a single project stack, because a polyglot monorepo may need eslint for `services/api`, golangci-lint for `cmd/worker`, and rubocop for `legacy/` in one invocation.
+Detect which stacks are present, then run each one's pass. The manifest → stack map is canonical in `skill: language-detection` — do not fork it. For this command, detect **per file/subtree**, not a single project stack, because a polyglot monorepo may need eslint for `services/api`, golangci-lint for `cmd/worker`, and rubocop for `legacy/` in one invocation.
 
 | Stack | Files / markers linted |
 |-------|------------------------|
@@ -242,7 +242,7 @@ Print the install hint from Tool Availability, skip that stack's pass, continue.
 
 ## See Also
 
-- `skill: stack-detection` — canonical manifest → stack → agent routing (keep detection in sync).
+- `skill: language-detection` — canonical manifest → stack → agent routing (keep detection in sync).
 - `/backend-developer:build-test` — run before building to cut compiler/transpiler-warning noise; build green first, then lint.
 - `/backend-developer:review-code --fix` — escalation target for findings that need judgment (semantic refactors, auth-boundary or transaction changes, API-contract fixes) beyond mechanical lint fixes.
 - `/backend-developer:fix-modernize` — for cross-version modernization (`ruff --select UP`, `golangci-lint` modernizers, framework migrations) which goes deeper than this command's mechanical pass.

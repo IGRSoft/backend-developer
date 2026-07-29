@@ -79,7 +79,7 @@ Detection is the first and most important step. Scan top-down; the **in-use** fr
 Resolution rules:
 
 - **In-use beats everything.** If the scan finds Vitest already wired in, do NOT generate Jest tests even if Jest is also installed — STOP and report the conflict (Error Handling → "framework conflict") when two unit frameworks compete.
-- **Empty project.** No framework markers found → pick the framework matrix default for the detected stack (`skill: testing-strategy`): Node/TS → Vitest, Go → stdlib `testing`, Python → pytest, Java/Kotlin → JUnit 5, Ruby → RSpec, PHP → PHPUnit, .NET → xUnit. Announce the choice in the report. Integration → add Testcontainers; contract → add Pact.
+- **Empty project.** No framework markers found → pick the framework matrix default for the detected stack (`skill: testing-principles`): Node/TS → Vitest, Go → stdlib `testing`, Python → pytest, Java/Kotlin → JUnit 5, Ruby → RSpec, PHP → PHPUnit, .NET → xUnit. Announce the choice in the report. Integration → add Testcontainers; contract → add Pact.
 - **Mixed-language repo.** Detect per language and generate per language; never cross frameworks. Language ownership follows `skill: language-detection`.
 
 This routing is a specialization of the shared detection table — keep it in sync with `skill: language-detection`, do not fork it.
@@ -116,10 +116,10 @@ Delegate per language. Pass the units under test, the resolved framework, the re
 
 - Node/TS tree:
   **Use Task tool with subagent_type="backend-developer:be-test-generator"**
-  Prompt: "Generate {framework} tests for the Node/TS units in `{path}`: {signatures/routes}. Framework is already in use / chosen: {framework} — do NOT introduce any other framework. Cover, per unit: happy path; edge cases (empty/oversized payloads, boundary values, malformed JSON, non-UTF-8 input); failure modes (validation rejection 4xx, auth boundaries — unauthenticated 401, wrong-owner/tenant 403 (BOLA/BFLA), idempotency on retry, DB/upstream timeout and connection reset, transaction rollback). Use AAA structure and `describe/it` with `test_[unit]_[scenario]_[expected]`-style names per `skill: testing-strategy`. {test_type_block} {coverage_gaps_block} Return the test source files and confirm the file naming/location so Vitest/Jest discovers them. Do not run the suite yourself; I run the verification gate."
+  Prompt: "Generate {framework} tests for the Node/TS units in `{path}`: {signatures/routes}. Framework is already in use / chosen: {framework} — do NOT introduce any other framework. Cover, per unit: happy path; edge cases (empty/oversized payloads, boundary values, malformed JSON, non-UTF-8 input); failure modes (validation rejection 4xx, auth boundaries — unauthenticated 401, wrong-owner/tenant 403 (BOLA/BFLA), idempotency on retry, DB/upstream timeout and connection reset, transaction rollback). Use AAA structure and `describe/it` with `test_[unit]_[scenario]_[expected]`-style names per `skill: testing-principles`. {test_type_block} {coverage_gaps_block} Return the test source files and confirm the file naming/location so Vitest/Jest discovers them. Do not run the suite yourself; I run the verification gate."
 - Go tree → **subagent_type="backend-developer:be-test-generator"** (same coverage; framework = stdlib `testing` + testify; table-driven tests, `t.Run` subtests, `httptest.Server` for handlers, registration = `*_test.go` in the package).
 - Python → **subagent_type="backend-developer:be-test-generator"**
-  Prompt: "Generate pytest tests for the Python module(s)/FastAPI/Django/Flask views in `{path}`: {symbols/routes}. pytest is the project framework — do NOT add unittest. Cover happy path; edge cases (empty/`None`, boundary values, malformed body, large inputs); failure modes (validation errors, auth boundaries 401/403 — BOLA/BFLA, idempotency on retry, upstream timeout/connection reset via mocked or Testcontainers boundaries, transaction rollback). Use `@pytest.mark.parametrize` for input families, `httpx`/`TestClient` for endpoints, and place shared fixtures in `conftest.py`. {test_type_block} {coverage_gaps_block} Follow `skill: testing-strategy`. Return test files plus any new `conftest.py`; do not run the suite."
+  Prompt: "Generate pytest tests for the Python module(s)/FastAPI/Django/Flask views in `{path}`: {symbols/routes}. pytest is the project framework — do NOT add unittest. Cover happy path; edge cases (empty/`None`, boundary values, malformed body, large inputs); failure modes (validation errors, auth boundaries 401/403 — BOLA/BFLA, idempotency on retry, upstream timeout/connection reset via mocked or Testcontainers boundaries, transaction rollback). Use `@pytest.mark.parametrize` for input families, `httpx`/`TestClient` for endpoints, and place shared fixtures in `conftest.py`. {test_type_block} {coverage_gaps_block} Follow `skill: testing-principles`. Return test files plus any new `conftest.py`; do not run the suite."
 - Java/Kotlin → **subagent_type="backend-developer:be-test-generator"** (JUnit 5 + Spring Test; `@SpringBootTest`/`@WebMvcTest`/`MockMvc`, `@DataJpaTest` for repositories; registration = `*Test.java` under `src/test/java`).
 - Ruby → **subagent_type="backend-developer:be-test-generator"** (RSpec request specs + model specs; `spec/*_spec.rb`).
 - PHP → **subagent_type="backend-developer:be-test-generator"** (PHPUnit / Laravel feature tests; `tests/*Test.php`).
@@ -146,7 +146,7 @@ Wire the generated tests into the runner so it discovers them. Registration is v
 | PHPUnit | `tests/*Test.php`; `phpunit.xml` testsuite paths | `vendor/bin/phpunit --list-tests` |
 | xUnit | `*Tests.cs` in the test project; `WebApplicationFactory` fixture | `dotnet test <path> --list-tests` |
 
-For empty-project scaffolding, also pin the dependency: add the framework + (if `--integration`) Testcontainers + (if `--contract`) Pact to the manifest, and create the config/test directory. Keep the pin in step with `skill: build-systems` and `skill: testing-strategy`.
+For empty-project scaffolding, also pin the dependency: add the framework + (if `--integration`) Testcontainers + (if `--contract`) Pact to the manifest, and create the config/test directory. Keep the pin in step with `skill: version-feature-matrix` and `skill: testing-principles`.
 
 ### Phase 5: Verification Gate (Bash) — MANDATORY
 
@@ -301,6 +301,6 @@ Print the install hint from Tool Availability, skip that language/test type, con
 - `/backend-developer:build-test` — the detect/install/build/test logic the verification gate reuses; run it first to confirm the project builds before adding tests.
 - `/backend-developer:analyze-security` — run the new tests' suite alongside an OWASP API Top 10 scan once they are green; auth-boundary tests pair with the scan's BOLA/BFLA checks.
 - `/backend-developer:review-code` — review the code before adding tests to it; `--coverage-gaps` pairs well after a review.
-- `skill: testing-strategy` — test pyramid, framework matrix, coverage targets, AAA/naming, Testcontainers and contract-testing conventions.
+- `skill: testing-principles` — test pyramid, framework matrix, coverage targets, AAA/naming, Testcontainers and contract-testing conventions.
 - `skill: language-detection` — canonical marker → language → agent routing (keep the framework table in sync).
-- `skill: _shared/version-feature-matrix.md` — canonical framework/runtime version → feature lookup and fallbacks.
+- `skill: version-feature-matrix.md` — canonical framework/runtime version → feature lookup and fallbacks.

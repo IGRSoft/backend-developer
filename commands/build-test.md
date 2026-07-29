@@ -59,7 +59,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 
 ## Detection: Stack Priority
 
-Scan `path` and apply the **first** match top-down. This is the canonical priority for this plugin; the marker → runtime → agent map lives in `skill: stack-detection` — keep this list in sync with it, do not fork the routing logic.
+Scan `path` and apply the **first** match top-down. This is the canonical priority for this plugin; the marker → runtime → agent map lives in `skill: language-detection` — keep this list in sync with it, do not fork the routing logic.
 
 | Priority | Marker | Stack | Owning agent (on failure) |
 |----------|--------|-------|---------------------------|
@@ -71,11 +71,11 @@ Scan `path` and apply the **first** match top-down. This is the canonical priori
 | 6 | `composer.json` | PHP (Composer — Laravel/Symfony) | `php-developer` |
 | 7 | `*.csproj` / `*.sln` | C# / .NET (ASP.NET Core) | `dotnet-developer` |
 
-**Package-manager tie-break for Node** (per `skill: stack-detection`): `pnpm-lock.yaml` → pnpm; `yarn.lock` → yarn; `package-lock.json` (or none) → npm. The server-dep check distinguishes a back-end service from a front-end-only `package.json`; a bare front-end manifest is not in scope for this command.
+**Package-manager tie-break for Node** (per `skill: language-detection`): `pnpm-lock.yaml` → pnpm; `yarn.lock` → yarn; `package-lock.json` (or none) → npm. The server-dep check distinguishes a back-end service from a front-end-only `package.json`; a bare front-end manifest is not in scope for this command.
 
 **Tie-break notes:**
 
-- A repo can carry several manifests (e.g. a Go service with a `package.json` for tooling, or a Python service with a thin `package.json` for lint hooks). The marker highest in the priority table that has a real server/build target wins for *this* command's primary build; mention secondary layers in the summary and suggest a second run scoped to that subdir if its tests matter. Polyglot routing itself is the router's job (`skill: stack-detection`).
+- A repo can carry several manifests (e.g. a Go service with a `package.json` for tooling, or a Python service with a thin `package.json` for lint hooks). The marker highest in the priority table that has a real server/build target wins for *this* command's primary build; mention secondary layers in the summary and suggest a second run scoped to that subdir if its tests matter. Polyglot routing itself is the router's job (`skill: language-detection`).
 - A `package.json` whose only scripts wrap shell/lint tooling (no server dependency, no build/start) is repo tooling, not a back-end build — prefer the next real marker.
 - Auxiliary `scripts/*.sh` or `Dockerfile`/`docker-compose.yml` alone never determine the stack; they inform the integration phase, not detection.
 
@@ -269,9 +269,9 @@ Print the install hint from Tool Availability, skip the stack, continue. Only wh
 
 ## See Also
 
-- `skill: stack-detection` — canonical marker → runtime → agent routing (keep the priority table in sync).
+- `skill: language-detection` — canonical marker → runtime → agent routing (keep the priority table in sync).
 - `skills/_shared/version-feature-matrix.md` — canonical runtime/framework version lookup for behaviour that differs by version.
 - `/backend-developer:fix-quick` — run linters/formatters/type-checks before building to cut noise.
 - `/backend-developer:gen-tests` — add a test suite (unit or Testcontainers integration) when detection finds no test target.
 - `/backend-developer:deps` — when an `install`-stage failure is a missing, outdated, or vulnerable dependency.
-- `/backend-developer:security-review` — once the build is green, run the OWASP API Security Top 10 pass over it.
+- `/backend-developer:analyze-security` — once the build is green, run the OWASP API Security Top 10 pass over it.

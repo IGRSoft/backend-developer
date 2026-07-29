@@ -2,7 +2,7 @@
 
 Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the igrsoft (company-workflow) plugin v3.36.0 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
 
-**Version**: 1.3.0 | **igrsoft Compatibility**: v3.36.0 | **claude-code min version**: "2.1.169"
+**Version**: 1.4.0 | **igrsoft Compatibility**: v3.36.0 | **claude-code min version**: "2.1.169"
 
 ## Boundaries
 
@@ -15,6 +15,10 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 | Shell / CI scripts | `/system-developer:bash-developer` |
 | Browser UI consuming the API | `/frontend-developer:*` |
 | Native mobile clients | `/apple-developer:*` |
+
+## What's in 1.4.0
+
+- **Polyglot-consistency pass** — the ecosystem-agnostic specialists now execute on every stack they advertise. `be-code-fixer` gained the Ruby/PHP/.NET binaries its own playbooks already prescribed (`rubocop`, `php-cs-fixer`, `dotnet`, plus test runners); `be-dependency-manager` gained the Bundler row, scan path, and grant behind its Ruby claim. Four commands had flags with no implementation behind them (`deps --upgrade` silently ran a read-only audit instead); those are now wired or removed. 26 dangling `skill:`/command references retargeted. See [CHANGELOG](CHANGELOG.md).
 
 ## What's in 1.3.0
 
@@ -43,7 +47,7 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 | `be-performance-engineer` | sonnet / high (review-only) | Profiling, load testing (k6), N+1/query perf, caching. `disallowed-tools: Write, Edit`; fixes route to `be-code-fixer`. |
 | `be-security-auditor` | sonnet / high (review-only) | OWASP API Top 10, authn/authz, injection (SQL/NoSQL/cmd), secrets, supply chain, rate limiting. `disallowed-tools: Write, Edit`. |
 | `be-code-fixer` | haiku / medium | Minimal-diff remediation of review/security/perf findings. |
-| `be-dependency-manager` | haiku / low | Per-ecosystem manifests + lockfiles (npm/go.mod/Maven/Gradle/Cargo/Composer/NuGet), CVE/license audit, one-at-a-time upgrades with a build+test gate. |
+| `be-dependency-manager` | haiku / low | Per-ecosystem manifests + lockfiles (npm/pnpm/yarn, go.mod, Maven/Gradle, Bundler, Composer, NuGet, uv), CVE/license audit, one-at-a-time upgrades with a build+test gate. |
 
 > `be-performance-engineer` and `be-security-auditor` are review-only by default; callers may override them to `opus` + `xhigh` for the hardest analyses (Opus 4.8 honors `xhigh`; Sonnet falls back to `high`, so the model must be raised too).
 

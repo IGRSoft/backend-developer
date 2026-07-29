@@ -67,13 +67,13 @@ All dependency, lint, migration, and test operations go through single scoped co
 - **Run**: `bundle exec <cmd>` for anything needing the project's gem set — `bundle exec rails console`, `bundle exec rake`, `bundle exec rspec`.
 - **Lint + format**: `bundle exec rubocop` (check) and `bundle exec rubocop -a` (safe autocorrect). Configure cops and `TargetRubyVersion`/`TargetRailsVersion` in `.rubocop.yml`.
 - **Migrations**: `bundle exec rails db:migrate` / `db:rollback` / `db:migrate:status`; check schema diff in `db/schema.rb` (or `structure.sql`). Route schema design and index strategy to `backend-developer:database-engineer`.
-- **Test**: `bundle exec rspec` (full) or `bundle exec rspec <path_or_pattern>` for changed-spec subsets in DV. See `skill: ruby-testing`.
+- **Test**: `bundle exec rspec` (full) or `bundle exec rspec <path_or_pattern>` for changed-spec subsets in DV. See `skill: testing-principles` (Ruby row: RSpec/Minitest, request specs, SimpleCov).
 
 When a tool is missing, print the install hint (`gem install bundler` / `bundle binstubs rubocop` / `bundle add rspec-rails --group test`) and skip that step — never hard-fail.
 
 ## ActiveRecord & Modeling Discipline
 
-Apply `skill: activerecord-patterns` for the full discipline (associations, validations, callbacks, scopes, query objects). Core rules:
+Apply `skill: orm-patterns` for the cross-ORM discipline (associations, eager loading, query objects, transaction scope). Core rules:
 
 - **Validations on the model, constraints in the database.** Mirror critical invariants (uniqueness, NOT NULL, foreign keys) with both a model validation and a DB constraint/index — a uniqueness validation without a unique index races.
 - **Keep callbacks lean and predictable.** Avoid `after_save`/`after_commit` chains that trigger further writes; prefer service objects for multi-record orchestration. Side effects that can fail belong in `after_commit`, not `after_save`.
@@ -82,7 +82,7 @@ Apply `skill: activerecord-patterns` for the full discipline (associations, vali
 
 ## Background & Concurrency Model Selection
 
-Apply `skill: rails-concurrency` for the decision table and patterns. Choose the model deliberately:
+Choose the model deliberately:
 
 | Workload | Model | Notes |
 |---|---|---|
@@ -95,7 +95,7 @@ Default to Active Job for anything that can fail, retry, or take longer than the
 
 ## API & Serialization Boundary
 
-REST/JSON contract design, status-code conventions, pagination, and versioning route to `backend-developer:api-designer`; this agent implements controllers and serializers against that contract. Keep serialization explicit (`ActiveModel::Serializer`/`jbuilder`/a serializer gem) — never leak full model attributes via `to_json` on the record, which is an API3 (property-level authorization) hazard. Document the response shape and error envelope alongside the controller. See `skill: rest-contracts`.
+REST/JSON contract design, status-code conventions, pagination, and versioning route to `backend-developer:api-designer`; this agent implements controllers and serializers against that contract. Keep serialization explicit (`ActiveModel::Serializer`/`jbuilder`/a serializer gem) — never leak full model attributes via `to_json` on the record, which is an API3 (property-level authorization) hazard. Document the response shape and error envelope alongside the controller. See `skill: rest-design`.
 
 ## Response Approach
 

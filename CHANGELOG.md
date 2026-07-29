@@ -5,6 +5,78 @@ All notable changes to the backend-developer plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] — 2026-07-29
+
+Polyglot-consistency audit. Hunts one defect class: a rule true for *some* of the
+seven advertised stacks, stated as though it held for all of them. Nothing here
+adds a stack — the fixes either extend a claim to the ecosystems it already
+promised, or narrow the claim to what is actually implemented.
+
+### Fixed
+
+- **`be-code-fixer` could not execute its own Ruby, PHP, or .NET playbooks.** Its
+  description and playbook tables covered all seven stacks, but the `tools:` grant
+  stopped at Node/Go/JVM/Python — so `rubocop -A` and `php-cs-fixer fix`, both
+  prescribed verbatim in the playbooks, were ungranted, and .NET had no build,
+  format, or test binary at all. A fix on those three stacks silently degraded to
+  hand-editing with no verification gate. Added `bundle`, `rubocop`, `rspec`,
+  `php`, `composer`, `php-cs-fixer`, `phpunit`, and `dotnet`, plus the matching
+  per-stack verify and narrowest-covering-test commands (which also stopped at
+  Python) and a .NET formatting row.
+- **`be-dependency-manager` claimed Ruby and implemented none of it.** Ruby was
+  named in the description and opening line, then absent from every content path:
+  no Bundler row in the ecosystem table, no `Gemfile.lock` in the CVE scan list,
+  the hand-edit ban, or the release-freeze lock modes, no `bundler` in either
+  enum, and no `bundle` grant. Added the Bundler row, guidance bullet,
+  `bundle-audit` scan path, and grant throughout.
+- **`deps --upgrade` silently did the opposite of what it advertised.** The
+  Options table documented it as an alias for the `upgrade` subcommand, but the
+  dispatch rule routes any flag first-token to read-only `audit` — so
+  `deps --upgrade lodash` reported an audit while the caller believed a pinned
+  upgrade had run. Removed the dead alias; a flag-form subcommand now stops with
+  an explicit error rather than falling through to `audit`.
+- **`analyze-accessibility`'s four category flags did nothing.** `--html`,
+  `--emails`, `--errors`, and `--metadata` appeared only in the Options table and
+  Usage examples; the workflow derived its categories purely from content
+  detection, so a restricted run reported every category anyway. The flags now
+  resolve `{active_categories}` and override detection, and are named in
+  `argument-hint`.
+- **`fix-refactor --max-steps` was a report label, not a cap.** The value reached
+  the architect prompt but was bound nowhere and unenforced in the apply loop, so
+  a longer plan applied every step. Bound the placeholder to the flag and made the
+  loop stop at the cap, deferring the remainder.
+- **`debug --stack` was advertised as an override and never honored.** Stack
+  Detection delegated unconditionally. It now short-circuits detection in both
+  configure and triage mode.
+- **`develop-feature --complexity` promised two effects it does not have.**
+  Narrowed the Options text: Phase 3 always produces all three test tiers and the
+  security pass has no complexity branch. Claim now matches behavior.
+- **README credited `be-dependency-manager` with Cargo/Rust**, an ecosystem the
+  plugin does not support anywhere — no agent, no detection marker, no grant.
+  Replaced with the ecosystems it actually handles.
+- **26 references pointed at skills and commands that do not exist.** Most were
+  load-bearing: eleven `skill: stack-detection` pointers (real name:
+  `language-detection`) sat next to instructions to "keep this list in sync with
+  it, do not fork the routing logic" — unfollowable, and the forking they forbid
+  was the likely outcome. Also `testing-strategy` → `testing-principles` (5),
+  `migration-detection`/`zero-downtime-migrations` → `migrations` (3),
+  `api-contracts` → `openapi-contracts`, `rest-contracts` → `rest-design`,
+  `api` → `api-skills`, and path-style `skill: <dir>/<name>` refs normalized to
+  bare names. `ruby-developer` pointed at three Ruby skills that were never
+  written (`ruby-testing`, `rails-concurrency`, `activerecord-patterns`) and
+  `gen-tests` at system-developer's `build-systems`; these were narrowed to the
+  real cross-stack homes rather than fabricating single-stack skills. Dangling
+  command refs `api-test`, `security-review`, `db-schema`, and `fix` retargeted.
+
+### Verified clean
+
+`skills/_shared/testing-principles.md`, `skills/_shared/language-detection.md`,
+and `skills/_shared/secure-coding/` each carry genuine per-stack rows for all
+seven languages — the neutral-named shared files are not single-stack.
+`commands/db-migrate.md` resolves twelve migration tools across all seven
+ecosystems, and `commands/gen-api.md` explicitly narrows its `--stack` list and
+documents the hand-roll path for the three stacks without first-party codegen.
+
 ## [1.3.0] — 2026-07-29
 
 Cross-plugin command unification. The command surface now uses the same verb

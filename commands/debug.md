@@ -83,6 +83,8 @@ With no configure flags, configure mode does all four layers (logging, attach, c
 
 ## Stack Detection
 
+**`--stack` wins outright.** When `--stack` is passed, that is the stack — in both configure and triage mode — and no detection or routing delegation runs. Only without it do the rules below apply.
+
 Resolve the stack the same way `/backend-developer:build-test` does (canonical marker → runtime → agent map: `skills/_shared/language-detection.md` — keep in sync, do not fork). If two server stacks are in scope and the failure does not name one, delegate the routing decision:
 
 **Use Task tool with subagent_type="backend-developer:backend-developer"**

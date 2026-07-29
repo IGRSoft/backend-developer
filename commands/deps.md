@@ -22,7 +22,9 @@ Three subcommands select the operation from the first argument:
 - **`deps upgrade [package|scope]`** — advance exactly one dependency, pinning an exact version and re-running the build and tests before touching the next. See [Upgrade](#upgrade-deps-upgrade).
 - **`deps add <package>`** — introduce a new dependency: justify it against the existing graph and the stdlib, vet its supply-chain posture, pin it exactly, and gate on a green build. See [Add](#add-deps-add).
 
-**Dispatch:** parse the first token of `$ARGUMENTS`. If it is `audit`, `upgrade`, or `add`, run that workflow with the remaining args as its scope/target. If the first token is anything else (a path, a flag, or empty), treat the whole argument string as the scope for **`audit`** — the read-only default. A legacy `--upgrade` flag anywhere in the arguments is accepted as an alias for the `upgrade` subcommand.
+**Dispatch:** parse the first token of `$ARGUMENTS`. If it is `audit`, `upgrade`, or `add`, run that workflow with the remaining args as its scope/target. If the first token is anything else (a path, a flag, or empty), treat the whole argument string as the scope for **`audit`** — the read-only default.
+
+There is no flag form of a subcommand. A mutating mode is selected by the first token only, never by a flag (Rule 2). If `--upgrade` or `--add` appears anywhere in the arguments, do NOT silently fall through to `audit` — stop and emit the "flag-form subcommand" message under Error Handling, so a caller expecting a mutation is never told an audit was what they asked for.
 
 > **Tool discipline:** `audit` is strictly read-only. This command's `allowed-tools` carries `Write`/`Edit` because `upgrade` and `add` edit manifests; the audit workflow MUST NOT modify a file, only report.
 
@@ -81,7 +83,8 @@ If no path is given, default to `.`. If no subcommand is given, default to read-
 | `[path\|package]` | `.` | For `audit`, the project root to scan — monorepos scan one level of obvious workspace dirs (`packages/`, `services/`, `apps/`). For `upgrade`, an optional package name to target instead of the highest-priority candidate. For `add`, the required package name. |
 | `--licenses` | off | `audit` only. Add a full license inventory pass (slower; pulls per-package metadata). Without it, licenses are reported best-effort only. |
 | `--stack <node\|go\|jvm\|python\|ruby\|php\|dotnet>` | auto | Restrict to one ecosystem. Without it, every discovered ecosystem is processed (audit) — `upgrade` and `add` require exactly one, so a polyglot repo must name it. Repeatable for `audit`. |
-| `--upgrade` | — | Deprecated back-compat alias for the `upgrade` subcommand. Prefer `deps upgrade`. |
+
+There is deliberately no `--upgrade`/`--add` flag: mutation is selected by the first token only. Passing one is an error, not a silent audit — see Error Handling.
 
 ## Manifest Discovery
 
@@ -359,6 +362,14 @@ Suggestion: Run from the project root, or pass an explicit [path].
 Error: {N} ecosystems present ({list}). `deps {upgrade|add}` needs exactly one.
 Suggestion: Re-run with --stack <node|go|jvm|python|ruby|php|dotnet>.
 ```
+
+### Flag-form subcommand
+```
+Error: `{--upgrade|--add}` is not a supported flag. Mutating modes are selected by
+the first token only, so this run would otherwise have silently become a read-only audit.
+Suggestion: Re-run as `deps {upgrade|add} [package]`.
+```
+Stop here — do not fall back to `audit`.
 
 ### Package not found in manifest (upgrade)
 ```

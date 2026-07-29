@@ -169,7 +169,7 @@ Produce an ordered, behaviour-preserving refactor plan. For each step emit exact
 - `risk` — low | medium | high, with the specific failure mode
 - `rollback` — how to undo this step alone
 
-Rules: do NOT edit any file. Do NOT propose feature changes, bug fixes, dependency upgrades, API-contract changes, or schema changes — those are out of scope and belong in `follow_ups`. Order steps so each leaves the tree buildable on its own (break cycles before extracting; introduce the port before moving the transaction boundary). Cap the plan at {max_steps} applied steps and list the remainder as `deferred`. For `dedupe`, first prove the duplicates are behaviourally identical; if they differ, do NOT propose unifying them — report the difference. Return: `{steps[], deferred[], follow_ups[], projected_ledger}`."
+Rules: do NOT edit any file. Do NOT propose feature changes, bug fixes, dependency upgrades, API-contract changes, or schema changes — those are out of scope and belong in `follow_ups`. Order steps so each leaves the tree buildable on its own (break cycles before extracting; introduce the port before moving the transaction boundary). Cap the plan at {max_steps} applied steps — the value of `--max-steps`, default 6 — and list the remainder as `deferred`. For `dedupe`, first prove the duplicates are behaviourally identical; if they differ, do NOT propose unifying them — report the difference. Return: `{steps[], deferred[], follow_ups[], projected_ledger}`."
 
 The architect's output is the plan. Nothing has been edited.
 
@@ -205,7 +205,7 @@ For each approved step `Sn`, in order:
 
 2. **Run the gate:** `/backend-developer:build-test <scope-root>` (append `--integration` when the step's `gate` says so).
 
-3. **Green** → record the step in the ledger as `applied`, capture the post-step metrics, continue to the next step.
+3. **Green** → record the step in the ledger as `applied`, capture the post-step metrics, then continue to the next step **only while fewer than `{max_steps}` steps have been applied in this run**. On reaching the cap, stop the loop and record every remaining step as `deferred (over --max-steps)` — the cap is a hard stop, not a suggestion.
 
 4. **Red** → halt immediately (Rule 4):
    - Revert this step's files to their pre-step state (`git checkout -- <touches>` when the baseline was clean, otherwise restore from the recorded pre-step copies).
