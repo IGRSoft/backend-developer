@@ -29,7 +29,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 4. **Gate every phase transition on a green build.** Run `/backend-developer:build-test` before each checkpoint from Phase 2 onward (with `--integration` from Phase 3 onward). A red gate blocks the checkpoint: report the failure and ask how to proceed. Never present a checkpoint over a broken build.
 5. **Halt on failure.** If any step fails (agent error, red gate, missing dependency, unresolvable contract conflict), STOP immediately, present the error, and ask how to proceed. Do NOT silently continue or paper over it.
 6. **The architect decides; the developer implements.** Service placement, data model, contract shape, and transaction boundaries are settled in Phase 1. If Phase 2 finds a design decision unworkable, it reports back for a design amendment — it does not redesign mid-implementation.
-7. **Use designated agents only.** Every `subagent_type` comes from `backend-developer`, `igrsoft`, `security-scanning`, or `general-purpose`. No other cross-plugin dependencies.
+7. **Use designated agents only.** Every `subagent_type` comes from `backend-developer`, `company-workflow`, `security-scanning`, or `general-purpose`. No other cross-plugin dependencies.
 8. **One stack per run.** Detect (or accept `--stack`) exactly one runtime. A feature spanning two back-end services is two runs, or a run per service — do NOT interleave stacks in one implementation phase.
 9. **Never enter plan mode autonomously.** Do NOT use EnterPlanMode. This command IS the plan — execute it.
 

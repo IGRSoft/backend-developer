@@ -167,7 +167,7 @@ families as apple-developer (`arch-*`, `analyze-*`, `review-*`, `gen-*`,
 
 ## [1.2.0] — 2026-07-22
 
-igrsoft v3.36.0 compatibility port: CLI evidence-freshness rule, the
+company-workflow v3.36.0 compatibility port: CLI evidence-freshness rule, the
 `state-patch.sh` pointer form, benchmark-driven output budgets on DV/AR/DR
 agents, and a complexity-triage gate on `backend-architector`. Added the
 `section-lint.sh` and `desc-lint.sh` repo-structure linters.

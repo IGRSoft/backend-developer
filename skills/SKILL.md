@@ -80,7 +80,7 @@ than trusting memory.
 | API security — OWASP API Top 10 checklist and remediations | [quality/api-security/SKILL.md](quality/api-security/SKILL.md) |
 | Performance budgets, load testing with k6, DR perf gate | [quality/be-performance/SKILL.md](quality/be-performance/SKILL.md) |
 | Reviewing auth, untrusted input, secrets, or SSRF | [_shared/secure-coding/SKILL.md](_shared/secure-coding/SKILL.md) |
-| Participating in an igrsoft workflow stage | [_shared/workflow-integration/SKILL.md](_shared/workflow-integration/SKILL.md) |
+| Participating in an company-workflow workflow stage | [_shared/workflow-integration/SKILL.md](_shared/workflow-integration/SKILL.md) |
 | Confirming a feature is available on a runtime/framework | [_shared/version-feature-matrix.md](_shared/version-feature-matrix.md) |
 | Routing a file or repo to the right agent | [_shared/language-detection.md](_shared/language-detection.md) |
 
@@ -231,7 +231,7 @@ Cross-cutting patterns used by every agent, command, and skill.
 | Skill | Path | Description |
 |-------|------|-------------|
 | **secure-coding** | [_shared/secure-coding/SKILL.md](_shared/secure-coding/SKILL.md) | Non-negotiable security rules mapped to the OWASP API Security Top 10, injection prevention, secrets hygiene, supply-chain |
-| **workflow-integration** | [_shared/workflow-integration/SKILL.md](_shared/workflow-integration/SKILL.md) | Integrating with the igrsoft 11-stage workflow system (v3.36.0) — DV/DR/QA artifact format and evidence gate |
+| **workflow-integration** | [_shared/workflow-integration/SKILL.md](_shared/workflow-integration/SKILL.md) | Integrating with the company-workflow 11-stage workflow system (v4.0.0) — DV/DR/QA artifact format and evidence gate |
 | version-feature-matrix | [_shared/version-feature-matrix.md](_shared/version-feature-matrix.md) | Runtimes/frameworks → minimum versions + headline features (canonical) |
 | language-detection | [_shared/language-detection.md](_shared/language-detection.md) | Marker → runtime → agent routing table, front-end vs back-end tie-break |
 | model-selection | [_shared/model-selection.md](_shared/model-selection.md) | Per-agent model/effort/maxTurns assignments |
@@ -276,5 +276,5 @@ runtime before relying on a feature.
 
 - [`_shared/version-feature-matrix.md`](_shared/version-feature-matrix.md) — canonical version/runtime lookup
 - [`_shared/language-detection.md`](_shared/language-detection.md) — file/repo → agent routing
-- [`_shared/workflow-integration/SKILL.md`](_shared/workflow-integration/SKILL.md) — igrsoft 11-stage integration
+- [`_shared/workflow-integration/SKILL.md`](_shared/workflow-integration/SKILL.md) — company-workflow 11-stage integration
 - [`_index.md`](_index.md) — full navigation index of every skill directory
