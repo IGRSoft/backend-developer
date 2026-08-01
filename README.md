@@ -1,8 +1,8 @@
 # Backend Developer Plugin
 
-Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the igrsoft (company-workflow) plugin v3.36.0 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
+Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the company-workflow plugin v4.0.0 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
 
-**Version**: 1.4.0 | **igrsoft Compatibility**: v3.36.0 | **claude-code min version**: "2.1.169"
+**Version**: 1.4.0 | **company-workflow Compatibility**: v4.0.0 | **claude-code min version**: "2.1.169"
 
 ## Boundaries
 
@@ -25,7 +25,7 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 - **16 agents** — a `backend-developer` router; four core stack developers (`node-developer`, `go-developer`, `jvm-backend-developer`, `python-backend-developer`); three optional runtimes (`ruby-developer`, `php-developer`, `dotnet-developer`); `backend-architector`, `api-designer`, `database-engineer`; and five Tier-2 specialists (`be-test-generator`, `be-performance-engineer`, `be-security-auditor`, `be-code-fixer`, `be-dependency-manager`). All inherit `agents/_base/backend-agent.md`.
 - **18 commands** — unified onto the cross-plugin `arch-*` / `analyze-*` / `review-*` / `gen-*` / `fix-*` naming families shared with apple-developer, so a command learned in one plugin is findable in the other. Each carries restrictive `allowed-tools` and an `estimated-cost` band; the `analyze-*` family is read-only by tool grant, not merely by convention.
 - **Complete skills tree** — entry + leaf `SKILL.md` skills across `_shared`, `node`, `go`, `jvm`, `python-web`, `api`, `data`, `architecture`, `tooling`, and `quality`, with deep reference files. Every framework/runtime feature carries a version marker and a fallback; the canonical runtime/framework table lives in `skills/_shared/version-feature-matrix.md`.
-- **Plugin-scoped advisory hooks** — `audit-tooluse`, `audit-subagent`, `precompact-checkpoint`, wired in `plugin.json` with igrsoft-compatible dedupe keys. Advisory only: never merges `state.json` (orchestrator-owned). See [`hooks/README.md`](hooks/README.md).
+- **Plugin-scoped advisory hooks** — `audit-tooluse`, `audit-subagent`, `precompact-checkpoint`, wired in `plugin.json` with company-workflow-compatible dedupe keys. Advisory only: never merges `state.json` (orchestrator-owned). See [`hooks/README.md`](hooks/README.md).
 - **CC capabilities adopted** — tiered `maxTurns` runaway-loop backstops, `disallowed-tools: Write, Edit` on the two review-only auditors, fully-qualified `Task(backend-developer:<agent>)` delegations, and scoped `Bash(cmd:*)` allowlists per toolchain.
 
 ## Agents (16)
@@ -53,7 +53,7 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 
 ## Commands (18)
 
-Commands are grouped into the verb families shared with the other igrsoft platform plugins.
+Commands are grouped into the verb families shared with the other company-workflow platform plugins.
 
 | Command | Description |
 |---------|-------------|
@@ -146,9 +146,9 @@ claude plugins install backend-developer@backend-developer
 
 After editing `settings.json`, run `/plugins` (or restart the session) to load the plugin.
 
-## Workflow Integration (igrsoft v3.36.0)
+## Workflow Integration (company-workflow v4.0.0)
 
-This plugin collaborates with the **igrsoft** (company-workflow) plugin v3.36.0 for 11-stage workflow orchestration. igrsoft owns orchestration, worktree isolation, and `state.json` merge; backend-developer agents stay invoked specialists and follow the handoff-protocol. During the DV stage, `igrsoft:developer` routes to the appropriate backend-developer specialist based on file/marker detection.
+This plugin collaborates with the **company-workflow** plugin v4.0.0 for 11-stage workflow orchestration. company-workflow owns orchestration, worktree isolation, and `state.json` merge; backend-developer agents stay invoked specialists and follow the handoff-protocol. During the DV stage, `company-workflow:developer` routes to the appropriate backend-developer specialist based on file/marker detection.
 
 | Stage | backend-developer Role | Contribution |
 |-------|------------------------|--------------|

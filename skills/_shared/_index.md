@@ -6,7 +6,7 @@ Quick navigation for cross-cutting references shared by all backend-developer ag
 
 | File | Description |
 |------|-------------|
-| `workflow-integration/SKILL.md` | Guide for integrating with igrsoft 11-stage workflow system — DV/DR/QA contracts, API/transcript cli-fallback evidence, gate feedback |
+| `workflow-integration/SKILL.md` | Guide for integrating with company-workflow 11-stage workflow system — DV/DR/QA contracts, API/transcript cli-fallback evidence, gate feedback |
 | `workflow-integration/templates/dv-development.md` | Copy-paste `development-N.md` artifact template (Build/Test Evidence, anchors, frontmatter) |
 | `workflow-integration/templates/dr-review.md` | Copy-paste `developer-review-N.md` template with back-end review checklist (API contract, transactions, N+1, idempotency, auth boundaries, migration safety) |
 | `workflow-integration/templates/qa-testing.md` | Copy-paste `testing-N.md` template with unit+integration+`analyze-security` gate evidence |
@@ -33,7 +33,7 @@ Quick navigation for cross-cutting references shared by all backend-developer ag
 
 ### "I need to..."
 
-- **Integrate with igrsoft worktask** → `workflow-integration/SKILL.md`
+- **Integrate with company-workflow worktask** → `workflow-integration/SKILL.md`
 - **Write a DV/DR/QA stage artifact** → `workflow-integration/templates/`
 - **Handle the evidence gate for API/service work** → `workflow-integration/SKILL.md § Evidence Gate for Non-UI Work`
 - **Route a file/repo to the right agent** → `language-detection.md`
