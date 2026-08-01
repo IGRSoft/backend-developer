@@ -80,7 +80,7 @@ than trusting memory.
 | API security — OWASP API Top 10 checklist and remediations | [quality/api-security/SKILL.md](quality/api-security/SKILL.md) |
 | Performance budgets, load testing with k6, DR perf gate | [quality/be-performance/SKILL.md](quality/be-performance/SKILL.md) |
 | Reviewing auth, untrusted input, secrets, or SSRF | [_shared/secure-coding/SKILL.md](_shared/secure-coding/SKILL.md) |
-| Participating in an company-workflow workflow stage | [_shared/workflow-integration/SKILL.md](_shared/workflow-integration/SKILL.md) |
+| Participating in a company-workflow workflow stage | [_shared/workflow-integration/SKILL.md](_shared/workflow-integration/SKILL.md) |
 | Confirming a feature is available on a runtime/framework | [_shared/version-feature-matrix.md](_shared/version-feature-matrix.md) |
 | Routing a file or repo to the right agent | [_shared/language-detection.md](_shared/language-detection.md) |
 

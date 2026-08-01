@@ -47,7 +47,7 @@ See: `skill: workflow-integration` for the complete 11-stage workflow guide and 
 
 ### DV Stage Quick Steps
 
-When `.context/state.json` exists, this agent is inside an company-workflow workflow. Follow `_base/backend-agent.md § Workflow Stage Participation § DV Stage` for the contract; the router-specific steps:
+When `.context/state.json` exists, this agent is inside a company-workflow workflow. Follow `_base/backend-agent.md § Workflow Stage Participation § DV Stage` for the contract; the router-specific steps:
 
 1. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and the active stage from `state.json`.
 2. Detect language(s), framework(s), and persistence layer(s) per the Quick Route Decision Tree below.

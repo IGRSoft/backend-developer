@@ -1,6 +1,6 @@
 # Companion Patch — `company-workflow/agents/developer.md`
 
-**Status (2026-07-22): applied upstream** — company-workflow's `agents/developer.md` now carries the backend-developer Task grants and routing (see company-workflow v4.0.0). This document is retained as the historical patch spec.
+**Status (2026-07-22): applied upstream** — company-workflow's `agents/developer.md` now carries the backend-developer Task grants and routing (see company-workflow v3.36.0). This document is retained as the historical patch spec.
 
 **Status:** REQUIRED, not yet applied. The company-workflow plugin is **not
 installed in this repository**, so this patch is documented here rather than applied.

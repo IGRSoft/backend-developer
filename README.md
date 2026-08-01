@@ -133,7 +133,7 @@ claude plugins install backend-developer@backend-developer
     "backend-developer": {
       "source": {
         "source": "directory",
-        "path": "/path/to/company-workflow/backend-developer"
+        "path": "/path/to/igrsoft/backend-developer"
       },
       "autoUpdate": true
     }
