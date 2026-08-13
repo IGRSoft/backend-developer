@@ -1,6 +1,6 @@
 # DR Stage Artifact Template (backend review)
 
-Primary artifact `.context/developer-review-N.md` is owned by company-workflow's technical-lead; use this when a backend-developer agent takes over DR or contributes the review body. be-code-fixer appends retry narratives to `.context/errors/be-code-fixer.md` instead.
+Primary artifact `.context/developer-review-N.md` is owned by corpflow's technical-lead; use this when a backend-developer agent takes over DR or contributes the review body. be-code-fixer appends retry narratives to `.context/errors/be-code-fixer.md` instead.
 
 ```markdown
 ---

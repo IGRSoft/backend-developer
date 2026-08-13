@@ -1,7 +1,7 @@
 ---
 name: workflow-integration
 description: >-
-  Binding contract for participating in the company-workflow 11-stage workflow (v4.0.0) as a
+  Binding contract for participating in the corpflow 11-stage pipeline (v4.0.13) as a
   back-end agent — the per-stage recipes (DV/DR/SR/QA/RE), the numbered artifact
   filenames (development-N.md, developer-review-N.md, testing-N.md), the handoff:
   frontmatter schema, the gate-feedback contract, and the cli-fallback evidence model
@@ -14,7 +14,7 @@ description: >-
 
 # Workflow Integration Guide
 
-When invoked from the company-workflow workflow system, follow these guidelines for seamless collaboration.
+When invoked from corpflow, follow these guidelines for seamless collaboration.
 
 ## 11-Stage Pipeline (Default)
 
@@ -24,7 +24,7 @@ PL → AR → TL → DV → DR → SR → QA → DC → RE → FN → ST
    backend-developer agents contribute to AR, DV, DR, SR, QA, and RE
 ```
 
-| Code | Stage | company-workflow Agent | backend-developer Contribution |
+| Code | Stage | corpflow Agent | backend-developer Contribution |
 |------|-------|---------------|--------------------------------|
 | PL | Planning | product-manager | — |
 | AR | Architecture | software-architector | backend-architector (consultation: service boundaries, data model, API/contract design) |
@@ -51,7 +51,7 @@ PL → AR → TL → DV → DR → SR → QA → DC → RE → FN → ST
 
 ## DV Contract for Backend Work
 
-The DV agent writes `.context/development-N.md`. Mandatory H2 anchors are fixed by company-workflow's anchor allow-list (`handoff-protocol.md#anchor-allow-list`): `## files-changed`, `## tests-added`, `## deviations`, `## follow-ups`. Backend-specific sections nest as H3 under them:
+The DV agent writes `.context/development-N.md`. Mandatory H2 anchors are fixed by corpflow's anchor allow-list (`handoff-protocol.md#anchor-allow-list`): `## files-changed`, `## tests-added`, `## deviations`, `## follow-ups`. Backend-specific sections nest as H3 under them:
 
 | Section | Anchor level | Content |
 |---------|--------------|---------|
@@ -69,7 +69,7 @@ Copy-paste template: [templates/dv-development.md](templates/dv-development.md).
 
 ## Screenshot Gate for API Work (HIGHEST INTEGRATION RISK — read this)
 
-company-workflow's `dv-screenshot-gate.sh` blocks `SubagentStop` when `metadata.requires_screenshots != false` and no manifest exists at `.context/images/<worktask_id>/screenshots.md`. The company-workflow default is **TRUE** — but service/API work has no UI to screenshot. Handle it in this order:
+corpflow's `dv-screenshot-gate.sh` blocks `SubagentStop` when `metadata.requires_screenshots != false` and no manifest exists at `.context/images/<worktask_id>/screenshots.md`. The corpflow default is **TRUE** — but service/API work has no UI to screenshot. Handle it in this order:
 
 1. **Preferred**: the dispatcher sets `metadata.requires_screenshots: false` for backend-developer DV stages (non-UI changes). Then no manifest is required and the gate is skipped. Plugin norm: `requires_screenshots: false` is the **default expectation** for backend work — flag it in your return summary if the metadata says otherwise.
 2. **cli-fallback procedure** (when the flag is unset/true and you cannot change it): produce the manifest anyway using request/response and test transcripts —
@@ -77,9 +77,9 @@ company-workflow's `dv-screenshot-gate.sh` blocks `SubagentStop` when `metadata.
    - Write `.context/images/<worktask_id>/screenshots.md` with one row per capture, `source: cli-fallback`, and a `notes` cell explaining why (e.g. "HTTP API, no UI; request/response transcript capture").
    - Frontmatter `screenshot_count` MUST equal the number of table rows.
 3. **Never** fabricate image files or return without either the `false` flag or a cli-fallback manifest — the gate re-dispatches DV until one exists.
-4. **Evidence freshness**: every `cli-fallback` transcript row (curl/httpie request+response, test output, k6 report, migration dry-run/log) must be produced *this run* from the actual invocation — never reuse a transcript from a prior run or another workdir. company-workflow QA direct-reads the evidence files and cross-checks them against the `### build-evidence` log paths in the DV artifact; a stale or duplicated transcript is flagged and re-opens DV. This extends rule 3's integrity bar — the "never fabricate" rule applies to reused text transcripts as much as to invented image files.
+4. **Evidence freshness**: every `cli-fallback` transcript row (curl/httpie request+response, test output, k6 report, migration dry-run/log) must be produced *this run* from the actual invocation — never reuse a transcript from a prior run or another workdir. corpflow QA direct-reads the evidence files and cross-checks them against the `### build-evidence` log paths in the DV artifact; a stale or duplicated transcript is flagged and re-opens DV. This extends rule 3's integrity bar — the "never fabricate" rule applies to reused text transcripts as much as to invented image files.
 
-Manifest row format mirrors company-workflow's `dv-screenshot-capture` output: `| name | path | source | design_ref | notes |` with `source` ∈ {`cli-fallback`} for backend work; `design_ref` stays blank (no mockups for APIs).
+Manifest row format mirrors corpflow's `dv-screenshot-capture` output: `| name | path | source | design_ref | notes |` with `source` ∈ {`cli-fallback`} for backend work; `design_ref` stays blank (no mockups for APIs).
 
 ## Per-Agent Error Files
 
@@ -123,12 +123,12 @@ be-test-generator supports QA with framework-native generation (Vitest/Jest + su
 
 ## SR and RE Contributions
 
-- **SR** — be-security-auditor provides platform context to company-workflow's security-reviewer: OWASP API Security Top 10 (2023) mapping (API1 BOLA, API2 broken auth, API3 BOPLA, API4 unrestricted resource consumption, API5 BFLA, API6 sensitive business flows, API7 SSRF, API8 misconfiguration, API9 inventory, API10 unsafe upstream consumption), injection review (SQL/NoSQL/command), secrets scan, supply-chain audit (`npm audit`, `osv-scanner`, `govulncheck`, `trivy`), and transport/config hardening (TLS, CORS, security headers, default-deny authz). Review-only: findings route to be-code-fixer for application.
+- **SR** — be-security-auditor provides platform context to corpflow's security-reviewer: OWASP API Security Top 10 (2023) mapping (API1 BOLA, API2 broken auth, API3 BOPLA, API4 unrestricted resource consumption, API5 BFLA, API6 sensitive business flows, API7 SSRF, API8 misconfiguration, API9 inventory, API10 unsafe upstream consumption), injection review (SQL/NoSQL/command), secrets scan, supply-chain audit (`npm audit`, `osv-scanner`, `govulncheck`, `trivy`), and transport/config hardening (TLS, CORS, security headers, default-deny authz). Review-only: findings route to be-code-fixer for application.
 - **RE** — release-engineer owns the stage; backend-developer contributes packaging: be-dependency-manager freezes lockfiles/pins (`package-lock.json`/`pnpm-lock.yaml`, `go.sum`, `gradle.lockfile`, `uv.lock`), and the language agents produce release artifacts (container images, version bumps, changelog entries) plus the migration ordering/rollback note recorded in `release-N.md`.
 
 ## Artifact Filename Contract (v4.0.0)
 
-**Numbered `<stage>-N.md` names are canonical** per company-workflow's authoritative `handoff-protocol.md#stage-artifact-map`. N is allocated by PL0 (same value as `planning-N.md`), shared across all stages within a run, and propagated via `task.metadata.run_index`; it bumps on gate loop-back re-dispatch. Readers fall back to newest-glob (`<basename>-*.md`).
+**Numbered `<stage>-N.md` names are canonical** per corpflow's authoritative `handoff-protocol.md#stage-artifact-map`. N is allocated by PL0 (same value as `planning-N.md`), shared across all stages within a run, and propagated via `task.metadata.run_index`; it bumps on gate loop-back re-dispatch. Readers fall back to newest-glob (`<basename>-*.md`).
 
 | Stage | Artifact | Owner |
 |-------|----------|-------|
@@ -162,7 +162,7 @@ Every stage artifact MUST start with a YAML block between `---` markers. Budgets
 
 ## Gate-Feedback Contract (v4.0.0)
 
-When DR returns `verdict: fail` or QA returns `verdict: no-go`, the orchestrator re-dispatches DV (`run_index` bumped, `retry_count`++) and carries the upstream remediation **verbatim** into the retry prompt (company-workflow `worktask/SKILL.md` step 4.6). backend-developer agents **consume** this contract; the injection is orchestrator-owned.
+When DR returns `verdict: fail` or QA returns `verdict: no-go`, the orchestrator re-dispatches DV (`run_index` bumped, `retry_count`++) and carries the upstream remediation **verbatim** into the retry prompt (corpflow `worktask/SKILL.md` step 4.6). backend-developer agents **consume** this contract; the injection is orchestrator-owned.
 
 | Surface | Mechanism | backend-developer action |
 |---------|-----------|--------------------------|
@@ -182,8 +182,8 @@ All Task delegations MUST use the fully-qualified `plugin:agent` form:
 | Form | Status |
 |------|--------|
 | `backend-developer:node-developer` | Required |
-| `company-workflow:technical-lead` | Required |
-| `node-developer` (bare) | Deprecated — back-compat shim prepends `company-workflow:` and logs a warning (would resolve to the wrong plugin) |
+| `corpflow:technical-lead` | Required |
+| `node-developer` (bare) | Deprecated — back-compat shim prepends `corpflow:` and logs a warning (would resolve to the wrong plugin) |
 
 Task metadata carries qualified names:
 
@@ -202,10 +202,10 @@ Task metadata carries qualified names:
 
 ## Token Budgets
 
-- **Incoming compressed context** (from company-workflow): 300-500 tokens (planning summary 300, architecture summary 300, development handoff 500)
+- **Incoming compressed context** (from corpflow): 300-500 tokens (planning summary 300, architecture summary 300, development handoff 500)
 - **Full stage output**: write to `.context/<stage>-N.md` (no token cap)
 - **Outgoing return summary**: 500 tokens max (for the orchestrator)
-- **Inter-stage handoffs**: DV→DR 300, DR→QA 300 (`company-workflow:context-compression § Context Budget by Handoff`)
+- **Inter-stage handoffs**: DV→DR 300, DR→QA 300 (`corpflow:context-compression § Context Budget by Handoff`)
 
 ## Detecting Workflow Context
 
@@ -229,7 +229,7 @@ PL0 assesses complexity (0-50) and creates only the stages needed:
 
 Security-sensitive features (authentication, payment, PII, cryptography, secrets, file uploads, external API consumption) auto-include SR0 regardless of score.
 
-PL0 stamps `metadata.skipped_stages = [{stage, reason}]` for every stage dropped from the full 9-stage pipeline (PL→AR→TL→DV→DR→QA→DC→FN→ST), so `state.json` self-documents the drops. It also stamps `metadata.test_mode` (`build-only` / `scoped` / `full` — defaulted by score and marker coverage) and `metadata.ui_visual_check` (the UI-capture provenance gate — **N/A for backend work**, left `false`; it gates live-driven UI capture on UI platforms only). The stage table above, the `test_mode` defaults, and these stamps are all defined by company-workflow `estimation-methodology § PL0 Stage-Set` (the source of truth) — keep them in lockstep with it so the next sync is a mechanical copy.
+PL0 stamps `metadata.skipped_stages = [{stage, reason}]` for every stage dropped from the full 9-stage pipeline (PL→AR→TL→DV→DR→QA→DC→FN→ST), so `state.json` self-documents the drops. It also stamps `metadata.test_mode` (`build-only` / `scoped` / `full` — defaulted by score and marker coverage) and `metadata.ui_visual_check` (the UI-capture provenance gate — **N/A for backend work**, left `false`; it gates live-driven UI capture on UI platforms only). The stage table above, the `test_mode` defaults, and these stamps are all defined by corpflow `estimation-methodology § PL0 Stage-Set` (the source of truth) — keep them in lockstep with it so the next sync is a mechanical copy.
 
 ## MCP Dynamic Inheritance
 
@@ -239,16 +239,16 @@ Subagents inherit the parent session's MCP tools (Context7, Ref, etc.). Do not r
 
 If no workflow context is detected (no `.context/`, no task metadata), proceed with standard implementation: follow the language skills, run the same build/test/security discipline, and report results directly — no artifacts or frontmatter required.
 
-## Related Skills (company-workflow plugin)
+## Related Skills (corpflow plugin)
 
 | Skill | Purpose |
 |-------|---------|
-| `company-workflow:worktask` | Complete worktask system documentation |
-| `company-workflow:cross-plugin-handoff` | Handoff protocol between plugins |
-| `company-workflow:agent-coordination` | Multi-agent coordination patterns |
-| `company-workflow:context-compression` | Token budgets and compression techniques |
-| `company-workflow:security-review-process` | SR stage OWASP checklists |
-| `company-workflow:release-engineering` | RE stage versioning patterns |
+| `corpflow:worktask` | Complete worktask system documentation |
+| `corpflow:cross-plugin-handoff` | Handoff protocol between plugins |
+| `corpflow:agent-coordination` | Multi-agent coordination patterns |
+| `corpflow:context-compression` | Token budgets and compression techniques |
+| `corpflow:security-review-process` | SR stage OWASP checklists |
+| `corpflow:release-engineering` | RE stage versioning patterns |
 
 ## Related Skills (backend-developer plugin)
 

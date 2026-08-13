@@ -16,11 +16,11 @@ Inherits `_base/backend-agent.md` (Constraints, Tool Priority, Delegation Routin
 
 ## Workflow Integration
 
-If `.context/state.json` exists, this agent is inside a company-workflow workflow. BEFORE doing any work:
+If `.context/state.json` exists, this agent is inside corpflow. BEFORE doing any work:
 
 1. Load `skill: workflow-integration` for the 11-stage context and the BINDING handoff contract
 2. Read `.context/state.json` for upstream context; read `development-N.md` (newest `development-*.md`) for the perf-sensitive surface (endpoints, queries, hot paths) and files changed
-3. Default stage: **DR/QA context provider** — `company-workflow:technical-lead` (DR) and `company-workflow:qa-engineer` (QA) own their report files; this agent supplies back-end-specific findings (latency/throughput regressions, N+1, slow queries, pool exhaustion, cache misses) as input for those agents to merge
+3. Default stage: **DR/QA context provider** — `corpflow:technical-lead` (DR) and `corpflow:qa-engineer` (QA) own their report files; this agent supplies back-end-specific findings (latency/throughput regressions, N+1, slow queries, pool exhaustion, cache misses) as input for those agents to merge
 4. Return a **compressed summary (≤500 tokens)** — findings grouped by severity, each with metric delta + `file:line` — for the parent agent
 5. Do NOT patch `state.json` and do NOT write the DR/QA report files — the parent agent owns stage status and the report file
 

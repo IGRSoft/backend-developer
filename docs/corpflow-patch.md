@@ -1,13 +1,13 @@
-# Companion Patch — `company-workflow/agents/developer.md`
+# Companion Patch — `corpflow/agents/developer.md`
 
-**Status (2026-07-22): applied upstream** — company-workflow's `agents/developer.md` now carries the backend-developer Task grants and routing (see company-workflow v3.36.0). This document is retained as the historical patch spec.
+**Status (2026-07-22): applied upstream** — corpflow's `agents/developer.md` now carries the backend-developer Task grants and routing (see corpflow v3.36.0). This document is retained as the historical patch spec.
 
-**Status:** REQUIRED, not yet applied. The company-workflow plugin is **not
+**Status:** REQUIRED, not yet applied. The corpflow plugin is **not
 installed in this repository**, so this patch is documented here rather than applied.
-Apply it in the company-workflow repo when wiring backend-developer into the DV router,
-then bump company-workflow's patch/minor version and note it under "What's new".
+Apply it in the corpflow repo when wiring backend-developer into the DV router,
+then bump corpflow's patch/minor version and note it under "What's new".
 
-The DV router (`company-workflow:developer`) currently has no back-end specialist. Without this
+The DV router (`corpflow:developer`) currently has no back-end specialist. Without this
 patch, back-end service files at the DV stage fall through to the generic developer or to
 system-developer's language agents, which do not own the web-framework, API-contract, or
 persistence layer.
@@ -19,7 +19,7 @@ the back-end analog.
 
 ## 1. `tools:` frontmatter — add the qualified Task targets
 
-Add to `company-workflow/agents/developer.md` frontmatter `tools:`:
+Add to `corpflow/agents/developer.md` frontmatter `tools:`:
 
 ```
 Task(backend-developer:backend-developer),
@@ -86,7 +86,7 @@ migration logs). Point the back-end branch at the same adapter.
 
 ## Verification after applying
 
-- `company-workflow/scripts/validate.sh` (or its equivalent) passes with the new Task targets.
+- `corpflow/scripts/validate.sh` (or its equivalent) passes with the new Task targets.
 - A polyglot fixture (e.g. a Go service + a Node BFF) routes each file to the correct
   backend-developer specialist at DV.
 - A `package.json` carrying both a UI framework and a server framework triggers the
