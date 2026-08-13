@@ -145,5 +145,5 @@ func TestGetUser_OtherTenant_Returns404(t *testing.T) {
 ## Related Skills
 
 - `severity-matrix.md` — coverage requirements and finding priorities
-- `workflow-integration/SKILL.md` — QA gate definition for worktask runs
+- `CORPFLOW.md` — QA gate definition for worktask runs
 - per-stack testing deep dives in each language developer's skill set

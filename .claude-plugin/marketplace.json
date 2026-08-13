@@ -38,13 +38,11 @@
         "docker",
         "owasp-api",
         "k6",
-        "testcontainers",
-        "workflow-integration"
+        "testcontainers"
       ],
       "skills": [
         "./skills",
         "./skills/_shared/secure-coding",
-        "./skills/_shared/workflow-integration",
         "./skills/node",
         "./skills/node/modern-typescript-backend",
         "./skills/node/nest-express-fastify-patterns",

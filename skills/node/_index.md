@@ -28,4 +28,4 @@ for the guided entry with version snapshot and decision tree.
 | OWASP API Security Top 10 defenses (BOLA, authn/z, rate limits) | `../quality/api-security/SKILL.md` |
 | Unit + Testcontainers integration tests | `../quality/be-testing/SKILL.md` |
 | Profiling (clinic.js, `--prof`, heap snapshots) | `../quality/be-performance/SKILL.md` |
-| Workflow stage participation | `../_shared/workflow-integration/SKILL.md` |
+| Workflow stage participation | `CORPFLOW.md` |

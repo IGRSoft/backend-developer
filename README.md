@@ -2,7 +2,7 @@
 
 Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the corpflow plugin v4.0.13 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
 
-**Version**: 1.4.0 | **corpflow Compatibility**: v4.0.13 | **claude-code min version**: "2.1.169"
+**Version**: 1.4.0 | **claude-code min version**: "2.1.169"
 
 ## Boundaries
 
@@ -106,7 +106,6 @@ Entry + leaf `SKILL.md` skills across ten domains, plus shared references. Versi
 
 | Domain | Entry | Leaves |
 |--------|-------|--------|
-| `_shared` | `_index.md` | secure-coding (OWASP API Top 10), workflow-integration, version-feature-matrix, language-detection, model-selection, severity-matrix, testing-principles |
 | `node` | `node-skills` | modern-typescript-backend, nest-express-fastify-patterns, node-async-streams |
 | `go` | `go-skills` | modern-go, go-concurrency |
 | `jvm` | `jvm-skills` | spring-boot, kotlin-backend |
@@ -146,20 +145,12 @@ claude plugins install backend-developer@backend-developer
 
 After editing `settings.json`, run `/plugins` (or restart the session) to load the plugin.
 
-## Workflow Integration (corpflow v4.0.13)
+## corpflow Integration
 
-This plugin collaborates with the **corpflow** plugin v4.0.13 for 11-stage workflow orchestration. corpflow owns orchestration, worktree isolation, and `state.json` merge; backend-developer agents stay invoked specialists and follow the handoff-protocol. During the DV stage, `corpflow:developer` routes to the appropriate backend-developer specialist based on file/marker detection.
-
-| Stage | backend-developer Role | Contribution |
-|-------|------------------------|--------------|
-| AR | Consult | `backend-architector` + `api-designer`: service boundaries, API contracts, data model. |
-| **DV** | Primary | Endpoints/services/migrations; emits `development-N.md` with a Build Evidence section. |
-| **DR** | Support | `be-code-fixer` applies findings (minimal-diff gate); `backend-architector` for pattern concerns. |
-| SR | Context Provider | `be-security-auditor`: OWASP API Top 10, authn/authz, injection, secrets, supply chain, rate limiting. |
-| QA | Support | `be-test-generator`; QA gate = unit+integration pass **and** analyze-security clean. |
-| RE | Context Provider | `be-dependency-manager`: lockfile freeze, container image, DB migration plan, semver. |
-
-**Evidence norm**: service and API work defaults to `requires_screenshots: false`. When a gate demands evidence, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) rather than screenshots.
+This plugin runs standalone. It also participates in [corpflow](https://github.com/IGRSoft/corpflow)
+worktasks, and the whole of that integration lives in one file at the repository root:
+**[CORPFLOW.md](CORPFLOW.md)**. Delete that file and the plugin is fully standalone; restore it
+and it participates again. Nothing else here references corpflow.
 
 ## Quick Start
 

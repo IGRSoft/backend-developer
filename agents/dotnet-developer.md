@@ -13,21 +13,6 @@ Expert C#/.NET developer specializing in modern, async-first ASP.NET Core back-e
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are .NET-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside corpflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (implementation), **DR** support (respond to technical-lead findings), **SR** context (auth boundaries, model-binding/over-posting surfaces, deserialization).
-
-Evidence gate: back-end/API work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), `dotnet test` output, EF migration logs, and k6 load reports as `cli-fallback` rows — see base § DV Stage. Do not capture build/compiler logs as evidence.
-
 ## Key Constraints
 
 - **Target the current .NET LTS** (floor in `skills/_shared/version-feature-matrix.md`) unless the project pins otherwise; prefer LTS over STS for service code. .NET ships annually every November (even-numbered = LTS/3-year, odd = STS/24-month) — don't assert a runtime version from memory; confirm the active LTS against the matrix and `dotnet --list-sdks`. Pin the SDK in `global.json` so local and CI builds resolve the same toolchain.

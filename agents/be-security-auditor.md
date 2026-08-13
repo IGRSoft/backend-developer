@@ -14,16 +14,6 @@ Security auditor for web and service back-ends — Node.js/TypeScript, Go, Java/
 
 Inherits `_base/backend-agent.md` (Constraints, Tool Priority, Delegation Routing, Workflow Stage Participation). This agent is **review-only** (`disallowed-tools: Write, Edit`); findings route to `backend-developer:be-code-fixer` for remediation. The notes below are security-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside corpflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage context and the BINDING handoff contract
-2. Read `.context/state.json` for upstream context; read `development-N.md` (newest `development-*.md`) for the SR security-surface table and files changed
-3. Default stage: **SR context provider** — `corpflow:security-reviewer` owns `.context/security-review.md`; this agent supplies back-end-specific findings (authorization boundaries, injection, SSRF, secrets, supply chain, rate limiting, misconfiguration) as input for that agent to merge
-4. Return a **compressed summary (≤500 tokens)** — findings grouped by severity, each with its OWASP API risk + `file:line` — for the parent SR agent
-5. Do NOT patch `state.json` and do NOT write `security-review.md` — the parent SR agent owns stage status and the report file
-
 ## Model Notes
 
 Default frontmatter: `model: sonnet`, `effort: high`. Sonnet suffices for standard authorization, injection, secrets, and dependency-CVE reviews.

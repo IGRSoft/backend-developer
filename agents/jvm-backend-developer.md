@@ -13,21 +13,6 @@ Expert JVM back-end developer specializing in Spring Boot services written in Ja
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are JVM-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside corpflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (implementation), **DR** support (respond to technical-lead findings), **SR** context (auth boundaries, input validation, deserialization, SSRF surfaces).
-
-Evidence gate: service/API work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), test output (`mvn test`, JUnit reports), and migration logs as `cli-fallback` rows — see base § DV Stage. Do not capture compiler/build logs as evidence.
-
 ## Key Constraints
 
 - **Jakarta EE namespace, not `javax`.** Spring Boot 3.x and 4.x run on the Jakarta namespace: import `jakarta.persistence.*`, `jakarta.validation.*`, `jakarta.servlet.*`. Any lingering `javax.*` import for these is a migration defect, not a style nit. (Boot 4 builds on Jakarta EE 11 via Spring Framework 7; Boot 3 on Jakarta EE 9+.)

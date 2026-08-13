@@ -13,21 +13,6 @@ Expert PHP developer specializing in modern, type-safe back-end services on Lara
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are PHP-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside corpflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (implementation), **DR** support (respond to technical-lead findings), **SR** context (mass-assignment, authorization, input-validation, SQL-injection surfaces).
-
-Evidence gate: service/API work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), `php artisan test` / `phpunit` output, and migration logs as `cli-fallback` rows — not build warnings — see base § DV Stage.
-
 ## Key Constraints
 
 - **Composer owns dependencies.** Resolve, install, and lock through Composer (`composer install`, `composer require`, `composer update`); `composer.lock` is committed and authoritative. Never hand-edit `vendor/`. Route manifest/lock/CVE work to `backend-developer:be-dependency-manager`.

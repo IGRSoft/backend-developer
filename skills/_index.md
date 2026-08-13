@@ -27,7 +27,6 @@ patterns). **21 SKILL.md across 10 domains, plus shared references.** Start at
 | Skill | Path | Description |
 |-------|------|-------------|
 | **secure-coding** | [`_shared/secure-coding/SKILL.md`](_shared/secure-coding/SKILL.md) | Non-negotiable security rules mapped to the OWASP API Security Top 10 (2023) — BOLA/auth/property-level/rate-limiting/SSRF, injection (SQL/NoSQL/command), secrets hygiene, supply-chain CVEs |
-| **workflow-integration** | [`_shared/workflow-integration/SKILL.md`](_shared/workflow-integration/SKILL.md) | Guide for integrating with the corpflow 11-stage pipeline (v4.0.13) |
 | version-feature-matrix | [`_shared/version-feature-matrix.md`](_shared/version-feature-matrix.md) | Runtimes/frameworks → minimum versions and headline features (canonical lookup) |
 | language-detection | [`_shared/language-detection.md`](_shared/language-detection.md) | Marker → runtime → agent routing table, detection priority, tie-breaking |
 | model-selection | [`_shared/model-selection.md`](_shared/model-selection.md) | Per-agent model/effort/maxTurns assignments and opus+xhigh override paths |
