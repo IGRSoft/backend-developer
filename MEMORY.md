@@ -5,12 +5,12 @@
 | Field | Value |
 |-------|-------|
 | Plugin version | 1.4.0 |
-| company-workflow compatibility | v4.0.0 |
+| corpflow compatibility | v4.0.13 |
 | Claude Code min required | 2.1.169 |
 | Last updated | 2026-07-29 |
 
 Version strings move together (plugin.json, marketplace.json metadata, README
-header, CHANGELOG.md, this table) per the company-workflow `/cc-update` convention.
+header, CHANGELOG.md, this table) per the corpflow `/cc-update` convention.
 
 ## Template Lineage
 
@@ -23,7 +23,7 @@ layers, rather than the C/C++/Python/Bash *languages* system-developer owns.
 
 ## CC Features Adopted at 1.0.0
 
-Born on the company-workflow v3.17.0 / CC 2.1.169 baseline (current compatibility: company-workflow
+Born on the corpflow v3.17.0 / CC 2.1.169 baseline (current compatibility: corpflow
 v4.0.0); adopts the current capability set from the start:
 
 - **Tiered `maxTurns`** — haiku/low 20 (`be-dependency-manager`), haiku/medium 30
@@ -35,26 +35,26 @@ v4.0.0); adopts the current capability set from the start:
   (`be-performance-engineer`, `be-security-auditor`); fixes route to `be-code-fixer`.
 - **Fully-qualified `Task(plugin:agent)` references** — all delegations use the
   `Task(backend-developer:<agent>)` form; cross-plugin targets keep their own
-  prefix (`system-developer:*`, `company-workflow:*`, …).
+  prefix (`system-developer:*`, `corpflow:*`, …).
 - **Scoped `Bash(cmd:*)` allowlists** — each agent's `tools:` enumerates only the
   ecosystem binaries it needs (e.g. `node-developer`: node, npm, pnpm, yarn, npx,
   tsc, eslint, vitest, jest). Single-command invocations only (no `cd`-chains).
 - **Plugin-scoped advisory hooks** — `hooks/{audit-tooluse,audit-subagent,
   precompact-checkpoint}.sh`, wired in `plugin.json`. Advisory
   (`actor: "backend-developer:hook:*"`, `metadata.advisory: true`), sharing
-  company-workflow's `dedupe_key` / `dedupe_key_extended` shape. Each script has `--self-test`.
+  corpflow's `dedupe_key` / `dedupe_key_extended` shape. Each script has `--self-test`.
 
-## Not Adopted (company-workflow-owned infrastructure)
+## Not Adopted (corpflow-owned infrastructure)
 
-backend-developer agents are invoked specialists; company-workflow owns orchestration.
+backend-developer agents are invoked specialists; corpflow owns orchestration.
 Deliberately **not** implemented here:
 
-- **`audit-dedup.sh`** — company-workflow-owned. backend-developer emits advisory rows with
-  matching dedupe keys for company-workflow to reconcile.
+- **`audit-dedup.sh`** — corpflow-owned. backend-developer emits advisory rows with
+  matching dedupe keys for corpflow to reconcile.
 - **`state-merge.sh` / SubagentStop `state.json` merge** — orchestrator-owned. The
   hooks here read and checkpoint state but never merge it. Frontmatter emission is
-  unconditional (it is the input company-workflow's merge layer consumes).
-- **Screenshot-gate ownership** — company-workflow owns the evidence gate. backend-developer
+  unconditional (it is the input corpflow's merge layer consumes).
+- **Screenshot-gate ownership** — corpflow owns the evidence gate. backend-developer
   work defaults to `requires_screenshots: false` and, when a gate demands proof,
   supplies `cli-fallback` terminal transcripts (curl/httpie transcripts, test
   output, k6 load reports, migration logs). It does not own or override the gate.
@@ -161,19 +161,19 @@ Three conventions worth carrying forward:
 skills-size warnings (SKILL.md >8KB with no `references/` sibling). That is unchanged
 from master — the baseline exits 1 identically. Errors are 0 both before and after.
 
-### 1.2.0 — 2026-07-22 company-workflow v3.36.0 Port
+### 1.2.0 — 2026-07-22 corpflow v3.36.0 Port
 
 Compatibility ported v3.17.0 → v3.36.0 (~20 refs across README, this file, the agent
 stage-participation headers, the skill catalog, and the `workflow-integration` skill). The
 Dynamic Worktask Sizing table was already current (DR0 at every tier); the PL0 stamp note
 now also names `metadata.test_mode` (`build-only`/`scoped`/`full`) and `metadata.ui_visual_check`
-(N/A for backend/API work — left `false`), citing company-workflow `estimation-methodology § PL0
+(N/A for backend/API work — left `false`), citing corpflow `estimation-methodology § PL0
 Stage-Set` as the source of truth. The v3.17.0 / CC 2.1.169 birth record is preserved as history.
 
-Three workflow-contract learnings ported from company-workflow v3.36.0: (1) a **CLI evidence-freshness
+Three workflow-contract learnings ported from corpflow v3.36.0: (1) a **CLI evidence-freshness
 rule** — every `cli-fallback` transcript (curl/httpie request/response, test output, k6 report,
 migration dry-run/log) must be produced *this run* from the actual invocation, never reused;
-the systems analog of company-workflow's ov151 evidence-integrity gate (QA direct-reads evidence and
+the systems analog of corpflow's ov151 evidence-integrity gate (QA direct-reads evidence and
 cross-checks the `### build-evidence` log paths, re-opening DV on a stale/duplicated transcript).
 (2) The **state-patch pointer form** — the manual `read → merge → temp → fsync → rename`
 atomic-write prose is replaced by the two-mode `state-patch.sh --stage <CODE> --prev <PREV>`
@@ -185,7 +185,7 @@ with the five Build-Evidence lines exempt), AR, DV-support, and DR-support agent
 Repo-structure linters added: `section-lint.sh` (≤1000-char section cap, warn-only — baseline
 405 sections over cap across 118 files, burn-down tracked separately) and `desc-lint.sh`
 (three-tier frontmatter `description` brake: agents 450 / commands 250 / skills 750). The
-companion patch `docs/company-workflow-patch.md` is marked **applied upstream** (company-workflow's
+companion patch `docs/corpflow-patch.md` is marked **applied upstream** (corpflow's
 `agents/developer.md` now carries the backend-developer Task grants and routing).
 
 Follow-ups: the agent-description diet toward the ≤250 sibling-plugin ideal is eval-gated — ten
@@ -218,11 +218,11 @@ OWASP API Top 10 2023 edition re-anchor (structural, separate worktask).
 
 ## Companion Patch (REQUIRED, external)
 
-`company-workflow/agents/developer.md` needs a back-end specialist row in its DV
-router (see `docs/company-workflow-patch.md` for the exact patch): `tools:`
+`corpflow/agents/developer.md` needs a back-end specialist row in its DV
+router (see `docs/corpflow-patch.md` for the exact patch): `tools:`
 additions, a Backend/Service Specialization table, detection rules
 (`go.mod`→go; `pom.xml`/`build.gradle(.kts)`→jvm; `package.json` with a server
 dep→backend node; `requirements.txt`/`pyproject.toml` with fastapi/django/flask→
 backend python; `Gemfile`→ruby; `composer.json`→php; `*.csproj`→dotnet), and
-reuse of the existing `cli_fallback_adapter`. The company-workflow plugin is not installed
+reuse of the existing `cli_fallback_adapter`. The corpflow plugin is not installed
 in this repo, so the patch is documented rather than applied.

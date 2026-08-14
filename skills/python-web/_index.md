@@ -33,4 +33,4 @@ it, never duplicate it.
 | Injection, secrets, pickle/yaml/`shell=True`, OWASP API Top 10 | `../_shared/secure-coding/SKILL.md` |
 | API security review (BOLA, auth, rate limiting) | `../quality/api-security/SKILL.md` |
 | Backend testing (integration, Testcontainers, transcripts) | `../quality/be-testing/SKILL.md` |
-| Workflow stage participation | `../_shared/workflow-integration/SKILL.md` |
+| Workflow stage participation | `CORPFLOW.md` |

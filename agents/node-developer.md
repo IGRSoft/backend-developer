@@ -13,21 +13,6 @@ Expert Node.js developer specializing in modern, type-safe back-end services and
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are Node/TypeScript-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside a company-workflow workflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (implementation), **DR** support (respond to technical-lead findings), **SR** context (input-validation, authz boundaries, injection surfaces).
-
-Evidence gate: service/API work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), test output (`vitest`/`jest run`), and migration logs as `cli-fallback` rows — see base § DV Stage. (No build-warning or sanitizer logs apply here.)
-
 ## Key Constraints
 
 - **The package manager owns the environment.** Resolve, install, and lock dependencies through one tool per repo (`npm ci` / `pnpm install --frozen-lockfile` / `yarn install --immutable`); run code and tools through the project's scripts or `npx`/`pnpm dlx`. The lockfile (`package-lock.json` / `pnpm-lock.yaml` / `yarn.lock`) is committed and authoritative — do not mix managers in one repo.

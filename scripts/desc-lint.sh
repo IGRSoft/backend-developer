@@ -18,7 +18,7 @@
 #                               the 250-target diet is deferred, do not tighten.
 #   commands/**        → 250  — current max ~126, comfortably green; this tier
 #                               holds the CC ~250 guidance since commands fit.
-#   skills/**/SKILL.md → 750  — current max ~695 (workflow-integration). Skill
+#   skills/**/SKILL.md → 750  — current max ~695 (CORPFLOW.md). Skill
 #                               descriptions are deliberately trigger-engineered
 #                               (they must fire the right skill), so this brake
 #                               sits just above the worst — a diet pending

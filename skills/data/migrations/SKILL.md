@@ -142,7 +142,7 @@ psql "$DATABASE_URL" -c "SELECT relation::regclass, mode, granted FROM pg_locks 
 ```
 
 Attach the apply log, the `down` dry-run output, and (for big tables) lock/replication
-observations. See [workflow-integration](../../_shared/workflow-integration/SKILL.md).
+observations. See [CORPFLOW.md](../../../CORPFLOW.md).
 
 ## Diagnostics
 

@@ -27,7 +27,7 @@ These mirror the global security rules and never have exceptions without a docum
 5. **Control outbound egress (SSRF)** — a URL/host derived from input is fetched only through an allowlist with a resolved-IP check; block link-local, loopback, and cloud-metadata ranges. (**API7** SSRF.)
 6. **Never disable a security control without documented justification** — TLS verification off, auth middleware bypassed, rate limiter removed, CSP relaxed, lint/audit suppressions: each needs an inline comment with the reason and a tracking reference.
 
-> A change that breaks any of these does not pass DR/SR review. See [workflow-integration](../workflow-integration/SKILL.md) for stage gates.
+> A change that breaks any of these does not pass DR/SR review. See [CORPFLOW.md](../../../CORPFLOW.md) for stage gates.
 
 ## Injection-Safe Data Access (per stack)
 
@@ -164,4 +164,4 @@ A secret committed to git history is compromised even after deletion — rotate 
 - [input-validation-and-parsing.md](references/input-validation-and-parsing.md) — schema validation at trust boundaries, pagination/size limits (API4), mass-assignment / property-level authz (API3), safe deserialization
 - [command-execution-and-injection.md](references/command-execution-and-injection.md) — injection-safe execution, SSRF egress allowlists, secrets via secret-manager, supply-chain scanning
 - [version-feature-matrix.md](../version-feature-matrix.md) — runtime/framework versions and feature/fallback lookup
-- [workflow-integration/SKILL.md](../workflow-integration/SKILL.md) — SR/DR security gates and handoff contract
+- [CORPFLOW.md](../../../CORPFLOW.md) — SR/DR security gates and handoff contract

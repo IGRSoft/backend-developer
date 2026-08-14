@@ -122,7 +122,7 @@ npx @stoplight/prism-cli mock openapi.yaml
 
 This is where the **QA gate** evidence comes from: contract-test output + curl
 transcripts, not screenshots — see
-[workflow-integration](../../_shared/workflow-integration/SKILL.md) and
+[CORPFLOW.md](../../../CORPFLOW.md) and
 [be-testing](../../quality/be-testing/SKILL.md).
 
 ## Linting with Spectral
@@ -193,4 +193,4 @@ Confirm tool/spec support against the
 - [api-security](../../quality/api-security/SKILL.md) — OWASP API9 (inventory) via published specs
 - [event-driven](../../architecture/event-driven/SKILL.md) — AsyncAPI for message/event contracts
 - [version-feature-matrix](../../_shared/version-feature-matrix.md) — spec/tool floors
-- [workflow-integration](../../_shared/workflow-integration/SKILL.md) — contract-test evidence in the QA gate
+- [CORPFLOW.md](../../../CORPFLOW.md) — contract-test evidence in the QA gate

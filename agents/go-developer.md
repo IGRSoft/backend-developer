@@ -13,21 +13,6 @@ Expert Go developer specializing in idiomatic, concurrent back-end services. Mas
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are Go-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside a company-workflow workflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (implementation), **DR** support (respond to technical-lead findings), **SR** context (auth boundaries, input validation, SSRF, injection surfaces).
-
-Evidence gate: service/API work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), `go test -race` output, k6 load reports, and migration logs as `cli-fallback` rows — see base § DV Stage. Do not capture compiler/sanitizer logs.
-
 ## Key Constraints
 
 - **`go vet` + `golangci-lint` clean**: both report zero findings before code is complete. golangci-lint aggregates errcheck, staticcheck, govet, ineffassign, and more — do not introduce a second linter or suppress findings without a `//nolint:<linter> // reason` comment naming the reason.

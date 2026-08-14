@@ -88,4 +88,4 @@ Tooling task?
 - [secure-coding](../_shared/secure-coding/SKILL.md) — hardening belongs in the image and the handler, not as an afterthought
 - [api-security](../quality/api-security/SKILL.md) — OWASP API Security Top 10 the diagnostics and image hardening defend
 - [be-testing](../quality/be-testing/SKILL.md) — integration tests (Testcontainers) reuse the same images and Compose stacks
-- [workflow-integration](../_shared/workflow-integration/SKILL.md) — Build Evidence and the cli-fallback evidence norm
+- [CORPFLOW.md](../../CORPFLOW.md) — Build Evidence and the cli-fallback evidence norm

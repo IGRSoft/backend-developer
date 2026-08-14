@@ -17,21 +17,6 @@ Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priori
 
 This agent owns the **web-framework + persistence layer** — endpoints, dependency injection, Pydantic/serializer validation, SQLAlchemy/Django ORM models, query construction, transaction boundaries, and Alembic/Django migrations. Pure Python **language depth** — typing-system internals (PEP 695 variance, `TypeIs` flow), asyncio event-loop mechanics and custom executors, free-threading (`sys._is_gil_enabled()`) and subinterpreter design, packaging/build backends, and C-extension/FFI work — routes back to `system-developer:python-developer`. When a task is "make this request handler correct and async-safe" it is mine; when it is "design the concurrency primitive or the typing protocol the handler stands on" it is theirs. Hand off with the concrete framework context (route, ORM session lifecycle, where the blocking call sits) so they don't re-derive the web layer.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside a company-workflow workflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (implementation), **DR** support (respond to technical-lead findings), **SR** context (auth boundaries, input validation, ORM injection, SSRF surfaces).
-
-Evidence gate: service/API work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), `uv run pytest` output, and Alembic migration logs as `cli-fallback` rows — see base § DV Stage. Do not substitute build/compiler logs.
-
 ## Key Constraints
 
 - **uv owns the environment.** Resolve, install, and lock dependencies through uv (`uv sync`, `uv add`, `uv lock`); run code, the server, and tools through `uv run`. Never `pip install` into a system or ad-hoc environment for project work. Route manifest/lock/CVE work to `backend-developer:be-dependency-manager`.

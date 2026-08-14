@@ -85,4 +85,4 @@ Quality task?
 - [be-testing](be-testing/SKILL.md) — unit/integration/contract/load pyramid, Testcontainers, coverage gates
 - [version-feature-matrix](../_shared/version-feature-matrix.md) — framework/runtime floors per stack
 - [secure-coding](../_shared/secure-coding/SKILL.md) — input validation and injection defense belong in the code, not bolted on
-- [workflow-integration](../_shared/workflow-integration/SKILL.md) — QA gate, DR review criteria, and the cli-fallback evidence norm
+- [CORPFLOW.md](../../CORPFLOW.md) — QA gate, DR review criteria, and the cli-fallback evidence norm

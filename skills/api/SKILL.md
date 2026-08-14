@@ -99,7 +99,7 @@ API task?
 - **Errors are part of the contract.** REST returns `application/problem+json` (RFC 9457); gRPC uses canonical status codes + `google.rpc.Status`; GraphQL uses typed errors in the `errors` array. Never overload `200` with an embedded failure.
 - **Authorization is per-object, not per-route only.** Object-level checks (OWASP API1/API3) live in the handler, not just the gateway — see [api-security](../quality/api-security/SKILL.md).
 - **Single-command Bash invocations.** Use `buf lint`, `spectral lint openapi.yaml`, `npx openapi-generator-cli generate ...` — never `cd`-chains. Scoped Bash allowlists do not match compound commands.
-- **Evidence is transcripts, not screenshots.** Non-UI API work defaults to `requires_screenshots: false`; cli-fallback evidence = curl/httpie request/response transcripts, contract-test output, and k6 load reports — see [workflow-integration](../_shared/workflow-integration/SKILL.md).
+- **Evidence is transcripts, not screenshots.** Non-UI API work defaults to `requires_screenshots: false`; cli-fallback evidence = curl/httpie request/response transcripts, contract-test output, and k6 load reports — see [CORPFLOW.md](../../CORPFLOW.md).
 
 ## Related Skills
 
@@ -112,4 +112,4 @@ API task?
 - [be-testing](../quality/be-testing/SKILL.md) — contract + integration testing of the designed API
 - [secure-coding](../_shared/secure-coding/SKILL.md) — injection-safe handlers, secrets hygiene, auth boundaries
 - [version-feature-matrix](../_shared/version-feature-matrix.md) — spec/tool/runtime floors
-- [workflow-integration](../_shared/workflow-integration/SKILL.md) — API Evidence and the cli-fallback transcript norm
+- [CORPFLOW.md](../../CORPFLOW.md) — API Evidence and the cli-fallback transcript norm

@@ -13,21 +13,6 @@ Expert database engineer specializing in the data layer behind web and service b
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are database-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside a company-workflow workflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV**)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **DV** (schema + migration + query work), **DR** support (respond to technical-lead findings on migration safety and query plans), **SR** context (BOLA/property-level authorization at the data boundary, injection surfaces, secrets in connection strings).
-
-Evidence gate: data-layer work defaults `requires_screenshots: false`. When the gate is armed, capture `EXPLAIN ANALYZE` output, migration up/down logs, and integration-test transcripts (Testcontainers spinning a real Postgres/MySQL) as `cli-fallback` rows — see base § DV Stage. Never substitute build/compiler logs.
-
 ## Key Constraints
 
 - **Migrations are the only path to schema change.** Every DDL change is a reversible, version-controlled migration (Prisma Migrate, Drizzle, Flyway, Liquibase, Alembic, golang-migrate, EF Core). No ad-hoc `ALTER` against a live database; no editing an applied migration — write a new one.

@@ -1,6 +1,6 @@
 {
   "name": "backend-developer",
-  "description": "Web/service back-end toolkit: Node/TS, Go, JVM (Spring), Python web (FastAPI/Django), plus REST/GraphQL/gRPC API design, databases/ORM/migrations, and event-driven architecture. Full company-workflow 11-stage workflow integration; requires_screenshots:false / cli-fallback evidence (curl/httpie/k6/test transcripts); scoped Bash allowlists; qualified Task() delegation; plugin-scoped audit/checkpoint hooks. Delegates Python/C/C++/Bash language depth to system-developer.",
+  "description": "Web/service back-end toolkit: Node/TS, Go, JVM (Spring), Python web (FastAPI/Django), plus REST/GraphQL/gRPC API design, databases/ORM/migrations, and event-driven architecture. Delegates Python/C/C++/Bash language depth to system-developer.",
   "version": "1.4.0",
   "author": {
     "name": "IGRSoft",
@@ -50,7 +50,6 @@
     "testcontainers",
     "opentelemetry",
     "observability",
-    "workflow-integration",
     "developer-review",
     "dr-stage",
     "security-review",

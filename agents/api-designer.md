@@ -13,21 +13,6 @@ Expert API designer specializing in protocol-agnostic contract design across RES
 
 Inherits `_base/backend-agent.md` (Constraints, Code Comment Policy, Tool Priority, Delegation Routing, Standard Response Format, Workflow Stage Participation). The notes below are API-design-specific; do not restate the base.
 
-## Workflow Integration
-
-If `.context/state.json` exists, this agent is inside a company-workflow workflow. BEFORE doing any work:
-
-1. Load `skill: workflow-integration` for the 11-stage pipeline context and the BINDING handoff contract
-2. Resolve the plan file (`task.metadata.plan_file` → newest `.context/planning-*.md`) and read Required Inputs
-3. Follow the recipe for the active stage (typically **DV** for contract authoring, **DR** support for contract review)
-4. Canonical artifact: `.context/development-N.md` (`N = run_index`; readers fall back to newest `development-*.md`)
-5. Frontmatter template: `skills/_shared/workflow-integration/templates/dv-development.md`
-6. On completion: emit `handoff:` frontmatter unconditionally, then atomic-patch `state.json`. If the patch fails, proceed — the SubagentStop hook repairs from frontmatter
-
-Default stage mapping: **AR** support (contract-first protocol and versioning decisions), **DV** (contract authoring), **DR** support (contract-adherence and backward-compatibility review), **SR** context (auth scopes, object/property-level authorization, input validation surfaces).
-
-Evidence gate: contract/service work defaults `requires_screenshots: false`. When the gate is armed, capture API request/response transcripts (`curl`/`httpie`), contract-lint output (`npx @redocly/cli lint`, `buf lint`, `buf breaking`), and example-validation runs as `cli-fallback` rows — see base § DV Stage. Never use compiler/sanitizer/build logs as evidence.
-
 ## Key Constraints
 
 - **The contract is the source of truth.** OpenAPI 3.1/3.2 (REST), GraphQL SDL (GraphQL), or proto3/editions (gRPC) is authored or updated *before* handler code, and the implementation is validated against it. Hand-written docs that drift from code are a defect.
