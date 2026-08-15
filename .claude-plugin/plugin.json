@@ -1,7 +1,7 @@
 {
   "name": "backend-developer",
   "description": "Web/service back-end toolkit: Node/TS, Go, JVM (Spring), Python web (FastAPI/Django), plus REST/GraphQL/gRPC API design, databases/ORM/migrations, and event-driven architecture. Delegates Python/C/C++/Bash language depth to system-developer.",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "author": {
     "name": "IGRSoft",
     "email": "support@igrsoft.com"
