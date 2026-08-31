@@ -4,10 +4,10 @@
 
 | Field | Value |
 |-------|-------|
-| Plugin version | 1.4.3 |
+| Plugin version | 1.5.0 |
 | corpflow compatibility | v4.0.13 |
 | Claude Code min required | 2.1.169 |
-| Last updated | 2026-07-29 |
+| Last updated | 2026-08-31 |
 
 Version strings move together (plugin.json, marketplace.json metadata, README
 header, CHANGELOG.md, this table) per the corpflow `/cc-update` convention.
@@ -61,6 +61,17 @@ Deliberately **not** implemented here:
 
 ## Decisions Log
 
+- **Twelve-factor rules were distributed, not given their own skill** (1.5.0) —
+  the contract is cross-cutting, so a standalone `twelve-factor` skill would
+  compete for triggering with the domain skills that already own each factor
+  (`observability` for logs, `containerization` for the image and runtime
+  boundary, `microservices-patterns` for boundaries and statelessness,
+  `migrations` for admin processes). Each factor instead lands in the skill a
+  reader is already consulting when the question arises, and the one genuinely
+  homeless cluster (config, build/release/run, port binding, per-stack shutdown)
+  became a `references/` file under `containerization` rather than a new skill.
+  Enforcement lives in the base agent and the three review commands, which is
+  what makes the rules bite regardless of which skill got loaded.
 - **Single owner per language** — system-developer remains canonical for the
   Python/C/C++/Bash *language* layer; `python-backend-developer` owns the
   **web-framework + persistence** layer (FastAPI/Django/Flask) and delegates pure
@@ -91,6 +102,37 @@ Deliberately **not** implemented here:
   rather than the memory-safety CWE Top 25 that anchors system-developer.
 
 ## Version History
+
+### 1.5.0 — 2026-08-31 Twelve-Factor Runtime Contract
+
+#### What was missing
+
+The plugin covered how to build a container and how to secure a handler, but
+never stated what the running process owes its platform. Factor V
+(build/release/run) had no representation anywhere. Config doctrine, port
+binding, statelessness, and admin processes were near-zero. Graceful shutdown
+existed for Go and Node only — the JVM, Python, Ruby, PHP, and .NET agents had
+no shutdown guidance at all, in a plugin that advertises all seven stacks.
+
+#### The source
+
+Analysed a snapshot of `twelve-factor/twelve-factor` (CC BY 4.0). Worth
+recording because the name misleads: the directory was labelled
+`twelve-factor-next` but holds the **`main`** branch. There are no new factors
+and no renamed ones — all twelve titles are byte-identical to 12factor.net, and
+a grep for container/k8s/observability/secrets terms across all 729 lines of
+`content/` returns four incidental hits. What actually changed is structural:
+each factor is decomposed into numbered normative principles (33 total) with
+`Examples` and `Guidance` sub-blocks. That decomposition is what made the
+manifesto usable as rules — 33 assertable statements rather than twelve essays.
+Anyone revisiting this should not expect modern content in the upstream text;
+the modernization is ours.
+
+#### Deliberately left
+
+No new skill directory (see Decisions Log). `marketplace.json` `skills[]` was
+therefore untouched — the only machine-checked skill registry needs no change
+when a `references/` file is added.
 
 ### 1.4.0 — 2026-07-29 Polyglot-Consistency Audit
 

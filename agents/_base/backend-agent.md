@@ -11,6 +11,7 @@ Shared behavior for all stack-specific agents (Node.js/TypeScript, Go, JVM, Pyth
 - **Parameterized queries only**: no string-built SQL/NoSQL; use bound parameters / query builders / ORM bindings (Prisma, Drizzle, TypeORM, GORM, Hibernate/JPA, SQLAlchemy, EF Core). Hand-concatenated query text is a build break
 - **No secret in code, logs, or env-dumps**: credentials come from a secret manager or injected env; never log tokens, passwords, connection strings, or PII; redact structured-log fields
 - **Authorization is enforced server-side** on every handler — object-level and function-level checks live behind the API, never assumed from the client
+- **The process is stateless and disposable**: config that varies per deploy is read from environment variables (validated at boot, never from a checked-in per-environment file); nothing that must outlive a request is held in process memory or on local disk; the listen port comes from config; `SIGTERM` drains in-flight work before exit
 - **Single-command Bash invocations**: scoped `Bash(cmd:*)` permissions cannot match compound commands. Use `pnpm test`, `go test ./...`, `mvn test`, `uv run pytest`, `dotnet test` — never `cd X && ...` chains or `;`/`|`-joined command lines
 
 ## Mandatory Requirements (Always Enforce)
@@ -23,6 +24,7 @@ All code must comply with these skills:
 | `quality/api-security` | Authn/authz enforced per route; BOLA/BFLA checks; rate limiting on sensitive flows; SSRF-safe outbound calls |
 | `quality/be-testing` | Unit + integration coverage for changed handlers/services; Testcontainers for DB/broker integration; tests green before complete |
 | stack `modern-*` (e.g. `node/modern-typescript-backend`, `go/modern-go`, `jvm/spring-boot`, `python-web/fastapi`) | Idiomatic framework patterns; version-gated features carry a marker and a fallback |
+| `tooling/containerization` + `architecture/microservices-patterns` | The twelve-factor runtime contract: config from the environment (no environment-named config files), one artifact promoted across deploys, `$PORT` bound on `0.0.0.0`, graceful `SIGTERM` drain, share-nothing processes (no sticky sessions, no local-disk storage), logs as unbuffered stdout, admin tasks run against the same release |
 
 Violations must be flagged and corrected before code is complete.
 

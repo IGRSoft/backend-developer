@@ -7,7 +7,7 @@ Quick navigation for distributed back-end architecture patterns.
 | File | Description |
 |------|-------------|
 | `SKILL.md` | Entry point: canonical pattern-selection table (need → pattern → simpler fallback), decision tree |
-| `microservices-patterns/SKILL.md` | Service boundaries (DDD bounded contexts), API gateway/BFF, discovery, resilience (breaker/retry/bulkhead/timeout), data per service |
+| `microservices-patterns/SKILL.md` | Service boundaries (DDD bounded contexts), API gateway/BFF, discovery, resilience (breaker/retry/bulkhead/timeout), data per service, backing services as attached resources, stateless processes and process-type scale-out |
 | `event-driven/SKILL.md` | Pub/sub, brokers (Kafka/RabbitMQ/SQS), transactional outbox, idempotent consumers, ordering, dead-letter queues |
 | `cqrs-event-sourcing/SKILL.md` | Command/query separation, event store, projections/read models, snapshots, event versioning, replay |
 | `saga-orchestration/SKILL.md` | Orchestration vs choreography, compensating transactions, state machines, timeout/failure handling |
@@ -36,6 +36,10 @@ Quick navigation for distributed back-end architecture patterns.
 - **Decide microservices vs modular monolith** → `microservices-patterns/SKILL.md` > Monolith First
 - **Draw boundaries from bounded contexts** → `microservices-patterns/SKILL.md` > Service Boundaries
 - **Stop a cascading failure** → `microservices-patterns/SKILL.md` > Resilience
+- **Decide whether two apps may share one codebase** → `microservices-patterns/SKILL.md` > Monolith First
+- **Swap a local dependency for a managed one** → `microservices-patterns/SKILL.md` > Backing services are attached resources
+- **Make a service safe to scale out** → `microservices-patterns/SKILL.md` > Stateless Processes
+- **Get rid of sticky sessions** → `microservices-patterns/SKILL.md` > Stateless Processes
 - **Publish an event atomically with a DB write** → `event-driven/SKILL.md` > Transactional Outbox
 - **Make a consumer safe under retries** → `event-driven/SKILL.md` > Idempotent Consumers
 - **Guarantee per-key ordering** → `event-driven/references/delivery-semantics.md`

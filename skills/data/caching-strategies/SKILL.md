@@ -114,6 +114,34 @@ try {
   across a Redis cluster, use Redlock *(understand its trade-offs)* or push the
   invariant into the database (`SELECT ... FOR UPDATE`, unique constraint).
 
+## Session & Per-Request State
+
+App processes are share-nothing: memory and local disk are a scratch pad for one
+transaction, never a store. Anything that must survive the next request belongs
+in a backing service, or the first scale-in, rolling deploy, or crash loses it.
+
+```ts
+// Sessions in Redis with a TTL — any replica can serve any request
+app.use(session({
+  store: new RedisStore({ client: redis, prefix: "sess:" }),
+  secret: env.SESSION_SECRET,
+  cookie: { maxAge: 86_400_000, httpOnly: true, secure: true, sameSite: "lax" },
+  resave: false, saveUninitialized: false,
+}));
+```
+
+| Instead of | Use |
+|------------|-----|
+| In-memory session map, sticky sessions | Time-expiring store (Redis/Memcached) keyed by session ID |
+| Uploads or generated files on local disk | Object storage (S3/GCS), URL persisted in the DB |
+| A per-process rate-limit or job-dedup counter | A shared counter — see Rate-Limit Counters below |
+| Assets compiled on first request | Compiled at build time into the artifact |
+
+Sticky sessions look like a fix and are a violation: they pin a user to one
+instance, so the instance's lifetime becomes the session's lifetime. See
+[microservices-patterns](../../architecture/microservices-patterns/SKILL.md) >
+Stateless Processes.
+
 ## Idempotency Stores
 
 Make retried writes (network retries, at-least-once queues, client double-submit)

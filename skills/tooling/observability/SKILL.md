@@ -78,7 +78,7 @@ log.info("order_created", user_id=uid, order_id=oid, latency_ms=ms)
 
 Doctrine:
 
-- **JSON to stdout.** Let the platform collect it (12-factor). Don't write log files inside the container.
+- **JSON to stdout, unbuffered.** The log is an event stream with no beginning or end; the process writes it and nothing else. Routing, retention, rotation, and archival belong to the execution environment (twelve-factor XI). Don't open a logfile, don't add a rotation library, don't ship to a log backend from inside the app — a logfile inside a container is deleted with the container, and in-process shipping makes the app fail when the log backend does. Disable buffering that can swallow the last lines before a crash (`PYTHONUNBUFFERED=1`, unbuffered stdout in Node/Go by default).
 - **One event per line, key/value fields** — never string-concatenate values into the message; you can't query that.
 - **Levels mean something:** `error` = needs attention, `warn` = degraded but handled, `info` = business events, `debug` = off in prod.
 - **Never log secrets or PII** — tokens, passwords, full card/PII numbers. Redact at the logger. This is an **API8 / secrets-hygiene** boundary ([api-security](../../quality/api-security/SKILL.md)).

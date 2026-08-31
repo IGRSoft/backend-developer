@@ -268,8 +268,6 @@ fork a standard's text into this plugin; a copy drifts silently.
 | | |
 |---|---|
 | Targets corpflow | `4.0.27` |
-| Size budget | ≤260 lines |
-| Size budget | ≤280 lines |
 | Size budget | ≤280 lines |
 | Contract source | `corpflow skills/cross-plugin-handoff/references/plugin-contract.md` |
 | Template | `corpflow skills/cross-plugin-handoff/templates/CORPFLOW.md` |

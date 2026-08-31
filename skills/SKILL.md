@@ -40,9 +40,9 @@ than trusting memory.
 | [Architecture](#architecture) | [`architecture/SKILL.md`](architecture/SKILL.md) | 1 + 4 leaves | Microservices, event-driven/CQRS, saga, idempotency, caching |
 | [Tooling](#tooling) | [`tooling/SKILL.md`](tooling/SKILL.md) | 1 + 3 leaves | Docker/Compose, structured logs, OpenTelemetry traces/metrics, CI, diagnostics |
 | [Quality](#quality) | [`quality/SKILL.md`](quality/SKILL.md) | 1 + 3 leaves | Test pyramid, integration tests, load testing, API security, review gates |
-| [Shared](#shared) | [`_shared/_index.md`](_shared/_index.md) | 2 SKILL.md + references | Workflow integration, secure coding, versions, routing, severity |
+| [Shared](#shared) | [`_shared/_index.md`](_shared/_index.md) | 1 SKILL.md + 5 references | Secure coding, versions, routing, model selection, severity, testing principles |
 
-**Total: 42 SKILL.md across 10 domains, plus shared reference files.**
+**Total: 41 SKILL.md across 10 domains, plus shared reference files.**
 
 ## I need help with...
 
@@ -74,6 +74,10 @@ than trusting memory.
 | CQRS + event sourcing, projected read models | [architecture/cqrs-event-sourcing/SKILL.md](architecture/cqrs-event-sourcing/SKILL.md) |
 | Saga pattern (orchestration or choreography), compensations | [architecture/saga-orchestration/SKILL.md](architecture/saga-orchestration/SKILL.md) |
 | Dockerfile, Compose, multi-stage builds, image hygiene | [tooling/containerization/SKILL.md](tooling/containerization/SKILL.md) |
+| Config from env vars, secrets at deploy, no per-environment config files | [tooling/containerization/references/runtime-contract.md](tooling/containerization/references/runtime-contract.md) |
+| Promote one artifact across deploys; immutable releases | [tooling/containerization/references/runtime-contract.md](tooling/containerization/references/runtime-contract.md) |
+| `$PORT` binding, graceful `SIGTERM` shutdown, fast startup | [tooling/containerization/references/runtime-contract.md](tooling/containerization/references/runtime-contract.md) |
+| Make a service stateless enough to scale out | [architecture/microservices-patterns/SKILL.md](architecture/microservices-patterns/SKILL.md) |
 | Structured logging, OpenTelemetry traces and metrics | [tooling/observability/SKILL.md](tooling/observability/SKILL.md) |
 | Debugging a live service, profiling, slow-query triage | [tooling/be-diagnostics/SKILL.md](tooling/be-diagnostics/SKILL.md) |
 | Building a test pyramid, integration and load tests | [quality/be-testing/SKILL.md](quality/be-testing/SKILL.md) |
@@ -201,7 +205,7 @@ Containerization and observability for all runtimes, plus runtime diagnostics.
 
 | Skill | Path | Description |
 |-------|------|-------------|
-| **containerization** | [tooling/containerization/SKILL.md](tooling/containerization/SKILL.md) | Multi-stage Dockerfiles, Compose for local stacks, image size/security hygiene, healthchecks, distroless/scratch bases |
+| **containerization** | [tooling/containerization/SKILL.md](tooling/containerization/SKILL.md) | Multi-stage Dockerfiles, Compose for local stacks, image size/security hygiene, healthchecks, distroless/scratch bases, and the twelve-factor runtime contract — config from the environment, build/release/run promotion, port binding, graceful shutdown |
 | **observability** | [tooling/observability/SKILL.md](tooling/observability/SKILL.md) | Structured JSON logging, OpenTelemetry traces and metrics, correlation IDs, RED/USE signals, alerting thresholds |
 | **be-diagnostics** | [tooling/be-diagnostics/SKILL.md](tooling/be-diagnostics/SKILL.md) | Live service debugging, pprof/py-spy/async-profiler/dotnet-trace profiling, slow-query tracing, heap dumps, CPU flame graphs |
 

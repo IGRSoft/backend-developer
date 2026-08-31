@@ -142,6 +142,8 @@ Egress allowlist construction and redirect handling: [references/command-executi
 
 A secret committed to git history is compromised even after deletion — rotate it, do not just `git rm`. CI must fail on a detected secret (gitleaks/trufflehog) and on a high-severity dependency CVE.
 
+**The litmus test:** could this repository be made public right now without compromising a credential? If not, config has leaked into code. Everything that varies between deploys — connection strings, credentials, per-deploy hostnames — reaches the process as an environment variable, sourced from a secret manager at deploy time. A committed `config/production.yml` fails the test even when it is `.gitignore`d locally, because the pattern invites the next value to be committed. See [containerization](../../tooling/containerization/references/runtime-contract.md) > Config Comes From the Environment.
+
 ## Diagnostic Table
 
 | Symptom / finding | Likely cause | OWASP | Fix | Reference |
