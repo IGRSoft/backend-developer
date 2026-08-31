@@ -17,6 +17,8 @@ Thin router. Pick a sub-skill from the tables below; the leaf skills teach.
 | I need to... | Use this skill |
 |--------------|----------------|
 | Build a small, secure image; wire up Compose for local deps | [containerization/SKILL.md](containerization/SKILL.md) |
+| Decide where config/secrets come from, or stop hardcoding a port | [containerization/SKILL.md](containerization/SKILL.md) > Config, Release, and Port |
+| Make a deploy stop dropping in-flight requests | [containerization/SKILL.md](containerization/SKILL.md) > Graceful Shutdown |
 | Find/fix a 5xx, latency spike, leak, deadlock, or slow query | [be-diagnostics/SKILL.md](be-diagnostics/SKILL.md) |
 | Profile a slow endpoint or set a performance baseline | [be-diagnostics/SKILL.md](be-diagnostics/SKILL.md) > Profiling |
 | Add structured logs, traces, or RED/USE metrics | [observability/SKILL.md](observability/SKILL.md) |
@@ -34,6 +36,10 @@ Start here when you have a behavior, not a tool name.
 | Query is slow / full table scan | missing index, bad plan | [be-diagnostics](be-diagnostics/SKILL.md) > EXPLAIN |
 | Image is huge / build is slow / leaks secrets | no multi-stage, bad layer order, COPY of `.env` | [containerization](containerization/SKILL.md) |
 | Container is unhealthy / restarts in a loop | missing/incorrect healthcheck, wrong port/PID 1 | [containerization](containerization/SKILL.md) > Healthchecks |
+| Deploys drop requests; workers lose in-flight jobs | no `SIGTERM` drain, or a deadline above the grace period | [containerization](containerization/SKILL.md) > Graceful Shutdown |
+| Users log out at random; a file uploaded to one replica 404s | state in process memory or on local disk | [containerization](containerization/references/runtime-contract.md) |
+| "Works in staging, fails in prod" on identical code | rebuilt per environment, or config grouped by environment name | [containerization](containerization/references/runtime-contract.md) |
+| Service is unreachable inside the cluster despite being up | bound to `127.0.0.1`, or the port is hardcoded | [containerization](containerization/references/runtime-contract.md) > Port Binding |
 | "I can't tell which service caused the error" | no correlation/trace ID across hops | [observability](observability/SKILL.md) > Correlation |
 | Dashboards exist but don't explain the outage | wrong signals (no RED/USE), no exemplars | [observability](observability/SKILL.md) > RED/USE |
 
@@ -61,7 +67,8 @@ Tooling task?
 ├── "How do I package / ship / run this service?" → containerization/SKILL.md
 │   ├── Multi-stage + distroless image → containerization/references/dockerfile-patterns.md
 │   ├── Compose for Postgres/Redis/Kafka locally → containerization/references/compose-local-deps.md
-│   └── Build args, BuildKit secrets, caching → containerization/references/dockerfile-patterns.md
+│   ├── Build args, BuildKit secrets, caching → containerization/references/dockerfile-patterns.md
+│   └── Config from env, release promotion, $PORT, SIGTERM → containerization/references/runtime-contract.md
 ├── "It 5xxes / is slow / leaks / deadlocks / slow query" → be-diagnostics/SKILL.md
 │   ├── Profilers per runtime (pprof/py-spy/JFR/clinic) → be-diagnostics/references/profilers.md
 │   ├── DB query diagnosis (EXPLAIN, pool, N+1) → be-diagnostics/references/db-diagnosis.md
@@ -81,7 +88,7 @@ Tooling task?
 
 ## Related Skills
 
-- [containerization](containerization/SKILL.md) — multi-stage Dockerfiles, distroless, layer caching, non-root, Compose, healthchecks, BuildKit secrets
+- [containerization](containerization/SKILL.md) — multi-stage Dockerfiles, distroless, layer caching, non-root, Compose, healthchecks, BuildKit secrets, and the twelve-factor runtime contract (config, release promotion, port binding, graceful shutdown)
 - [be-diagnostics](be-diagnostics/SKILL.md) — symptom → logs/traces/metrics/profiler/EXPLAIN routing
 - [observability](observability/SKILL.md) — structured logging, OpenTelemetry traces, RED/USE metrics, exemplars
 - [version-feature-matrix](../_shared/version-feature-matrix.md) — runtime/framework floors per feature

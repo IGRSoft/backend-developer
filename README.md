@@ -2,7 +2,7 @@
 
 Claude Code plugin for **web/service back-end** development in **Node.js/TypeScript**, **Go**, **JVM (Spring Boot / Kotlin)**, and **Python web (FastAPI/Django/Flask)** — plus **Ruby/PHP/.NET** — with cross-cutting **API design (REST/GraphQL/gRPC)**, **databases/ORM/migrations**, and **event-driven / CQRS / event-sourcing** architecture. Collaborates with the corpflow plugin v4.0.13 for full 11-stage workflow orchestration (PL→AR→TL→DV→**DR**→SR→QA→DC→RE→FN→ST) including the handoff-protocol (planning-N.md, state.json ledger, frontmatter schema). Service and API work defaults to `requires_screenshots: false`; when an evidence gate demands proof, agents attach `cli-fallback` terminal transcripts (curl/httpie request/response, test output, k6 load reports, migration logs) instead of screenshots.
 
-**Version**: 1.4.0 | **claude-code min version**: "2.1.169"
+**Version**: 1.5.0 | **claude-code min version**: "2.1.169"
 
 ## Boundaries
 
@@ -15,6 +15,15 @@ backend-developer owns HTTP/RPC services, their API contracts, and their data la
 | Shell / CI scripts | `/system-developer:bash-developer` |
 | Browser UI consuming the API | `/frontend-developer:*` |
 | Native mobile clients | `/apple-developer:*` |
+
+## What's in 1.5.0
+
+The twelve-factor runtime contract is now enforced, not just implied. Config sourcing, build/release/run promotion, port binding, statelessness, and graceful shutdown were previously either undocumented or covered for only one or two stacks — a service could pass every review and still lose sessions on a scale-in or drop requests on every deploy.
+
+- **New reference** `skills/tooling/containerization/references/runtime-contract.md` — config from validated env vars, immutable release promotion, `$PORT` binding, per-stack `SIGTERM` shutdown (Spring Boot, FastAPI/uvicorn, Puma, ASP.NET Core, PHP-FPM — previously only Go and Node had any), fast startup.
+- **Enforced at the base agent** — all seven stack agents now inherit the contract as a Constraint and a Mandatory Requirement.
+- **Detectable in review** — `/arch-review` gains a sixth check family and a `--focus runtime` value; `/analyze-tech-debt` grows its Operational debt taxonomy from 3 rows to 10; `/review-code` applies a shared runtime-contract clause across every stack reviewer.
+- **Fixed** the fully-stale `skills/_index.md` (every path in it pointed at a skill tree that no longer existed), the skill count in `skills/SKILL.md` (42 → 41), and a `Size budget` row duplicated three times in `CORPFLOW.md`.
 
 ## What's in 1.4.0
 

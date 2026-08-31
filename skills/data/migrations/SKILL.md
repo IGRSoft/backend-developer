@@ -128,6 +128,35 @@ WHERE  id BETWEEN :lo AND :hi
 
 Confirm against the [version-feature-matrix](../../_shared/version-feature-matrix.md).
 
+## Admin Processes Run Against the Release
+
+A migration is the canonical *admin process*: a one-off task run beside the
+long-running processes, not inside them. The same is true of a REPL/console
+session, a backfill script, and any one-time repair.
+
+The rule is that an admin process runs **against the same release** as the app —
+same code, same config, same dependency isolation. Drift there is how a
+migration written for the new schema runs against yesterday's code, or a
+console session connects to the wrong database.
+
+```bash
+# Same image, same env, one-off command — not a second, differently-built artifact
+kubectl run migrate-$(date +%s) --rm -i --restart=Never \
+  --image=registry.example.com/orders-api:${GIT_SHA} \
+  --env-file=prod.env -- npx prisma migrate deploy
+
+docker compose run --rm api npx prisma migrate deploy   # locally, same service definition
+```
+
+- **Do not migrate on application boot.** Every replica racing the same DDL turns
+  a rolling deploy into a lock pile-up, and it makes startup slow and fallible.
+  Run migrations as a discrete step that must succeed before the new release
+  takes traffic.
+- **Use the app's own dependency isolation** — `npx`/`bundle exec`/`uv run`, the
+  same lockfile, the same image — never an ad-hoc client on someone's laptop.
+- Expand-contract is what lets the migration step and the deploy step be
+  ordered independently; see above.
+
 ## Migration Evidence
 
 A migration is non-UI work — `requires_screenshots: false`. The cli-fallback

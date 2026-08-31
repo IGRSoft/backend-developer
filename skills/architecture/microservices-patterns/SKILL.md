@@ -35,6 +35,9 @@ For the message-driven alternative to synchronous calls, see the
 | Independent deploy/scale per capability | Microservices | Splitting by technical layer (ui/api/db) |
 | Team autonomy at scale | One service per team boundary | One service per noun/table |
 | Cross-cutting transaction | Keep inside one service | Distributed transaction across services |
+| Code shared by two services | A versioned library via the dependency manager | A second app built from the same codebase |
+
+**One codebase, one app, many deploys.** A codebase maps 1:1 to a deployable app; prod, staging, and each developer's laptop are *deploys* of it. Two apps built from one codebase is not an app but a distributed system wearing one repo — extract the shared part into a library instead. A monorepo is fine: what matters is that each app has its own codebase root and its own release, not that each lives in its own repository.
 
 A modular monolith with clean module boundaries gives you most of the design
 benefit (clear ownership, testable seams) without the operational tax of the
@@ -85,6 +88,21 @@ Terminate cross-cutting concerns (authn, rate limiting, TLS) at the edge; keep
 business logic out of the gateway. A BFF is a service you own, not config — it
 composes downstream calls into one client-shaped response and is the natural
 place to apply per-client backpressure.
+
+### Backing services are attached resources
+
+Every service the app consumes over the network — its database, cache, broker,
+mail relay, and every peer service — is an *attached resource*, reached through
+a locator supplied by config. Two databases are two resources, even on one
+engine.
+
+The test: swapping local Postgres for managed RDS, or a peer's staging URL for
+its production one, must be a config change and nothing else. If the code
+distinguishes "our" services from third-party ones, or hardcodes a hostname,
+the resource is welded on rather than attached — and attach/detach is what makes
+a deploy, a failover, or a local reproduction possible. Locators and credentials
+come from the environment: [containerization](../../tooling/containerization/references/runtime-contract.md)
+> Config.
 
 ## Resilience
 
@@ -152,6 +170,33 @@ SELECT o.*, o.payment_status    -- ✅ local read model, updated by PaymentSettl
 FROM orders.orders o;
 ```
 
+## Stateless Processes, Scaled by Process Type
+
+Horizontal scale only works if any instance can serve any request. That requires
+processes to be **share-nothing**: memory and local disk are a scratch pad for a
+single transaction, never a store. Anything that must outlive the request goes
+to a backing service.
+
+- **Sticky sessions are a violation, not a workaround.** They pin a user to an
+  instance, so scale-in, a rolling deploy, or one crash loses their state. Put
+  session data in a time-expiring store (Redis, Memcached) —
+  [caching-strategies](../../data/caching-strategies/SKILL.md).
+- **Uploads, generated files, and caches on local disk vanish.** Use object
+  storage; the container filesystem is ephemeral and per-replica.
+- **Compile assets at build**, not on first request into a local directory that
+  the next replica does not have.
+
+Scale by **process type**, not by growing one instance. Declare each workload
+(`web`, `worker`, `scheduler`) as its own type and scale the count of each
+independently — one VM can only grow so far, so the app must span machines.
+In-process concurrency (threads, event loop, goroutines) is complementary, not a
+substitute.
+
+Processes must **never daemonize or write PID files**. The platform's process
+manager — systemd, Kubernetes, a container runtime — owns supervision, restarts,
+and log capture. A process that forks into the background hides its own death
+from the supervisor.
+
 ## Diagnostics
 
 | Symptom | Cause | Fix | Reference |
@@ -163,6 +208,11 @@ FROM orders.orders o;
 | "Microservices" but every change touches three repos | Boundaries split a single context | Re-draw on bounded contexts; consider merging | this file, Service Boundaries |
 | Need a distributed transaction | Write spans services | Use a saga + compensation | [saga-orchestration](../saga-orchestration/SKILL.md) |
 | Gateway became a business-logic monolith | Logic crept into the edge | Move logic to services; keep edge cross-cutting only | this file, Edge & Discovery |
+| Users log out at random after a scale-in or deploy | Session state in process memory; sticky sessions | Externalize sessions to a time-expiring store | this file, Stateless Processes |
+| A file uploaded through one replica 404s from another | Local disk used as storage | Object storage; treat the filesystem as ephemeral | this file, Stateless Processes |
+| Adding replicas doesn't add throughput | One process type doing every workload | Split `web`/`worker`/`scheduler` into process types | this file, Stateless Processes |
+| Supervisor reports healthy while the app is dead | Process daemonized / wrote a PID file | Run in the foreground; let the platform supervise | this file, Stateless Processes |
+| Works locally, fails in prod on the same code | Different backing service type or version per environment | Same image and version everywhere | [containerization](../../tooling/containerization/SKILL.md) |
 
 ## Deep-Dive References
 

@@ -1,6 +1,6 @@
 ---
-description: Review a back-end codebase against its architecture pattern — boundaries, transactions, coupling, consistency
-argument-hint: <file path, directory, PR number, or branch> [--pattern <name>] [--focus boundaries|transactions|consistency|coupling] [--scope module|service|platform]
+description: Review a back-end codebase against its architecture pattern — boundaries, transactions, coupling, consistency, twelve-factor runtime contract
+argument-hint: <file path, directory, PR number, or branch> [--pattern <name>] [--focus boundaries|transactions|consistency|coupling|runtime] [--scope module|service|platform]
 allowed-tools: Read, Glob, Grep, Bash
 model: opus
 estimated-cost:
@@ -64,7 +64,7 @@ You MUST follow these rules exactly. Violating any of them is a failure.
 |--------|---------|--------|
 | `target` | working changes | File, directory, PR number, or branch to review. See Scope Resolution. |
 | `--pattern <name>` | detected | Assert the intended pattern (`modular-monolith`, `microservices`, `hexagonal`, `layered`, `event-driven`, `cqrs`, `event-sourcing`, `saga-orchestration`, `saga-choreography`). Drift between the assertion and the evidence is reported as a finding. |
-| `--focus boundaries\|transactions\|consistency\|coupling` | all | Run one check family instead of all five. `boundaries` = module/layer/service boundaries and dependency direction; `transactions` = transaction scope and idempotency; `consistency` = declared vs actual consistency guarantees; `coupling` = shared state, cyclic deps, deploy coupling. |
+| `--focus boundaries\|transactions\|consistency\|coupling\|runtime` | all | Run one check family instead of all six. `boundaries` = module/layer/service boundaries and dependency direction; `transactions` = transaction scope and idempotency; `consistency` = declared vs actual consistency guarantees; `coupling` = shared state, cyclic deps, deploy coupling; `runtime` = the twelve-factor runtime contract (config, release promotion, statelessness, port binding, disposability). |
 | `--scope module\|service\|platform` | inferred | Review altitude. `module` = inside one deployable; `service` = one deployable end to end; `platform` = cross-service boundaries, data ownership, and deploy coupling across the repo. |
 
 ## Pre-flight
@@ -99,9 +99,9 @@ Write: `.context/.arch-review/arch-detection.json` — pattern, confidence, evid
 
 ## Step 3: Playbook Evaluation
 
-Load the playbook matching the detected pattern and evaluate the code against it. Anchors: `skill: microservices-patterns` (monolith/microservices/hexagonal/layered), `skill: event-driven` (pub/sub, outbox, delivery semantics, choreography), `skill: cqrs-event-sourcing` (write/read split, event store, projections), `skill: saga-orchestration` (coordinator, compensations, saga state machines), `skill: schema-design` and `skill: orm-patterns` (ownership, transactions, N+1 by design), `skill: api-skills` and `skill: rest-design` (contract boundaries, versioning, idempotency).
+Load the playbook matching the detected pattern and evaluate the code against it. Anchors: `skill: microservices-patterns` (monolith/microservices/hexagonal/layered), `skill: event-driven` (pub/sub, outbox, delivery semantics, choreography), `skill: cqrs-event-sourcing` (write/read split, event store, projections), `skill: saga-orchestration` (coordinator, compensations, saga state machines), `skill: schema-design` and `skill: orm-patterns` (ownership, transactions, N+1 by design), `skill: api-skills` and `skill: rest-design` (contract boundaries, versioning, idempotency), `skill: containerization` (the twelve-factor runtime contract — config, build/release/run, port binding, disposability).
 
-Run these five check families (all by default; one when `--focus` is set):
+Run these six check families (all by default; one when `--focus` is set):
 
 ### 1. Boundary violations
 
@@ -144,6 +144,18 @@ Run these five check families (all by default; one when `--focus` is set):
 - No correlation/trace ID crossing an async boundary, so a failed flow cannot be reconstructed (`skill: observability`).
 - Health/readiness and graceful shutdown missing where the pattern requires them (a consumer that drops in-flight messages on deploy).
 
+### 6. Runtime contract (twelve-factor)
+
+The platform contract the service must satisfy to be deployable, scalable, and recoverable. Anchor: `skill: containerization`.
+
+- State that outlives a request held in process memory or on local disk — an in-memory session map, sticky sessions, uploads or generated files written to the container filesystem, a per-process counter or cache treated as authoritative.
+- Config read from a checked-in per-environment file, or code branching on an environment *name* (`NODE_ENV`, `SPRING_PROFILES_ACTIVE`, `RAILS_ENV`) to choose a datastore, credential, or endpoint — rather than each value arriving as its own env var.
+- A backing service reached through a hardcoded host, or code that distinguishes a locally-run dependency from a managed one; swapping either must be a config change alone.
+- A build that differs per environment, a release mutated in place, or a deploy identified by a moving tag (`:latest`) so the running version cannot be named or rolled back.
+- Migrations, backfills, or other admin tasks run on application boot, or from an artifact built differently from the app's own release.
+- A process that daemonizes, writes a PID file, or expects a webserver to be injected by the environment rather than binding a port itself; a listen port hardcoded rather than read from config, or bound to loopback only.
+- Secrets or credentials sourced from the repository rather than injected at deploy time.
+
 For `--focus`, run only the matching family and say so in the report.
 
 ## Step 4: Findings
@@ -153,7 +165,7 @@ Rank every finding with `skill: severity-matrix`:
 | Severity | Meaning in an architecture review |
 |----------|-----------------------------------|
 | **P0 - Critical** | The boundary is broken in a way that loses or corrupts data, or defeats an authorization boundary — dual-write with no outbox, two owners writing one table, transaction spanning a network call, unenforced invariant on a money/stock path. |
-| **P1 - High** | The pattern is defeated where it matters — cyclic dependency, domain importing an adapter, non-idempotent consumer under at-least-once delivery, ORM entity on a published contract, deploy coupling between nominally independent services. |
+| **P1 - High** | The pattern is defeated where it matters — cyclic dependency, domain importing an adapter, non-idempotent consumer under at-least-once delivery, ORM entity on a published contract, deploy coupling between nominally independent services. Also here: request-surviving state in process memory or on local disk, and sticky sessions — both pass every test on one instance and silently break the moment the service scales out or rolls. |
 | **P2 - Medium** | Convention violation or missing seam — layering skipped, no contract test on a published boundary, structural N+1, missing correlation ID across an async hop. |
 | **P3 - Low** | Naming, placement, or organization drift that does not yet threaten a boundary. |
 
@@ -178,7 +190,7 @@ Write the final report to `.context/.arch-review/arch-review.md` and present the
 **Scope:** {resolved target — paths / PR# / branch}
 **Files reviewed:** {N} ({stacks present})
 **Altitude:** {module | service | platform}
-**Checks run:** {all five families | --focus <family>}
+**Checks run:** {all six families | --focus <family>}
 
 ### Detected Architecture
 - **Structure:** {pattern} (confidence: {high/medium/low})
@@ -226,6 +238,11 @@ Write the final report to `.context/.arch-review/arch-review.md` and present the
 | Published contracts use explicit DTOs, not ORM entities | ✅ / ❌ |
 | Each boundary has a substitution seam for tests | ✅ / ❌ |
 | Services deploy independently | ✅ / ❌ / N/A |
+| Config comes from the environment, not per-environment files | ✅ / ❌ |
+| Processes are share-nothing (no local state, no sticky sessions) | ✅ / ❌ |
+| One artifact promoted across deploys; releases are immutable | ✅ / ❌ |
+| Port bound from config; `SIGTERM` drains in-flight work | ✅ / ❌ |
+| Admin tasks run against the same release, not on boot | ✅ / ❌ / N/A |
 
 ### Top 3 Recommendations
 1. {highest-leverage fix, with the finding it closes}

@@ -5,6 +5,26 @@ All notable changes to the backend-developer plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] — 2026-08-31
+
+The plugin taught every stack how to build a container and how to secure a handler, but not what contract the running process owes its platform. Config doctrine, build/release/run separation, port binding, and statelessness had no home at all; graceful shutdown existed for Go and Node and for no other stack. A service could pass review and still lose every session on a scale-in, drop in-flight requests on each deploy, or ship an artifact that was rebuilt rather than promoted. This release encodes the twelve-factor manifesto's 33 normative principles as checkable rules and wires them into the paths that actually gate work.
+
+### Added
+
+- **`skills/tooling/containerization/references/runtime-contract.md`** — the four factors that had no home. Config from environment variables validated at boot (with the open-source litmus test and the ban on environment-grouped config); build/release/run as three stages with immutable, append-only releases promoted as one artifact; `$PORT` read from config and bound on `0.0.0.0`; and **per-stack `SIGTERM` shutdown for Spring Boot, FastAPI/uvicorn, Puma, ASP.NET Core, and PHP-FPM** — the five stacks that previously had no shutdown guidance anywhere in the plugin.
+- **Twelve-factor rules distributed to the skills that already own each factor.** `microservices-patterns` gained codebase-to-app 1:1, backing services as attached resources, and a Stateless Processes section (sticky sessions and local-disk storage named as violations, with five new Diagnostics rows); `caching-strategies` gained session and per-request state externalization; `migrations` gained Admin Processes Run Against the Release, including the rule against migrating on application boot; `observability` completed factor XI with the "the app never manages logfiles" half; `secure-coding` gained the config-in-the-environment litmus test; `containerization` gained a sixth doctrine rule, declare-and-isolate dependency guidance, and dev/prod parity promoted from an aside to a stated rule.
+- **Enforcement in `agents/_base/backend-agent.md`** — a Constraints bullet and a Mandatory Requirements row, so all seven stack agents inherit the contract rather than relying on a skill being consulted.
+- **`/backend-developer:arch-review`** — a sixth check family (Runtime contract), a `--focus runtime` value, five new Pattern Checklist rows, and P1 severity assigned to request-surviving in-process state and sticky sessions, which pass every single-instance test and break on the first scale-out.
+- **`/backend-developer:analyze-tech-debt`** — the Operational debt taxonomy grows from 3 rows to 10, and the operational probe now loads the containerization skill alongside observability.
+- **`/backend-developer:review-code`** — a runtime-contract clause stated once in the Phase 1 preamble and applied by all seven stack reviewers, rather than duplicated into seven per-language focus lists.
+
+### Fixed
+
+- **`skills/_index.md` was entirely stale.** Every path in it pointed at a skill tree that no longer exists (`node/node-service-patterns`, `go/go-testing`, `jvm/spring-boot-patterns`, `data/migrations-queries`, `architecture/service-architecture`, `quality/testing-strategy`, `quality/review-gates`), and it claimed 21 SKILL.md. Root `skills/SKILL.md` links to it as the "full navigation index", so every reader who followed that link landed on dead paths. Rewritten against the real 41-skill tree; all 90 links verified to resolve.
+- **`skills/SKILL.md` claimed "Total: 42 SKILL.md"** — the actual count is 41.
+- **`CORPFLOW.md` repeated its `Size budget` row three times** with conflicting values (≤260, ≤280, ≤280). Reduced to one row at ≤280, the only value the 273-line file satisfies. Note that no sibling plugin and not the corpflow template carries this row at all.
+- **Version strings had drifted apart** across the five sites MEMORY.md requires to move together: `plugin.json` said 1.4.3, `marketplace.json` said 1.4.1, and the README header said 1.4.0. All five now read 1.5.0.
+
 ## [1.4.3] — 2026-08-15
 
 ### Fixed
